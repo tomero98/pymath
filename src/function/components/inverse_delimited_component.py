@@ -1,0 +1,2 @@
+class InverseDelimitedComponent:
+    pass

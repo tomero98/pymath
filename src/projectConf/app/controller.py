@@ -8,7 +8,6 @@ class Controller:
     def __init__(self):
         self._app = None
         self._current_view = None
-        self._previous_view = None
 
     def run(self):
         self._init_app()
@@ -19,8 +18,12 @@ class Controller:
         self._app = PyMathApp(sys_argv=[])
 
     def _start_app_flow(self):
-        FunctionExercisePage(subtopic=Topic(identifier=2, title='Tópicos', description='', topic_parent_id=None)).draw()
         # self._setup_front_page()
+
+        # FunctionExercisePage(subtopic=Topic(identifier=3, title='Tópicos', description='', topic_parent_id=None)).draw()
+        topic = Topic(identifier=5, title='Máximos y mínimos relativos', description='Máximos y Mínimos',
+                      topic_parent_id=None)
+        self._setup_exercise_page(subtopic=topic)
 
     def _setup_front_page(self):
         front_page = WelcomePage()
@@ -32,31 +35,31 @@ class Controller:
     def _setup_topic_page(self):
         topic_page = TopicPage()
         topic_page.draw()
-        self._current_view, self._previous_view = topic_page, self._current_view
+        self._current_view = topic_page
         self._current_view.close_signal.connect(self._close_page)
         self._current_view.continue_signal.connect(self._setup_subtopic_page)
 
     def _setup_subtopic_page(self, topic: Topic):
         topic_page = TopicPage(topic=topic)
         topic_page.draw()
-        self._current_view, self._previous_view = topic_page, None
+        self._current_view = topic_page
         self._current_view.close_signal.connect(self._close_page)
         self._current_view.continue_signal.connect(self._setup_exercise_page)
+        self._current_view.back_signal.connect(self._setup_topic_page)
 
     def _setup_exercise_page(self, subtopic: Topic):
-        exercise_page = self._get_exercise_page(subtopic=subtopic)
+        exercise_page = FunctionExercisePage(subtopic=subtopic)
         exercise_page.draw()
-        self._current_view, self._previous_view = exercise_page, None
+        exercise_page.back_signal.connect(self._back_page)
+        self._current_view = exercise_page
 
     def _close_page(self):
-        if self._previous_view:
-            self._previous_view.show()
         self._current_view.close()
-        self._current_view = self._previous_view
+
+    def _back_page(self):
+        self._current_view.close()
+        topic = Topic(identifier=1, title='Funciones', description='Inversas', topic_parent_id=None)
+        self._setup_subtopic_page(topic=topic)
 
     def _execute_app(self):
         self._app.exec()
-
-    @staticmethod
-    def _get_exercise_page(subtopic: Topic):
-        return FunctionExercisePage(subtopic=subtopic)

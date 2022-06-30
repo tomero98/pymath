@@ -10,9 +10,9 @@ class Window(QMainWindow):
 
     def __init__(self, title):
         super().__init__()
-        self.resize(1750, 850)
+        self.setFixedSize(1400, 850)
         self.setWindowTitle(title)
-        self.setStyleSheet("background-color: #E0E0E0;")
+        self.setStyleSheet("background-color: white;")
         self.center()
         self._create_menu_bar()
 

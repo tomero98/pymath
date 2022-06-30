@@ -33,15 +33,18 @@ class FunctionExerciseDataMapper:
             function_expression = result.value('graph_expression')
             function_domain = result.value('graph_domain')
             is_main_graphic = bool(result.value('is_main_graphic'))
+            is_elementary_graph = bool(result.value('is_elementary_graph'))
             inverse_function = None
             inverse_function_id = bool(result.value('inverse_id'))
             if inverse_function_id:
                 inverse_expression = result.value('inverse_expression')
                 inverse_domain = result.value('inverse_domain')
                 inverse_function = Function(function_id=inverse_function_id, expression=inverse_expression,
-                                            domain=inverse_domain, is_main_graphic=False, inverse_function=None)
+                                            domain=inverse_domain, is_main_graphic=False,
+                                            is_elementary_graph=False, inverse_function=None)
             function = Function(function_id=function_id, expression=function_expression, domain=function_domain,
-                                is_main_graphic=is_main_graphic, inverse_function=inverse_function)
+                                is_main_graphic=is_main_graphic, inverse_function=inverse_function,
+                                is_elementary_graph=is_elementary_graph)
             exercise.functions.append(function)
 
         for exercise in exercises_by_id.values():
@@ -57,8 +60,8 @@ class FunctionExerciseDataMapper:
             exercises.help_text as help_text, exercises."order" as exercise_order,
             exercises.priority as exercise_priority, graphs.id as graph_id, graphs.expression as graph_expression,
             graphs.domain as graph_domain, exercise_graphs.is_main_graphic as is_main_graphic,
-            inverse_graphs.id as inverse_id, inverse_graphs.expression as inverse_expression,
-            inverse_graphs.domain as inverse_domain
+            graphs.is_elementary_graph as is_elementary_graph, inverse_graphs.id as inverse_id, 
+            inverse_graphs.expression as inverse_expression, inverse_graphs.domain as inverse_domain
             FROM exercises
             INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
             INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id

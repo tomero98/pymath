@@ -1,14 +1,15 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QSizePolicy, QPushButton, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QWidget
 
 from ..components import Window
+from ..factories import LabelFactory, ButtonFactory
+from ..factories.icon_factory import IconFactory
+from ..models.enums.text_type import TextType
 
 
 class WelcomePage(Window):
     def __init__(self):
-        title = 'Página de inicio'
+        title = 'Inicio'
         super(WelcomePage, self).__init__(title=title)
 
     def draw(self, *args, **kwargs):
@@ -19,8 +20,9 @@ class WelcomePage(Window):
         subtitle_widget = self._get_subtitle_widget()
         logo_widget = self._get_logo_widget()
         enter_button = self._get_enter_button()
+        footer_layout = self._get_footer_layout()
         self._set_layout(layout=layout, title_widget=title_widget, subtitle_widget=subtitle_widget,
-                         logo_widget=logo_widget, enter_button=enter_button)
+                         logo_widget=logo_widget, enter_button=enter_button, footer_layout=footer_layout)
 
         main_window.setLayout(layout)
         self.setCentralWidget(main_window)
@@ -28,58 +30,60 @@ class WelcomePage(Window):
 
     @staticmethod
     def _get_title_widget():
-        label = QLabel()
-        text = 'UVa PyMath'
-        font = QFont('Times', 36, QFont.Capitalize)
-        font.setUnderline(True)
-        align = Qt.AlignHCenter
-        label.setText(text)
-        label.setFont(font)
-        label.setAlignment(align)
-        return label
+        title = LabelFactory.get_label_component(
+            text='Desarrollo de recursos de apoyo para el aprendizaje de conceptos básicos relativos a funciones',
+            label_type=TextType.TITLE, fixed_width=900, need_word_wrap=True, align=Qt.AlignHCenter
+        )
+        return title
 
     @staticmethod
     def _get_subtitle_widget():
-        label = QLabel()
-        text = 'Aplicación de refuerzo para la asignatura de Fundamento de Matemáticas'
-        font = QFont('Times', 18, QFont.Capitalize)
-        align = Qt.AlignHCenter
-        label.setText(text)
-        label.setFont(font)
-        label.setAlignment(align)
-        return label
+        subtitle = LabelFactory.get_label_component(
+            text='Aplicación de refuerzo para la asignatura de Fundamento de Matemáticas',
+            label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter
+        )
+        return subtitle
 
     @staticmethod
     def _get_logo_widget() -> QLabel:
-        pixmap = QPixmap('uva_logo.png')
-        logo_widget = QLabel()
-        logo_widget.setPixmap(pixmap)
+        logo_widget = LabelFactory.get_label_image_component(image_name='uva_logo.jpg', align=Qt.AlignHCenter,
+                                                             width=275, height=275)
         return logo_widget
 
-    def _get_enter_button(self):
-        text = 'Iniciar'
-        button = QPushButton(text)
-        button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        button.pressed.connect(self.continue_signal)
+    def _get_enter_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='power_button2.png')
+        button = ButtonFactory.get_button_component(title='', function_to_connect=self.continue_signal, icon=icon,
+                                                    icon_size=75, tooltip='Iniciar')
         return button
 
     @staticmethod
+    def _get_footer_layout() -> QVBoxLayout:
+        layout = QVBoxLayout()
+        student_label = LabelFactory.get_label_component(text='Alumno: Tomás Meroño Madriz.',
+                                                         label_type=TextType.NORMAL_TEXT)
+        teacher_label = LabelFactory.get_label_component(text='Tutor: Charo.',
+                                                         label_type=TextType.NORMAL_TEXT)
+        layout.addWidget(student_label, alignment=Qt.AlignRight)
+        layout.addWidget(teacher_label, alignment=Qt.AlignRight)
+        return layout
+
+    @staticmethod
     def _set_layout(layout: QVBoxLayout, title_widget: QLabel, subtitle_widget: QLabel, logo_widget: QLabel,
-                    enter_button: QPushButton):
-        layout.setContentsMargins(0, 75, 0, 0)
-        layout.setSpacing(0)
+                    enter_button: QPushButton, footer_layout: QVBoxLayout):
+        layout.setContentsMargins(0, 25, 0, 0)
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         layout.addWidget(title_widget)
+        layout.addSpacing(10)
         layout.addWidget(subtitle_widget)
-
-        layout.addWidget(logo_widget)
-        lay = QHBoxLayout()
+        layout.addSpacing(30)
+        layout.addWidget(logo_widget, alignment=Qt.AlignHCenter)
+        layout.addSpacing(30)
+        layout.addWidget(enter_button, alignment=Qt.AlignHCenter)
         layout.addStretch()
-        layout.addLayout(lay)
-        lay.addStretch()
-        lay.addWidget(enter_button)
-        lay.addStretch()
-        layout.addStretch()
+        label = QLabel()
+        layout.addWidget(label, alignment=Qt.AlignRight)
+        layout.addLayout(footer_layout)
+        layout.addSpacing(10)
 
     def keyPressEvent(self, e):
         if e.key() in (Qt.Key_Return, Qt.Key_Enter):

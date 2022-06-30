@@ -28,4 +28,4 @@ class TopicDataMapper:
 
     @staticmethod
     def _get_subtopic_query(topic_parent_id):
-        return f'SELECT id, title, topic_parent_id FROM topics WHERE topic_parent_id={topic_parent_id}'
+        return f'SELECT id, title, description, topic_parent_id FROM topics WHERE topic_parent_id={topic_parent_id}'

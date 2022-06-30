@@ -1,13 +1,16 @@
 from typing import List
 
 import pyqtgraph
+from PyQt5.QtGui import QFont
+from pyqtgraph import TextItem
 
 from src.function.models.function import Function
+from src.function.models.function_point import FunctionPoint
 
 
 class PlotFactory:
     @classmethod
-    def get_plot(cls, functions: List[Function]) -> pyqtgraph.PlotWidget:
+    def get_plot(cls, functions: List[Function], show_title: bool = False) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget()
         graph.setMouseEnabled(x=False, y=False)
         graph.showGrid(x=True, y=True)
@@ -15,15 +18,15 @@ class PlotFactory:
         function_ranges = []
         for function in functions:
             x_values, y_values = function.get_points()
-            pen = pyqtgraph.mkPen(color=(255, 255, 255)) if function.is_main_graphic \
-                else pyqtgraph.mkPen(color=(128, 0, 128))
+            pen = pyqtgraph.mkPen(color=(255, 255, 255), width=5) if function.is_main_graphic \
+                else pyqtgraph.mkPen(color=(128, 0, 128), width=3)
             graph.plot(x_values, y_values, pen=pen)
+            if show_title and function.is_elementary_graph and function.is_main_graphic and len(functions) == 1:
+                math_expression = function.get_math_expression()
+                graph.setTitle(math_expression, color='orange', size='18pt')
 
             function_ranges.append((x_values, y_values))
-            if not function.domain:
-                continue
 
-            # function_ranges.append((x_values, y_values))
             is_first_point_included = function.domain[0] == '['
             first_point_filling = 'w' if is_first_point_included else 'black'
             graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
@@ -37,19 +40,23 @@ class PlotFactory:
         return graph
 
     @classmethod
-    def update_plot(cls, plot_widget: pyqtgraph.PlotWidget, current_functions: List[Function],
-                    functions_to_update: List[Function], is_help_data: bool = False):
-        function_ranges = []
-        for function in functions_to_update:
-            pen = pyqtgraph.mkPen(color=(0, 0, 255)) if is_help_data else pyqtgraph.mkPen(color=(255, 0, 0))
+    def update_plot(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_update: List[Function],
+                    help_points: List[FunctionPoint] = None, is_help_data: bool = False,
+                    rgb_tuple: tuple = (0, 0, 255), no_points: bool = False, constants: bool = False):
+        if not help_points:
+            help_points = []
 
-            x_values, y_values = function.get_points()
+        for function in functions_to_update:
+            pen_width = 1 if is_help_data else 3
+            pen = pyqtgraph.mkPen(color=rgb_tuple, width=pen_width) if is_help_data \
+                else pyqtgraph.mkPen(color=rgb_tuple, width=pen_width)
+
+            x_values, y_values = function.get_points() if not constants else function.get_constant_points()
             plot_widget.plot(x_values, y_values, pen=pen)
 
-            if not function.domain:
+            if no_points:
                 continue
 
-            function_ranges.append((x_values, y_values))
             is_first_point_included = function.domain[0] == '['
             first_point_filling = 'w' if is_first_point_included else 'black'
             plot_widget.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
@@ -59,56 +66,23 @@ class PlotFactory:
             plot_widget.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling,
                              symbolSize='12')
 
-        current_ranges = [function.get_points() for function in current_functions]
-        plot_x_range, plot_y_range = cls._get_range_functions(function_ranges=function_ranges + current_ranges)
+        for point in help_points:
+            color = 'blue'
+            plot_widget.plot([point.x_value], [point.y_value], symbol='o', symbolBrush=color, symbolSize='12')
+
+        plot_x_range = plot_y_range = (-5, 5)
         plot_widget.setRange(xRange=plot_x_range, yRange=plot_y_range)
 
-    @staticmethod
-    def _get_range_functions(function_ranges: (tuple, tuple)) -> (tuple, tuple):
-        graph_min_x = graph_max_x = graph_min_y = graph_max_y = 5
-        for x_values, y_values in function_ranges:
-            function_min_x, function_max_x = min(x_values), max(x_values),
-            function_min_y, function_max_y = min(y_values), max(y_values)
-            graph_min_x = function_min_x if graph_min_x is None or graph_min_x > function_min_x else graph_min_x
-            graph_max_x = function_max_x if graph_max_x is None or graph_max_x < function_max_x else graph_max_x
-            graph_min_y = function_min_y if graph_min_y is None or graph_min_y > function_min_y else graph_min_y
-            graph_max_y = function_max_y if graph_max_y is None or graph_max_y < function_max_y else graph_max_y
-
-        x_distance = abs(graph_min_x - graph_max_x) * 0.5
-        y_distance = abs(graph_min_y - graph_max_y) * 0.5
-        plot_x_range = (graph_min_x - x_distance, graph_max_x + x_distance)
-        plot_y_range = (graph_min_y - y_distance, graph_max_y + y_distance)
-        return plot_x_range, plot_y_range
-
-# Puntos en la grafica
-# x_points_plot = [x for x, y in zip(x_values[1:-1], y_values[1:-1]) if x == int(x) and y == int(y)]
-# y_points_plot = [y for x, y in zip(x_values[1:-1], y_values[1:-1]) if x == int(x) and y == int(y)]
-# graph.plot(x_points_plot, y_points_plot, symbol='o', symbolBrush='w', symbolSize='5')
-
-# Setup coordenadas
-# self.proxy = pyqtgraph.SignalProxy(graph.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
-# def mouseMoved(self, e):
-#     pos = e[0]
-#     if self._plot_widget.sceneBoundingRect().contains(pos):
-#         mousePoint = self._plot_widget.getPlotItem().vb.mapSceneToView(pos)
-#         x_position = round(mousePoint.x(), 1)
-#         y_position = round(mousePoint.y(), 1)
-#         position_text = f'Posición actual: ({x_position}, {y_position})'
-#         # self._help_subtitle_widget.setText(position_text)
-#
-#         if x_position == int(x_position) and y_position == int(y_position):
-#             x_values, y_values = self._exercise.functions[0].get_points()
-#             dictionary = {x: y for x, y in zip(x_values, y_values)}
-#             if x_position in x_values and y_position in y_values and dictionary[x_position] == y_position:
-#                 QApplication.setOverrideCursor(Qt.PointingHandCursor)
-#         else:
-#             QApplication.restoreOverrideCursor()
-
-# Add labels
-# font = QFont()
-# font.setPixelSize(9)
-# label = TextItem(anchor=(0.5,0.5))
-# label.setText(text='Ejemplo de todo')
-# label.setPos(0, 0)
-# label.setFont(font)
-# graph.addItem(label)
+    @classmethod
+    def add_function_labels(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_labelling_with_color: list):
+        for function, color in functions_to_labelling_with_color:
+            font = QFont()
+            font.setPixelSize(20)
+            x_value, y_value = function.get_random_points()
+            label = TextItem(anchor=(0.5, 0.5))
+            text = function.get_math_expression()
+            label.setText(text=text)
+            label.setPos(x_value - 0.2, y_value + 0.4)
+            label.setFont(font)
+            label.setColor(color)
+            plot_widget.addItem(label)

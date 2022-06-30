@@ -66,7 +66,10 @@ class DatabaseManager:
     def _populate_subtopic_data():
         subtopic_seed = [
             ('Funciones inversas', 'Ejercicios sobre inversas', 1),
-            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1)]
+            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1),
+            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1),
+            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1)
+        ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
@@ -107,6 +110,12 @@ class DatabaseManager:
         exercise_seed = [
             ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 0, 0, 'Help text', 2),
             ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 0, 0, 'Help text', 3),
+            ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 1, 1, 'Help text', 3),
+            ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 2, 2, 'Help text', 3),
+            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 1, 1, 'Help text', 2),
+            ('Gráficas elementales', 'ElementaryGraphExercise', 0, 0, 'Help text', 4),
+            ('Máximos relativos y absoluto', 'MaximumPointsExercise', 0, 0, 'Help text', 5),
+            ('Mínimos relativos y absoluto', 'MinimumPointsExercise', 0, 0, 'Help text', 5),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -137,6 +146,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 expression VARCHAR(64) NOT NULL,
                 domain VARCHAR(64),
+                is_elementary_graph INT,
                 inverse_graph_id INT,
                 FOREIGN KEY (inverse_graph_id) REFERENCES graphs(id)
                 )
@@ -146,22 +156,35 @@ class DatabaseManager:
     @staticmethod
     def _populate_graph_data():
         graph_seed = [
-            ('x + 5', '[0,5)', None),
-            ('x - 5', '[5,10)', 1),
-            ('x + 2', '[0,5)', None),
-            ('x - 1', '[0,5)', None),
-            ('math.pow(x, 3)', None, None)
+            ('math.sqrt(x)', '[0, 5)', 0, None),
+            ('x**2', '[0, 5)', 0, 1),
+            ('x + 2', '[0, 5)', 0, None),
+            ('x - 1', '[0, 5)', 0, None),
+            ('x**3', '[-6, 6]', 1, None),
+            ('3', '(-3, 2]', 1, None),
+            ('math.sin(x)', '[-3, 1)', 1, None),
+            ('2', '[2, 8]', 1, None),
+            ('(x)**4', '[-3, 3]', 0, None),
+            ('x**(1/4)', '[0, 3]', 0, 9),
+            ('math.cos(x)', '(-4, 2)', 1, None),
+            ('math.tan(x)', '(-4, 4)', 1, None),
+            ('math.asin(x)', '(-1, 1)', 1, None),
+            ('math.acos(x)', '(-1, 1)', 1, None),
+            ('math.atan(x)', '(-3, 4]', 1, None),
+            ('(x)**3-4*(x)**2+2*x+2', '(-3, 3]', 0, None),
+            ('(x)**3-3*(x)**2', '(-1, 3)', 0, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO graphs (expression, domain, inverse_graph_id) VALUES (?, ?, ?)
+            INSERT INTO graphs (expression, domain, is_elementary_graph, inverse_graph_id) VALUES (?, ?, ?,?)
             """
         )
 
-        for expression, domain, inverse_graph_id in graph_seed:
+        for expression, domain, is_elementary_graph, inverse_graph_id in graph_seed:
             sql_query.addBindValue(expression)
             sql_query.addBindValue(domain)
+            sql_query.addBindValue(is_elementary_graph)
             sql_query.addBindValue(inverse_graph_id)
             sql_query.exec()
 
@@ -190,6 +213,17 @@ class DatabaseManager:
             (1, 3, 0),
             (1, 4, 0),
             (2, 5, 1),
+            (3, 6, 1),
+            (4, 7, 1),
+            (4, 8, 1),
+            (5, 9, 1),
+            (5, 10, 0),
+            (6, 7, 1),
+            (6, 11, 0),
+            (6, 12, 0),
+            (6, 13, 0),
+            (7, 17, 1),
+            (8, 16, 1),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

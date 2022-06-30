@@ -10,12 +10,12 @@ from ...projectConf.factories.icon_factory import IconFactory
 from ...projectConf.models.enums.text_type import TextType
 
 
-class InverseBooleanComponent(QWidget):
+class BoundedRangeComponent(QWidget):
     continue_signal = pyqtSignal(bool)
     validate_signal = pyqtSignal()
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep):
-        super(InverseBooleanComponent, self).__init__()
+        super(BoundedRangeComponent, self).__init__()
         self._exercise = exercise
         self._step = step
         self._is_answer_correct = True
@@ -55,7 +55,7 @@ class InverseBooleanComponent(QWidget):
 
     def _get_main_window_layout(self, exercise: FunctionExercise) -> QHBoxLayout:
         main_window_layout = QHBoxLayout()
-        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()])
+        self._plot_widget = PlotFactory.get_plot(exercise.functions)
 
         main_window_layout.addStretch()
         main_window_layout.addWidget(self._plot_widget)
@@ -83,22 +83,15 @@ class InverseBooleanComponent(QWidget):
 
     def setup_help_data(self):
         self._set_help_text()
-        self._update_plot_with_help_data()
 
     def _set_help_text(self):
         self._help_text.setText(self._step.function_help_data.help_text)
         self._help_text.setStyleSheet(f'color: blue')
 
-    def _update_plot_with_help_data(self):
-        functions_to_update = self._step.function_help_data.help_expressions
-        points_to_update = self._step.function_help_data.help_points
-        PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=functions_to_update,
-                                is_help_data=True, help_points=points_to_update)
-
     def _validate_exercise(self, response: bool, pressed_button: QPushButton):
         self.validate_signal.emit()
-        has_function_inverse = self._exercise.has_main_function_inverse()
-        self._is_answer_correct = has_function_inverse == response
+        bounded_range = self._exercise.has_bounded_range()
+        self._is_answer_correct = bounded_range == response
         border_color = '#2F8C53' if self._is_answer_correct else 'red'
         if self._is_answer_correct:
             self._help_text.setText('Correcto.')
@@ -113,14 +106,9 @@ class InverseBooleanComponent(QWidget):
 
     def _update_plot_with_error_data(self):
         self._help_text.setText(
-            f'Incorrecto. Recuerda que: "{self._step.function_help_data.help_text}". Por lo que en este caso '
-            f'habría que delimitar el dominio de la función.'
+            f'Incorrecto.'
         )
         self._help_text.setStyleSheet(f'color: red')
-        functions_to_update = self._step.function_help_data.help_expressions
-        points_to_update = self._step.function_help_data.help_points
-        PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=functions_to_update,
-                                help_points=points_to_update)
 
     def _send_continue_signal(self):
         self.continue_signal.emit(self._is_answer_correct)

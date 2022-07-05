@@ -10,7 +10,8 @@ from src.function.models.function_point import FunctionPoint
 
 class PlotFactory:
     @classmethod
-    def get_plot(cls, functions: List[Function], show_title: bool = False) -> pyqtgraph.PlotWidget:
+    def get_plot(cls, functions: List[Function], show_title: bool = False,
+                 show_ends: bool = True) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget()
         graph.setMouseEnabled(x=False, y=False)
         graph.showGrid(x=True, y=True)
@@ -27,13 +28,14 @@ class PlotFactory:
 
             function_ranges.append((x_values, y_values))
 
-            is_first_point_included = function.domain[0] == '['
-            first_point_filling = 'w' if is_first_point_included else 'black'
-            graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
+            if show_ends:
+                is_first_point_included = function.domain[0] == '['
+                first_point_filling = 'w' if is_first_point_included else 'black'
+                graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
 
-            is_last_point_included = function.domain[-1] == ']'
-            last_point_filling = 'w' if is_last_point_included else 'black'
-            graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
+                is_last_point_included = function.domain[-1] == ']'
+                last_point_filling = 'w' if is_last_point_included else 'black'
+                graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
 
         plot_x_range = plot_y_range = (-5, 5)
         graph.setRange(xRange=plot_x_range, yRange=plot_y_range)
@@ -42,7 +44,8 @@ class PlotFactory:
     @classmethod
     def update_plot(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_update: List[Function],
                     help_points: List[FunctionPoint] = None, is_help_data: bool = False,
-                    rgb_tuple: tuple = (0, 0, 255), no_points: bool = False, constants: bool = False):
+                    rgb_tuple: tuple = (0, 0, 255), no_points: bool = False, constants: bool = False,
+                    show_ends: bool = True):
         if not help_points:
             help_points = []
 
@@ -55,6 +58,9 @@ class PlotFactory:
             plot_widget.plot(x_values, y_values, pen=pen)
 
             if no_points:
+                continue
+
+            if not show_ends:
                 continue
 
             is_first_point_included = function.domain[0] == '['

@@ -33,7 +33,16 @@ class Function:
         return [num / value for num in range(min_x * value, max_x * value, 1)]
 
     def _get_range_values(self, x_values: List[float]):
-        y_values = [eval(self.expression.replace('x', str(x))) for x in x_values]
+        y_values = []
+        x_value_to_del = []
+        for x in x_values:
+            try:
+                y_values.append(eval(self.expression.replace('x', str(x))))
+            except Exception:
+                x_value_to_del.append(x)
+
+        for x in x_value_to_del:
+            x_values.remove(x)
         return y_values
 
     def get_random_points(self) -> (float, float):
@@ -87,4 +96,5 @@ class Function:
         return f'{start_interval}{y_start}, {y_end}{end_interval}'
 
     def get_math_expression(self):
-        return self.expression.replace('math.sqrt', '√').replace('**', '^')
+        return self.expression.replace('math.sqrt', '√').replace('**', '^').replace('math.e', 'e') \
+            .replace('math.log', 'ln')

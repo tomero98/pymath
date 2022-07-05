@@ -24,7 +24,8 @@ class FunctionExercise:
 
     def has_main_function_inverse(self) -> bool:
         main_function = next(function for function in self.functions if function.is_main_graphic)
-        return main_function.domain == main_function.inverse_function.domain
+        _, y_values = main_function.get_points()
+        return len(set(y_values)) == len(y_values)
 
     def get_inverse_graph(self) -> Function:
         main_function = next(function for function in self.functions if function.is_main_graphic)

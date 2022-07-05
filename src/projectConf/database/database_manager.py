@@ -108,14 +108,10 @@ class DatabaseManager:
     @staticmethod
     def _populate_exercise_data():
         exercise_seed = [
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 0, 0, 'Help text', 2),
-            ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 0, 0, 'Help text', 3),
-            ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 1, 1, 'Help text', 3),
-            ('Conceptos sobre dominio y recorrido', 'ConceptDomainExercise', 2, 2, 'Help text', 3),
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 1, 1, 'Help text', 2),
-            ('Gráficas elementales', 'ElementaryGraphExercise', 0, 0, 'Help text', 4),
-            ('Máximos relativos y absoluto', 'MaximumPointsExercise', 0, 0, 'Help text', 5),
-            ('Mínimos relativos y absoluto', 'MinimumPointsExercise', 0, 0, 'Help text', 5),
+            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 0, 0, 'Help text', 2),  # 1
+            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 1, 0, 'Help text', 2),  # 2
+            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 2, 0, 'Help text', 2),  # 3
+            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 3, 0, 'Help text', 2),  # 4
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -156,23 +152,32 @@ class DatabaseManager:
     @staticmethod
     def _populate_graph_data():
         graph_seed = [
-            ('math.sqrt(x)', '[0, 5)', 0, None),
-            ('x**2', '[0, 5)', 0, 1),
-            ('x + 2', '[0, 5)', 0, None),
-            ('x - 1', '[0, 5)', 0, None),
-            ('x**3', '[-6, 6]', 1, None),
-            ('3', '(-3, 2]', 1, None),
-            ('math.sin(x)', '[-3, 1)', 1, None),
-            ('2', '[2, 8]', 1, None),
-            ('(x)**4', '[-3, 3]', 0, None),
-            ('x**(1/4)', '[0, 3]', 0, 9),
-            ('math.cos(x)', '(-4, 2)', 1, None),
-            ('math.tan(x)', '(-4, 4)', 1, None),
-            ('math.asin(x)', '(-1, 1)', 1, None),
-            ('math.acos(x)', '(-1, 1)', 1, None),
-            ('math.atan(x)', '(-3, 4]', 1, None),
-            ('(x)**3-4*(x)**2+2*x+2', '(-3, 3]', 0, None),
-            ('(x)**3-3*(x)**2', '(-1, 3)', 0, None),
+            # First exercise inverse
+            ('x**(1/5)', '[-4, 4]', 1, None),  # 1
+            ('x**5', '[-2, 2]', 1, 1),  # 2
+            ('-(x**(1/5))', '[-4, 4]', 0, None),  # 3
+            ('-x**1/2', '[0, 4]', 0, None),  # 4
+
+            # Second exercise inverse
+            ('math.e**x', '[-4, 2]', 1, None),  # 5
+            ('math.log(x)', '[0, 3]', 1, 5),  # 6
+            ('-math.e**x', '[-4, 2]', 0, None),  # 7
+            ('-(x+4)**(1/2)', '[-4, 6]', 0, None),  # 8
+
+            # Third exercise inverse
+            ('math.cos(x)', '[-4, 4]', 1, None),  # 9
+            ('math.acos(x)', '[-1, 1]', 0, 9),  # 10
+            ('math.sin(x)', '[-4, 4]', 1, None),  # 11
+            ('-math.cos(x)', '[-4, 4]', 0, None),  # 12
+
+            # Four exercise inverse
+            ('x**4', '(0, 2)', 1, None),  # 13
+            ('x**(1/4)', '[0, 6)', 0, 13),  # 14
+            ('-x**4', '(0, 2)', 0, None),  # 15
+            ('-x**3', '(0, 2', 0, None),  # 16
+
+
+
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -209,21 +214,30 @@ class DatabaseManager:
     @staticmethod
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
+            # First exercise
             (1, 1, 1),
+            (1, 2, 0),
             (1, 3, 0),
             (1, 4, 0),
+
+            # Second exercise
             (2, 5, 1),
-            (3, 6, 1),
-            (4, 7, 1),
-            (4, 8, 1),
-            (5, 9, 1),
-            (5, 10, 0),
-            (6, 7, 1),
-            (6, 11, 0),
-            (6, 12, 0),
-            (6, 13, 0),
-            (7, 17, 1),
-            (8, 16, 1),
+            (2, 6, 0),
+            (2, 7, 0),
+            (2, 8, 0),
+
+            # Third exercise
+            (3, 9, 1),
+            (3, 10, 0),
+            (3, 11, 0),
+            (3, 12, 0),
+
+            # Four exercise
+            (4, 13, 1),
+            (4, 14, 0),
+            (4, 15, 0),
+            (4, 16, 0),
+
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

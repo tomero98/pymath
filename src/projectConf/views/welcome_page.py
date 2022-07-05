@@ -60,9 +60,9 @@ class WelcomePage(Window):
     def _get_footer_layout() -> QVBoxLayout:
         layout = QVBoxLayout()
         student_label = LabelFactory.get_label_component(text='Alumno: Tomás Meroño Madriz.',
-                                                         label_type=TextType.NORMAL_TEXT)
-        teacher_label = LabelFactory.get_label_component(text='Tutor: Charo.',
-                                                         label_type=TextType.NORMAL_TEXT)
+                                                         label_type=TextType.SUBTITLE)
+        teacher_label = LabelFactory.get_label_component(text='Tutora: María Rosario Abril Raymundo.',
+                                                         label_type=TextType.SUBTITLE)
         layout.addWidget(student_label, alignment=Qt.AlignRight)
         layout.addWidget(teacher_label, alignment=Qt.AlignRight)
         return layout
@@ -79,10 +79,9 @@ class WelcomePage(Window):
         layout.addWidget(logo_widget, alignment=Qt.AlignHCenter)
         layout.addSpacing(30)
         layout.addWidget(enter_button, alignment=Qt.AlignHCenter)
-        layout.addStretch()
-        label = QLabel()
-        layout.addWidget(label, alignment=Qt.AlignRight)
+        layout.addSpacing(65)
         layout.addLayout(footer_layout)
+        layout.addStretch()
         layout.addSpacing(10)
 
     def keyPressEvent(self, e):

@@ -55,7 +55,7 @@ class InverseBooleanComponent(QWidget):
 
     def _get_main_window_layout(self, exercise: FunctionExercise) -> QHBoxLayout:
         main_window_layout = QHBoxLayout()
-        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()])
+        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()], show_ends=False)
 
         main_window_layout.addStretch()
         main_window_layout.addWidget(self._plot_widget)
@@ -93,7 +93,7 @@ class InverseBooleanComponent(QWidget):
         functions_to_update = self._step.function_help_data.help_expressions
         points_to_update = self._step.function_help_data.help_points
         PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=functions_to_update,
-                                is_help_data=True, help_points=points_to_update)
+                                is_help_data=True, help_points=points_to_update, show_ends=False)
 
     def _validate_exercise(self, response: bool, pressed_button: QPushButton):
         self.validate_signal.emit()
@@ -113,8 +113,7 @@ class InverseBooleanComponent(QWidget):
 
     def _update_plot_with_error_data(self):
         self._help_text.setText(
-            f'Incorrecto. Recuerda que: "{self._step.function_help_data.help_text}". Por lo que en este caso '
-            f'habría que delimitar el dominio de la función.'
+            f'Incorrecto. {self._step.function_help_data.help_text}.'
         )
         self._help_text.setStyleSheet(f'color: red')
         functions_to_update = self._step.function_help_data.help_expressions

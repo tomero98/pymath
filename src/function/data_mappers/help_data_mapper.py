@@ -35,7 +35,7 @@ class HelpDataMapper:
     def _get_inverse_concept_help(self) -> FunctionHelpData:
         identifier = 0
         help_text = 'Recuerda que para que una gráfica tenga inversa no debe de tener ninguna de sus imágenes ' \
-                    'repetidas, es decir, la gráfica debe ser inyectiva.'
+                    'repetidas.'
         function = self._exercise.get_main_function()
         x_values, y_values = function.get_points(small_sample=True)
 
@@ -46,7 +46,8 @@ class HelpDataMapper:
     @staticmethod
     def _get_selection_inverse_help() -> FunctionHelpData:
         identifier = 0
-        help_text = 'Para que una gráfica tenga inversa debe de tener...'
+        help_text = 'La inversa de la función tiene que ser la simétrica respecto a la bisectriz del 1 y del 3' \
+                    ' cuadrante.'
         constant_graph_help = Function(function_id=-1, expression='x', domain='[-10, 10]', is_main_graphic=False,
                                        is_elementary_graph=False, inverse_function=None)
         return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[constant_graph_help])

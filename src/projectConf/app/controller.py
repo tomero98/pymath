@@ -18,18 +18,13 @@ class Controller:
         self._app = PyMathApp(sys_argv=[])
 
     def _start_app_flow(self):
-        # self._setup_front_page()
-
-        # FunctionExercisePage(subtopic=Topic(identifier=3, title='Tópicos', description='', topic_parent_id=None)).draw()
-        topic = Topic(identifier=5, title='Máximos y mínimos relativos', description='Máximos y Mínimos',
-                      topic_parent_id=None)
-        self._setup_exercise_page(subtopic=topic)
+        self._setup_front_page()
 
     def _setup_front_page(self):
         front_page = WelcomePage()
         front_page.draw()
         self._current_view = front_page
-        self._current_view.continue_signal.connect(self._setup_topic_page)
+        self._current_view.continue_signal.connect(self._setup_subtopic_page)
         self._current_view.close_signal.connect(self._close_page)
 
     def _setup_topic_page(self):
@@ -39,7 +34,8 @@ class Controller:
         self._current_view.close_signal.connect(self._close_page)
         self._current_view.continue_signal.connect(self._setup_subtopic_page)
 
-    def _setup_subtopic_page(self, topic: Topic):
+    def _setup_subtopic_page(self):
+        topic = Topic(identifier=1, title='Funciones', description='Ejercicios sobre funciones', topic_parent_id=None)
         topic_page = TopicPage(topic=topic)
         topic_page.draw()
         self._current_view = topic_page
@@ -58,8 +54,7 @@ class Controller:
 
     def _back_page(self):
         self._current_view.close()
-        topic = Topic(identifier=1, title='Funciones', description='Inversas', topic_parent_id=None)
-        self._setup_subtopic_page(topic=topic)
+        self._setup_subtopic_page()
 
     def _execute_app(self):
         self._app.exec()

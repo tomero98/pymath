@@ -62,8 +62,7 @@ class StepDataMapper:
         second_step = self._get_second_domain_concept_step()
         third_step = self._get_third_domain_concept_step()
         four_step = self._get_four_domain_concept_step()
-        # return [first_step, second_step, third_step, four_step]
-        return [four_step]
+        return [first_step, second_step, third_step, four_step]
 
     def _get_first_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_domain_exercise

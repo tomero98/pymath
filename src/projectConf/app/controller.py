@@ -18,9 +18,9 @@ class Controller:
         self._app = PyMathApp(sys_argv=[])
 
     def _start_app_flow(self):
-        self._setup_exercise_page(subtopic=Topic(identifier=3, title='Funciones',
-                                                 description='Ejercicios sobre funciones', topic_parent_id=None))
-        # self._setup_front_page()
+        # self._setup_exercise_page(subtopic=Topic(identifier=3, title='Funciones',
+        #                                          description='Ejercicios sobre funciones', topic_parent_id=None))
+        self._setup_front_page()
 
     def _setup_front_page(self):
         front_page = WelcomePage()

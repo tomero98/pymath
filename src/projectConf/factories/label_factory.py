@@ -10,8 +10,8 @@ from ..models.enums.text_type import TextType
 
 class LabelFactory:
     @classmethod
-    def get_label_component(cls, text: str, label_type: TextType, align=Qt.AlignLeft,
-                            set_underline: bool = False, fixed_width: int = None,
+    def get_label_component(cls, text: str, label_type: TextType, align=Qt.AlignLeft, set_visible: bool = True,
+                            set_underline: bool = False, fixed_width: int = None, size_policy=None,
                             need_word_wrap: bool = False, set_cursive: bool = False, set_bold: bool = False) -> QLabel:
         font = QFont('Times', label_type.value)
         font.setItalic(set_cursive)
@@ -23,9 +23,12 @@ class LabelFactory:
         label.setFont(font)
         label.setAlignment(align)
         label.setWordWrap(need_word_wrap)
+        label.setVisible(set_visible)
 
         if fixed_width:
             label.setFixedWidth(fixed_width)
+        if size_policy:
+            label.setSizePolicy(*size_policy)
         return label
 
     @classmethod

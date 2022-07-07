@@ -33,27 +33,22 @@ class HelpDataMapper:
         return help_data
 
     def _get_inverse_concept_help(self) -> FunctionHelpData:
-        identifier = 0
-        help_text = 'Recuerda que para que una gráfica tenga inversa no debe de tener ninguna de sus imágenes ' \
-                    'repetidas.'
+        help_text = '¿Tiene imágenes repetidas?'
         function = self._exercise.get_main_function()
         x_values, y_values = function.get_points(small_sample=True)
 
         graphs, function_points = self._get_constant_graphs(x_values=x_values, y_values=y_values)
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=graphs,
+        return FunctionHelpData(help_text=help_text, help_expressions=graphs,
                                 help_points=function_points)
 
     @staticmethod
     def _get_selection_inverse_help() -> FunctionHelpData:
-        identifier = 0
-        help_text = 'La inversa de la función tiene que ser la simétrica respecto a la bisectriz del 1 y del 3' \
-                    ' cuadrante.'
+        help_text = 'La inversa de una función es su simétrica respecto a la bisectriz de la función y=x.'
         constant_graph_help = Function(function_id=-1, expression='x', domain='[-10, 10]', is_main_graphic=False,
                                        is_elementary_graph=False, inverse_function=None)
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[constant_graph_help])
+        return FunctionHelpData(help_text=help_text, help_expressions=[constant_graph_help])
 
     def _get_indicate_domain_help(self) -> FunctionHelpData:
-        identifier = 0
         help_text = 'El dominio es el rango de valores...'
         x_values, y_values = self._exercise.get_domain_range_values()
         x_values_by_y_value = defaultdict(list)
@@ -90,7 +85,7 @@ class HelpDataMapper:
             x_graph = Function(function_id=-1, expression=f'{y_value}', domain=f'[-10, {x_value}]',
                                is_main_graphic=False, is_elementary_graph=False, inverse_function=None, is_invert=False)
             graphs.append(x_graph)
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=graphs)
+        return FunctionHelpData(help_text=help_text, help_expressions=graphs)
 
     def _get_constant_graphs(self, x_values, y_values):
         unique_elements = set()
@@ -117,10 +112,11 @@ class HelpDataMapper:
             function_points = [
                 FunctionPoint(x_value=duplicated_x, y_value=duplicated_element) for duplicated_x in duplicated_x_values
             ]
+        index = -1 if len(graphs)> 1 else 1
         constant_graphs = [
             Function(function_id=-1, expression=f'{constant}', domain='[-10, 10]', is_main_graphic=False,
                      is_elementary_graph=False, inverse_function=None)
-            for constant in graphs
+            for constant in graphs[:index]
         ]
         return constant_graphs, function_points
 
@@ -132,30 +128,25 @@ class HelpDataMapper:
 
     @staticmethod
     def _get_indicate_bounded_range_help() -> FunctionHelpData:
-        identifier = 0
         help_text = 'Para que una gráfica se diga que está acotada...'
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[])
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_maximum_relative_help() -> FunctionHelpData:
-        identifier = 0
         help_text = 'Para que un punto sea máximo relativo tiene que tener...'
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[])
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_maximum_absolute_help() -> FunctionHelpData:
-        identifier = 0
         help_text = 'Para que un punto sea máximo absoluto tiene que tener...'
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[])
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_minimum_relative_help() -> FunctionHelpData:
-        identifier = 0
         help_text = 'Para que un punto sea mínimo relativo tiene que tener...'
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[])
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_minimum_absolute_help() -> FunctionHelpData:
-        identifier = 0
         help_text = 'Para que un punto sea mínimo absoluto tiene que tener...'
-        return FunctionHelpData(identifier=identifier, help_text=help_text, help_expressions=[])
+        return FunctionHelpData(help_text=help_text, help_expressions=[])

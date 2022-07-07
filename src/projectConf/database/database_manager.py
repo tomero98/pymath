@@ -94,11 +94,9 @@ class DatabaseManager:
             """
             CREATE TABLE exercises (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-                title VARCHAR(64) NOT NULL,
                 type VARCHAR(64) NOT NULL,
                 'order' INT NOT NULL, 
-                priority INT NOT NULL, 
-                help_text VARCHAR(64), 
+                domain VARCHAR(64),
                 topic_id INT NOT NULL,
                 FOREIGN KEY (topic_id) REFERENCES topics(id)
                 )
@@ -107,25 +105,46 @@ class DatabaseManager:
 
     @staticmethod
     def _populate_exercise_data():
+        # Domain example: '5, 5'
         exercise_seed = [
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 0, 0, 'Help text', 2),  # 1
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 1, 0, 'Help text', 2),  # 2
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 2, 0, 'Help text', 2),  # 3
-            ('Conceptos sobre funciones inversas', 'ConceptInverseExercise', 3, 0, 'Help text', 2),  # 4
+            # Inverse exercise
+            ('ConceptInverseExercise', 0, '-3, 3', 2),  # 1
+            ('ConceptInverseExercise', 0, '-3, 3', 2),  # 2
+            ('ConceptInverseExercise', 0, None, 2),  # 3
+            ('ConceptInverseExercise', 0, None, 2),  # 4
+            ('ConceptInverseExercise', 0, None, 2),  # 5
+            ('ConceptInverseExercise', 0, None, 2),  # 6
+
+            # Domain exercise
+            ('ConceptDomainExercise', 0, None, 3),
+            # ('ConceptDomainExercise', 1, None, 3),
+            # ('ConceptDomainExercise', 2, None, 3),
+            # ('ConceptDomainExercise', 3, None, 3),
+            #
+            # # Elementary functions
+            # ('ElementaryGraphExercise', 0, None, 4),
+            # ('ElementaryGraphExercise', 1, None, 4),
+            # ('ElementaryGraphExercise', 2, None, 4),
+            # ('ElementaryGraphExercise', 3, None, 4),
+            #
+            # # Maximum functions
+            # ('MaximumPointsExercise', 0, None, 5),
+            # ('MinimumPointsExercise', 1, None, 5),
+            # ('MaximumPointsExercise', 2, None, 5),
+            # ('MinimumPointsExercise', 3, None, 5),
+
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercises (title, type, 'order', priority, help_text, topic_id) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO exercises (type, 'order', domain, topic_id) VALUES (?, ?, ?, ?)
             """
         )
 
-        for title, exercise_type, exercise_order, priority, help_text, topic_id in exercise_seed:
-            sql_query.addBindValue(title)
+        for exercise_type, exercise_order, domain, topic_id in exercise_seed:
             sql_query.addBindValue(exercise_type)
             sql_query.addBindValue(exercise_order)
-            sql_query.addBindValue(priority)
-            sql_query.addBindValue(help_text)
+            sql_query.addBindValue(domain)
             sql_query.addBindValue(topic_id)
             sql_query.exec()
 
@@ -141,7 +160,6 @@ class DatabaseManager:
             CREATE TABLE graphs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 expression VARCHAR(64) NOT NULL,
-                domain VARCHAR(64),
                 is_elementary_graph INT,
                 inverse_graph_id INT,
                 FOREIGN KEY (inverse_graph_id) REFERENCES graphs(id)
@@ -153,42 +171,66 @@ class DatabaseManager:
     def _populate_graph_data():
         graph_seed = [
             # First exercise inverse
-            ('x**(1/5)', '[-4, 4]', 1, None),  # 1
-            ('x**5', '[-2, 2]', 1, 1),  # 2
-            ('-(x**(1/5))', '[-4, 4]', 0, None),  # 3
-            ('-x**1/2', '[0, 4]', 0, None),  # 4
+            ('x**(1/5)', 1, None),  # 1
+            ('x**5', 1, 1),  # 2
+            ('-(x**(1/5))', 0, None),  # 3
+            ('-x**1/2', 0, None),  # 4
 
-            # Second exercise inverse
-            ('math.e**x', '[-4, 2]', 1, None),  # 5
-            ('math.log(x)', '[0, 3]', 1, 5),  # 6
-            ('-math.e**x', '[-4, 2]', 0, None),  # 7
-            ('-(x+4)**(1/2)', '[-4, 6]', 0, None),  # 8
-
+            # # Second exercise inverse
+            ('math.e**x', 1, None),  # 5
+            ('math.log(x)', 1, 5),  # 6
+            ('-math.e**x', 0, None),  # 7
+            ('-(x+4)**(1/2)', 0, None),  # 8
+            #
             # Third exercise inverse
-            ('math.cos(x)', '[-4, 4]', 1, None),  # 9
-            ('math.acos(x)', '[-1, 1]', 0, 9),  # 10
-            ('math.sin(x)', '[-4, 4]', 1, None),  # 11
-            ('-math.cos(x)', '[-4, 4]', 0, None),  # 12
-
+            ('math.cos(x)', 1, None),  # 9
+            ('math.acos(x)', 0, 9),  # 10
+            ('math.sin(x)', 1, None),  # 11
+            ('-math.cos(x)', 0, None),  # 12
+            #
             # Four exercise inverse
-            ('x**4', '(0, 2)', 1, None),  # 13
-            ('x**(1/4)', '[0, 6)', 0, 13),  # 14
-            ('-x**4', '(0, 2)', 0, None),  # 15
-            ('-x**3', '(0, 2', 0, None),  # 16
+            ('x**4', 1, None),  # 13
+            ('x**(1/4)', 0, 13),  # 14
+            ('-x**4', 0, None),  # 15
+            ('-x**3', 0, None),  # 16
 
-
-
+            # Fifth exercise
+            ('x**3-3*x', 0, None),  # 17
+            #
+            # # Todo: add two domain exercise
+            #
+            # # Sixth exercise
+            # ('math.cosh(x)', '(-3, 3)', 1, None),  # 18
+            #
+            # # Seventh exercise
+            # ('x**2', '[2, 2]', 0, None),  # 19
+            #
+            # # Eight exercise
+            # ('math.tan(x)', '[-3, 3]', 1, None),  # 20
+            #
+            # # Nine exercise
+            # ('x**4', '(-2, 2)', 1, None),  # 21
+            # ('1/(x**5)', '[-3, 3]', 1, None),  # 22
+            #
+            # # Tenth exercise
+            # ('x+2', '[-3, -1)', 0, None),  # 23
+            # ('x**2', '[-1, 1]', 0, None),  # 24
+            # ('-(x-1)**(1/2)', '(1, 2)', 0, None),  # 25
+            #
+            # # Twelve exercise
+            # ('(x+2)**(3)-3*(x+2)**2', '(-2, 0]', 0, None),  # 26
+            # ('x**(1/2)', '(0, 2]', 0, None),  # 27
+            # ('(x-2)**(2)-1', '(2, 4]', 0, None),  # 28
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO graphs (expression, domain, is_elementary_graph, inverse_graph_id) VALUES (?, ?, ?,?)
+            INSERT INTO graphs (expression, is_elementary_graph, inverse_graph_id) VALUES (?, ?,?)
             """
         )
 
-        for expression, domain, is_elementary_graph, inverse_graph_id in graph_seed:
+        for expression, is_elementary_graph, inverse_graph_id in graph_seed:
             sql_query.addBindValue(expression)
-            sql_query.addBindValue(domain)
             sql_query.addBindValue(is_elementary_graph)
             sql_query.addBindValue(inverse_graph_id)
             sql_query.exec()
@@ -206,7 +248,8 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 exercise_id INT NOT NULL,
                 graph_id INT NOT NULL,
-                is_main_graphic INT
+                is_main_graphic INT,
+                domain VARCHAR(64)
                 )
             """
         )
@@ -215,39 +258,85 @@ class DatabaseManager:
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
             # First exercise
-            (1, 1, 1),
-            (1, 2, 0),
-            (1, 3, 0),
-            (1, 4, 0),
+            (1, 1, 1, None),
+            (1, 2, 0, None),
+            (1, 3, 0, None),
+            (1, 4, 0, None),
 
             # Second exercise
-            (2, 5, 1),
-            (2, 6, 0),
-            (2, 7, 0),
-            (2, 8, 0),
+            (2, 5, 1, None),
+            (2, 6, 0, None),
+            (2, 7, 0, None),
+            (2, 8, 0, None),
 
-            # Third exercise
-            (3, 9, 1),
-            (3, 10, 0),
-            (3, 11, 0),
-            (3, 12, 0),
+            # # Third exercise
+            (3, 9, 1, None),
+            (3, 10, 0, None),
+            (3, 11, 0, None),
+            (3, 12, 0, None),
 
             # Four exercise
-            (4, 13, 1),
-            (4, 14, 0),
-            (4, 15, 0),
-            (4, 16, 0),
+            (4, 13, 1, None),
+            (4, 14, 0, None),
+            (4, 15, 0, None),
+            (4, 16, 0, None),
 
+            # Fifth exercise
+            (7, 17, 1, '[-2, 6)'),
+            #
+            # # Sixth exercise
+            # (6, 18, 1),
+            #
+            # # Seventh exercise
+            # (9, 1, 1),
+            # (9, 2, 0),
+            # (9, 3, 0),
+            # (9, 19, 0),
+            #
+            # # Eight exercise
+            # (10, 5, 1),
+            # (10, 6, 0),
+            # (10, 7, 0),
+            # (10, 8, 0),
+            #
+            # # Nine exercise
+            # (11, 9, 1),
+            # (11, 10, 0),
+            # (11, 11, 0),
+            # (11, 20, 0),
+            #
+            # # Tenth exercise
+            # (12, 2, 1),
+            # (12, 21, 0),
+            # (12, 1, 0),
+            # (12, 20, 0),
+            #
+            # # Eleventh exercise
+            # (13, 23, 1),
+            # (13, 24, 1),
+            # (13, 25, 1),
+            #
+            # # Twelve
+            # (14, 18, 1),
+            #
+            # # Thirteenth exercise
+            # (15, 17, 1),
+            #
+            # # Fourteenth exercise
+            # (16, 26, 1),
+            # (16, 27, 1),
+            # (16, 28, 1),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercise_graphs (exercise_id, graph_id, is_main_graphic) VALUES (?, ?, ?)
+            INSERT INTO exercise_graphs (exercise_id, graph_id, is_main_graphic, domain) VALUES (?, ?, ?, ?)
             """
         )
 
-        for exercise_id, graph_id, is_main_graphic in exercise_graph_seed:
+        for exercise_id, graph_id, is_main_graphic, domain in exercise_graph_seed:
             sql_query.addBindValue(exercise_id)
             sql_query.addBindValue(graph_id)
             sql_query.addBindValue(is_main_graphic)
+            sql_query.addBindValue(domain)
             sql_query.exec()

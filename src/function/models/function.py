@@ -45,12 +45,16 @@ class Function:
             x_values.remove(x)
         return y_values
 
+    def get_center_point(self):
+        random_points = self.get_random_points()
+        return random_points[len(random_points) // 2]
+
     def get_random_points(self) -> (float, float):
         x_values, y_values = self.get_points(small_sample=True)
         filter_values = list(
             (x_value, y_value) for x_value, y_value in zip(x_values, y_values) if -2 < x_value < 4 and -2 < y_value < 4
         )
-        return filter_values[len(filter_values) // 2]
+        return filter_values
 
     def get_points_grouped(self, small_sample: bool = False) -> (List[int], List[int]):
         x_values = self._get_domain_values(small_sample=small_sample) if self.domain else range(-50, 50)
@@ -97,4 +101,5 @@ class Function:
 
     def get_math_expression(self):
         return self.expression.replace('math.sqrt', '√').replace('**', '^').replace('math.e', 'e') \
-            .replace('math.log', 'ln')
+            .replace('math.log', 'ln').replace('math.cosh', 'cosh').replace('math.cos', 'cos') \
+            .replace('math.acos', 'acos').replace('math.sin', 'sin').replace('math.tan', 'tan')

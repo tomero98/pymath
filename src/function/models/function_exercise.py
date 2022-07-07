@@ -1,19 +1,20 @@
 from functools import reduce
 from typing import List
 
+from .enums.inverse_exercise_type import FunctionExerciseType
 from .enums.inverse_step_type import InverseStepType
 from .function import Function
 from .function_step import FunctionStep
 
 
 class FunctionExercise:
-    def __init__(self, identifier: int, exercise_type: str, title: str, exercise_order: int, exercise_priority: int,
+    def __init__(self, identifier: int, exercise_type: str, title: str, exercise_order: int, exercise_domain: tuple,
                  functions: List[Function], steps: List[FunctionStep]):
         self.id = identifier
         self.type = exercise_type
         self.title = title
+        self.exercise_domain = exercise_domain
         self.exercise_order = exercise_order
-        self.exercise_priority = exercise_priority
         self.functions = functions
         self.steps = steps
 
@@ -107,3 +108,17 @@ class FunctionExercise:
 
     def _get_minimum_relative_value(self, points: list):
         pass
+
+    @classmethod
+    def get_title_by_exercise_type(cls, exercise_type) -> str:
+        if exercise_type == FunctionExerciseType.inverse_concept_exercise.value:
+            title = 'Funciones inversas'
+        elif exercise_type == FunctionExerciseType.domain_concept_exercise.value:
+            title = 'Dominio y recorrido'
+        elif exercise_type == FunctionExerciseType.elementary_graph_exercise.value:
+            title = 'Gráficas elementales'
+        elif exercise_type == FunctionExerciseType.maximum_points_exercise.value:
+            title = 'Máximos'
+        elif exercise_type == FunctionExerciseType.minimum_points_exercise.value:
+            title = 'Mínimos'
+        return title

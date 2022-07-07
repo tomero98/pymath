@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QLabel, QComboBox
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
 from src.function.data_mappers.function_exercise_data_mapper import FunctionExerciseDataMapper
@@ -25,8 +25,12 @@ class FunctionExercisePage(Window):
         self.subtopic = subtopic
         self._exercise_count = 1
         self._exercises = []
-        self._title_label: QLabel = None
-        self._layout: QVBoxLayout = None
+        self._steps_done = []
+        self._step_widget_by_label = {}
+
+        self._title_label: QLabel = None  # noqa
+        self._layout: QVBoxLayout = None  # noqa
+        self._steps_done_widget: QComboBox = None  # noqa
         self._header_layout = None
         self._current_exercise_component = None
         self._get_exercise_data(subtopic_id=subtopic.id)
@@ -45,6 +49,11 @@ class FunctionExercisePage(Window):
 
         self._header_layout = self._get_header_layout()
         self._title_label = LabelFactory.get_label_component(text=self._get_title_label(), label_type=TextType.SUBTITLE)
+
+        self._steps_done_widget = QComboBox()
+        self._steps_done_widget.addItem('Sin ejercicios resueltos                              ')
+        self._steps_done_widget.setDisabled(True)
+
         self._current_exercise_component = self._get_current_exercise_component()
         self._set_layout()
 
@@ -96,6 +105,7 @@ class FunctionExercisePage(Window):
                 else True
             current_component = FunctionExerciseComponent(exercise=current_exercise, need_help_data=need_help_data)
             current_component.continue_signal.connect(self._setup_next_exercise)
+            # current_component.exercise_finished_signal.connect(self._save_step)
             return current_component
         except StopIteration:
             print('No hay ejercicios de este tipo')
@@ -111,6 +121,8 @@ class FunctionExercisePage(Window):
         self._layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self._layout.addLayout(self._header_layout)
         self._layout.addWidget(self._title_label, alignment=Qt.AlignHCenter)
+        self._layout.addSpacing(10)
+        self._layout.addWidget(self._steps_done_widget, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._current_exercise_component)
 
     def keyPressEvent(self, e):
@@ -134,11 +146,13 @@ class FunctionExercisePage(Window):
 
     def _setup_next_exercise(self):
         try:
+            # TODO Guardar el componente
             next_exercise: FunctionExercise = next(self._next_exercise)
             self._layout.removeWidget(self._current_exercise_component)
             self._current_exercise_component.setParent(None)
             self._current_exercise_component = FunctionExerciseComponent(exercise=next_exercise)
             self._current_exercise_component.continue_signal.connect(self._setup_next_exercise)
+            # self._current_exercise_component.exercise_finished_signal.connect(self._save_step)
             self._layout.addWidget(self._current_exercise_component, alignment=Qt.AlignHCenter)
             self._exercise_count += 1
             self._title_label.setText(self._get_title_label())
@@ -157,3 +171,30 @@ class FunctionExercisePage(Window):
 
     def _no_exit_dialog(self):
         self._exit_dialog_widget.close()
+
+    def _save_step(self):
+        step = self._current_exercise_component._current_step_component
+        step_label = f'Ejercicio {self._exercise_count}: {step.label}'
+
+        if step_label in self._step_widget_by_label:
+            return None
+
+        self._steps_done.append(step)
+
+        if self._steps_done_widget.itemText(0) == 'Sin ejercicios resueltos                              ':
+            self._steps_done_widget.clear()
+
+        self._steps_done_widget.addItem(step_label)
+        self._steps_done_widget.setCurrentIndex(self._steps_done_widget.count() - 1)
+        self._step_widget_by_label[step_label] = step
+
+        if self._steps_done_widget.count() == 1:
+            self._steps_done_widget.setDisabled(True)
+        else:
+            self._steps_done_widget.setDisabled(False)
+            self._steps_done_widget.activated.connect(self._update_step_component)
+
+    def _update_step_component(self):
+        current_text_label = self._steps_done_widget.currentText()
+        step_component = self._step_widget_by_label[current_text_label]
+        self._current_exercise_component.set_step_component(step_component)

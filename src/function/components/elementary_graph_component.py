@@ -55,7 +55,7 @@ class ElementaryGraphComponent(QWidget):
 
     def _get_main_window_layout(self, exercise: FunctionExercise) -> QHBoxLayout:
         main_window_layout = QHBoxLayout()
-        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()])
+        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()], show_ends=False)
 
         main_window_layout.addStretch()
         main_window_layout.addWidget(self._plot_widget, alignment=Qt.AlignHCenter)

@@ -5,26 +5,32 @@ from PyQt5.QtGui import QFont
 from pyqtgraph import TextItem
 
 from src.function.models.function import Function
+from src.function.models.function_exercise import FunctionExercise
 from src.function.models.function_point import FunctionPoint
 
 
 class PlotFactory:
     @classmethod
-    def get_plot(cls, functions: List[Function], show_title: bool = False,
+    def get_plot(cls, functions: List[Function], exercise: FunctionExercise, show_title: bool = False,
                  show_ends: bool = True) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget()
+        graph.setFixedSize(650, 650)
         graph.setMouseEnabled(x=False, y=False)
         graph.showGrid(x=True, y=True)
 
+        colors = [(255, 255, 255), (255, 255, 0), (128, 0, 128), (255, 153, 51), (255, 51, 204)]
         function_ranges = []
+        has_multiple_main_graphics = len([function for function in functions if function.is_main_graphic]) > 1
         for function in functions:
             x_values, y_values = function.get_points()
-            pen = pyqtgraph.mkPen(color=(255, 255, 255), width=5) if function.is_main_graphic \
-                else pyqtgraph.mkPen(color=(128, 0, 128), width=3)
+            pen = pyqtgraph.mkPen(color=colors.pop(0), width=5) \
+                if function.is_main_graphic and not has_multiple_main_graphics \
+                else pyqtgraph.mkPen(color=colors.pop(), width=3)
             graph.plot(x_values, y_values, pen=pen)
+
             if show_title and function.is_elementary_graph and function.is_main_graphic and len(functions) == 1:
                 math_expression = function.get_math_expression()
-                graph.setTitle(math_expression, color='orange', size='18pt')
+                graph.setTitle(math_expression, color='yellow', size='18pt')
 
             function_ranges.append((x_values, y_values))
 
@@ -37,8 +43,10 @@ class PlotFactory:
                 last_point_filling = 'w' if is_last_point_included else 'black'
                 graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
 
-        plot_x_range = plot_y_range = (-5, 5)
+        plot_x_range = plot_y_range = exercise.exercise_domain if exercise.exercise_domain else (-5, 5)
         graph.setRange(xRange=plot_x_range, yRange=plot_y_range)
+        graph.getAxis('left').setTextPen('yellow')
+        graph.getAxis('bottom').setTextPen('yellow')
         return graph
 
     @classmethod
@@ -73,18 +81,33 @@ class PlotFactory:
                              symbolSize='12')
 
         for point in help_points:
-            color = 'blue'
-            plot_widget.plot([point.x_value], [point.y_value], symbol='o', symbolBrush=color, symbolSize='12')
+            plot_widget.plot([point.x_value], [point.y_value], symbol='o', symbolBrush=rgb_tuple, symbolSize='12')
 
-        plot_x_range = plot_y_range = (-5, 5)
-        plot_widget.setRange(xRange=plot_x_range, yRange=plot_y_range)
+    @classmethod
+    def update_plot_with_points(cls, plot_widget: pyqtgraph.PlotWidget, point_function: List[List[tuple]],
+                                no_points: bool = False, rgb_tuple: tuple = (0, 0, 255), included: bool = False,
+                                point_color: tuple = (0, 0, 255)):
+
+        for function in point_function:
+            pen_width = 3
+            pen = pyqtgraph.mkPen(color=rgb_tuple, width=pen_width)
+
+            x_values = [point[0] for point in function]
+            y_values = [point[1] for point in function]
+            plot_widget.plot(x_values, y_values, pen=pen)
+
+            if no_points:
+                continue
+
+            plot_widget.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=point_color, symbolSize='12')
+            plot_widget.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=point_color, symbolSize='12')
 
     @classmethod
     def add_function_labels(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_labelling_with_color: list):
         for function, color in functions_to_labelling_with_color:
             font = QFont()
             font.setPixelSize(20)
-            x_value, y_value = function.get_random_points()
+            x_value, y_value = function.get_center_point()
             label = TextItem(anchor=(0.5, 0.5))
             text = function.get_math_expression()
             label.setText(text=text)

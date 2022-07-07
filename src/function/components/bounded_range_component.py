@@ -55,7 +55,7 @@ class BoundedRangeComponent(QWidget):
 
     def _get_main_window_layout(self, exercise: FunctionExercise) -> QHBoxLayout:
         main_window_layout = QHBoxLayout()
-        self._plot_widget = PlotFactory.get_plot(exercise.functions)
+        self._plot_widget = PlotFactory.get_plot(exercise.functions, exercise=exercise)
 
         main_window_layout.addStretch()
         main_window_layout.addWidget(self._plot_widget)
@@ -105,9 +105,7 @@ class BoundedRangeComponent(QWidget):
             self._update_plot_with_error_data()
 
     def _update_plot_with_error_data(self):
-        self._help_text.setText(
-            f'Incorrecto.'
-        )
+        self._help_text.setText(f'Incorrecto.')
         self._help_text.setStyleSheet(f'color: red')
 
     def _send_continue_signal(self):

@@ -60,16 +60,24 @@ class StepDataMapper:
     def _get_domain_concept_exercise_steps(self) -> List[FunctionStep]:
         first_step = self._get_first_domain_concept_step()
         second_step = self._get_second_domain_concept_step()
-        return [first_step, second_step]
+        third_step = self._get_third_domain_concept_step()
+        return [first_step, second_step, third_step]
 
     def _get_first_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_domain_exercise
-        question = 'Con la ayuda del ratón, indica el dominio y el recorrido de la siguiente gráfica'
+        question = 'Con la ayuda del ratón, indica el dominio de la siguiente gráfica'
         order = 0
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 
     def _get_second_domain_concept_step(self) -> FunctionStep:
+        step_type = InverseStepType.indicate_range_exercise
+        question = 'Con la ayuda del ratón, indica el recorrido de la siguiente gráfica'
+        order = 0
+        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+
+    def _get_third_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_bounded_range_exercise
         question = '¿La siguiente gráfica está acotada?'
         order = 1

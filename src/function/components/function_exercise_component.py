@@ -63,7 +63,7 @@ class FunctionExerciseComponent(QWidget):
             component = InverseSelectionComponent(exercise=self._exercise, step=step)
         elif step.type == InverseStepType.delimited_inverse_exercise:
             component = InverseDelimitedComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.indicate_domain_exercise:
+        elif step.type in [InverseStepType.indicate_domain_exercise, InverseStepType.indicate_range_exercise]:
             component = DomainIndicateComponent(exercise=self._exercise, step=step)
         elif step.type == InverseStepType.indicate_bounded_range_exercise:
             component = BoundedRangeComponent(exercise=self._exercise, step=step)

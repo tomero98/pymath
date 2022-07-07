@@ -6,6 +6,7 @@ class InverseStepType(Enum):
     selection_inverse_exercise = 'SelectionInverseExercise'
     delimited_inverse_exercise = 'DelimitedInverseExercise'
     indicate_domain_exercise = 'IndicateDomainExercise'
+    indicate_range_exercise = 'IndicateRangeExercise'
     indicate_bounded_range_exercise = 'IndicateBoundedRangeExercise'
     indicate_elementary_exercise = 'IndicateElementaryExercise'
     maximum_relative_exercise = 'MaximumRelativeExercise'

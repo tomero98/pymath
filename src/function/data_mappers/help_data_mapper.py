@@ -20,6 +20,8 @@ class HelpDataMapper:
             help_data = self._get_selection_inverse_help()
         elif step_type == InverseStepType.indicate_domain_exercise:
             help_data = self._get_indicate_domain_help()
+        elif step_type == InverseStepType.indicate_range_exercise:
+            help_data = self._get_indicate_range_help()
         elif step_type == InverseStepType.indicate_bounded_range_exercise:
             help_data = self._get_indicate_bounded_range_help()
         elif step_type == InverseStepType.maximum_relative_exercise:
@@ -49,7 +51,7 @@ class HelpDataMapper:
         return FunctionHelpData(help_text=help_text, help_expressions=[constant_graph_help])
 
     def _get_indicate_domain_help(self) -> FunctionHelpData:
-        help_text = 'El dominio es el rango de valores...'
+        help_text = 'Recuerda que el dominio lo forman los puntos con imagen.'
         x_values, y_values = self._exercise.get_domain_range_values()
         x_values_by_y_value = defaultdict(list)
         y_values_by_x_value = defaultdict(list)
@@ -112,7 +114,7 @@ class HelpDataMapper:
             function_points = [
                 FunctionPoint(x_value=duplicated_x, y_value=duplicated_element) for duplicated_x in duplicated_x_values
             ]
-        index = -1 if len(graphs)> 1 else 1
+        index = -1 if len(graphs) > 1 else 1
         constant_graphs = [
             Function(function_id=-1, expression=f'{constant}', domain='[-10, 10]', is_main_graphic=False,
                      is_elementary_graph=False, inverse_function=None)
@@ -125,6 +127,11 @@ class HelpDataMapper:
         start_point, end_point = y_range
         nums = [num for num in range(int(start_point), int(round(end_point) + 1))]
         return nums
+
+    @staticmethod
+    def _get_indicate_range_help() -> FunctionHelpData:
+        help_text = 'Recuerda que el recorrido son las imágenes que alcanza la función.'
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_indicate_bounded_range_help() -> FunctionHelpData:

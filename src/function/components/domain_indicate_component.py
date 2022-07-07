@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayo
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from ..factories import PlotFactory
+from ..models.enums.inverse_step_type import InverseStepType
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
 from ...projectConf.factories import LabelFactory, ButtonFactory
@@ -13,7 +14,7 @@ from ...projectConf.models.enums.text_type import TextType
 
 
 class DomainIndicateComponent(QWidget):
-    continue_signal = pyqtSignal(bool)
+    continue_signal = pyqtSignal()
     validate_signal = pyqtSignal()
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, need_help_data: bool = True):
@@ -22,6 +23,7 @@ class DomainIndicateComponent(QWidget):
         self._step = step
         self._is_answer_correct = True
         self._need_help_data = need_help_data
+        self._is_domain_exercise = step.type == InverseStepType.indicate_domain_exercise
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._help_subtitle_widget: QLabel = None  # noqa
@@ -187,7 +189,7 @@ class DomainIndicateComponent(QWidget):
         regex = QRegExp('[\(\[0-9\-][\ ]*[\-+inf0-9]+[\ ]*,[\ ]*[\-+inf0-9]+[\ ]*[\)\]][\ ]*U[\ ]*' * 5)
         validator = QtGui.QRegExpValidator(regex)
         self._domain_edit.setValidator(validator)
-        domain_text = 'Introduzca el dominio de la función: '
+        domain_text = f'Introduzca el {"dominio" if self._is_domain_exercise else "rango"} de la función: '
         domain_label = LabelFactory.get_label_component(text=domain_text, label_type=TextType.SUBTITLE)
         domain_layout.addWidget(domain_label, alignment=Qt.AlignHCenter)
         domain_layout.addWidget(self._domain_edit)
@@ -200,6 +202,8 @@ class DomainIndicateComponent(QWidget):
     def _set_help_text(self):
         self._help_text.setText(self._step.function_help_data.help_text)
         self._help_text.setStyleSheet(f'color: blue')
+        self._help_text.setVisible(True)
+        self._help_button.setDisabled(True)
 
     def _update_plot_with_help_data(self):
         functions_to_update = self._step.function_help_data.help_expressions
@@ -208,7 +212,9 @@ class DomainIndicateComponent(QWidget):
 
     def _validate_exercise(self):
         expression = self._domain_edit.text()
-        domain_is_correct = self._exercise.validate_domain_expression(domain_expression=expression)
+        domain_is_correct = self._exercise.validate_domain_expression(domain_expression=expression) \
+            if self._is_domain_exercise \
+            else self._exercise.validate_range_expression(range_expression=expression)
         self._is_answer_correct = domain_is_correct
         border_color = '#2F8C53' if self._is_answer_correct else 'red'
         if not domain_is_correct:
@@ -219,11 +225,15 @@ class DomainIndicateComponent(QWidget):
         self._continue_button.setDisabled(False)
         if not self._is_answer_correct:
             self._update_plot_with_error_data()
+        if self._help_button:
+            self._help_button.setDisabled(True)
+
+        help_text = 'Correcto.' if domain_is_correct else f'Incorrecto. {self._step.function_help_data.help_text}'
+        self._help_text.setText(help_text)
+        self._help_text.setStyleSheet(f'color: {border_color}')
+        self._help_text.setVisible(True)
 
     def _update_plot_with_error_data(self):
-        self._help_text.setText(f'Recuerda que: "{self._step.function_help_data.help_text}". Por lo que en este caso '
-                                f'habría que delimitar el dominio de la función.')
-        self._help_text.setStyleSheet(f'color: red')
         functions_to_update = self._step.function_help_data.help_expressions
         PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=functions_to_update, no_points=True,
                                 constants=True)

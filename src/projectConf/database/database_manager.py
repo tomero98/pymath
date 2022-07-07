@@ -126,12 +126,12 @@ class DatabaseManager:
             ('ElementaryGraphExercise', 1, None, 4),
             ('ElementaryGraphExercise', 2, None, 4),
             ('ElementaryGraphExercise', 3, None, 4),
-            #
-            # # Maximum functions
-            # ('MaximumPointsExercise', 0, None, 5),
-            # ('MinimumPointsExercise', 1, None, 5),
-            # ('MaximumPointsExercise', 2, None, 5),
-            # ('MinimumPointsExercise', 3, None, 5),
+
+            # Maximum functions
+            ('MaximumPointsExercise', 0, None, 5),
+            ('MinimumPointsExercise', 1, None, 5),
+            ('MaximumPointsExercise', 2, None, 5),
+            ('MinimumPointsExercise', 3, None, 5),
 
         ]
         sql_query = QSqlQuery()
@@ -207,20 +207,20 @@ class DatabaseManager:
 
             # Eight exercise
             ('math.tan(x)', 1, None),  # 20
-            #
-            # # Nine exercise
-            # ('x**4', '(-2, 2)', 1, None),  # 21
-            # ('1/(x**5)', '[-3, 3]', 1, None),  # 22
-            #
-            # # Tenth exercise
-            # ('x+2', '[-3, -1)', 0, None),  # 23
-            # ('x**2', '[-1, 1]', 0, None),  # 24
-            # ('-(x-1)**(1/2)', '(1, 2)', 0, None),  # 25
-            #
-            # # Twelve exercise
-            # ('(x+2)**(3)-3*(x+2)**2', '(-2, 0]', 0, None),  # 26
-            # ('x**(1/2)', '(0, 2]', 0, None),  # 27
-            # ('(x-2)**(2)-1', '(2, 4]', 0, None),  # 28
+
+            # Nine exercise
+            ('x**4', 1, None),  # 21
+            ('1/(x**5)', 1, None),  # 22
+
+            # Tenth exercise
+            ('x+2', 0, None),  # 23
+            ('x**2', 0, None),  # 24
+            ('-(x-1)**(1/2)', 0, None),  # 25
+
+            # Twelve exercise
+            ('(x+2)**(3)-3*(x+2)**2', 0, None),  # 26
+            ('x**(1/2)', 0, None),  # 27
+            ('(x-2)**(2)-1', 0, None),  # 28
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -310,22 +310,22 @@ class DatabaseManager:
             (12, 21, 0, None),
             (12, 1, 0, None),
             (12, 20, 0, None),
-            #
-            # # Eleventh exercise
-            # (13, 23, 1),
-            # (13, 24, 1),
-            # (13, 25, 1),
-            #
-            # # Twelve
-            # (14, 18, 1),
-            #
-            # # Thirteenth exercise
-            # (15, 17, 1),
-            #
-            # # Fourteenth exercise
-            # (16, 26, 1),
-            # (16, 27, 1),
-            # (16, 28, 1),
+
+            # Eleventh exercise
+            (13, 23, 1, None),
+            (13, 24, 1, None),
+            (13, 25, 1, None),
+
+            # Twelve
+            (14, 18, 1, None),
+
+            # Thirteenth exercise
+            (15, 17, 1, None),
+
+            # Fourteenth exercise
+            (16, 26, 1, None),
+            (16, 27, 1, None),
+            (16, 28, 1, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

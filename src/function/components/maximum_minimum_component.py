@@ -1,6 +1,6 @@
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt, QRegExp
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QLineEdit, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QLineEdit, QApplication, QSizePolicy
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from ..factories import PlotFactory
@@ -14,8 +14,7 @@ from ...projectConf.models.enums.text_type import TextType
 
 
 class MaximumMinimumComponent(QWidget):
-    continue_signal = pyqtSignal(bool)
-    validate_signal = pyqtSignal()
+    continue_signal = pyqtSignal()
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep):
         super(MaximumMinimumComponent, self).__init__()
@@ -43,43 +42,82 @@ class MaximumMinimumComponent(QWidget):
             self._function_points_by_expression[function.expression] = function.get_points_range()
 
     def _draw(self):
-        self._layout = QVBoxLayout()
-        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout = QHBoxLayout()
+        question_layout = self._get_question_layout()
+        self._set_plot_widget(self._exercise)
 
-        question_widget = LabelFactory.get_label_component(text=self._step.question, label_type=TextType.SUBTITLE)
-        self._point_label = LabelFactory.get_label_component(text='', label_type=TextType.SMALL_TEXT, set_bold=True)
-        self._main_window_layout = self._get_main_window_layout(self._exercise)
-        self._bottom_buttons_layout = self._get_bottom_buttons_layout()
-        self._help_text = LabelFactory.get_label_component(text='', label_type=TextType.NORMAL_TEXT,
-                                                           need_word_wrap=True)
+        self._layout.addLayout(question_layout)
+        self._layout.addWidget(self._plot_widget)
+        self.setLayout(self._layout)
+
+    def _get_question_layout(self) -> QVBoxLayout:
+        question_layout = QVBoxLayout()
+        question_layout.setContentsMargins(5, 25, 5, 5)
+
+        question_label = LabelFactory.get_label_component(text=self._step.question, label_type=TextType.BIG_TITLE,
+                                                          need_word_wrap=True, align=Qt.AlignHCenter)
+        self._point_label = LabelFactory.get_label_component(text='Coordenada x: ', label_type=TextType.SUBTITLE,
+                                                             set_bold=True, set_visible=False)
+        self._validate_button_layout = self._get_validate_button_layout()
         self._validate_button = ButtonFactory.get_button_component(
             title='Comprobar la respuesta', function_to_connect=lambda: self._validate_exercise()
         )
+        self._bottom_buttons_layout = self._get_bottom_buttons_layout()
 
-        icon = IconFactory.get_icon_widget(image_name='continue_button.png')
-        self._continue_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._send_continue_signal(), icon=icon, icon_size=40,
-            tooltip='Continuar')
+        question_layout.addWidget(question_label)
+        question_layout.addSpacing(40)
+        question_layout.addLayout(self._bottom_buttons_layout)
+        question_layout.addWidget(self._point_label, alignment=Qt.AlignHCenter)
+        question_layout.addSpacing(40)
+        question_layout.addLayout(self._validate_button_layout)
 
-        self._layout.addWidget(question_widget, alignment=Qt.AlignHCenter)
-        self._layout.addWidget(self._point_label, alignment=Qt.AlignRight)
-        self._layout.addLayout(self._main_window_layout)
-        self._layout.addLayout(self._bottom_buttons_layout)
-        self._layout.addWidget(self._help_text)
-        self._layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
-        self._layout.addWidget(self._continue_button, alignment=Qt.AlignLeft)
-        self.setLayout(self._layout)
+        continue_buttons_layout = self._get_continue_buttons_layout()
+        question_layout.addLayout(continue_buttons_layout)
+        question_layout.addStretch()
 
-    def _get_main_window_layout(self, exercise: FunctionExercise) -> QHBoxLayout:
-        main_window_layout = QHBoxLayout()
-        self._plot_widget = PlotFactory.get_plot(exercise.functions, show_title=True)
+        return question_layout
+
+    def _set_plot_widget(self, exercise: FunctionExercise):
+        self._plot_widget = PlotFactory.get_plot(exercise.functions, exercise=exercise, show_ends=False)
         self.proxy = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
         self.proxy2 = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseClicked, rateLimit=60, slot=self.on_click)
 
-        main_window_layout.addStretch()
-        main_window_layout.addWidget(self._plot_widget)
-        main_window_layout.addStretch()
-        return main_window_layout
+    def _get_validate_button_layout(self) -> QVBoxLayout:
+        validate_button_layout = QVBoxLayout()
+
+        icon = IconFactory.get_icon_widget(image_name='comprobar_respuesta.png')
+        self._validate_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=lambda: self._validate_exercise(), icon=icon, icon_size=50,
+            tooltip='Validar respuesta',
+        )
+        validate_button_text = LabelFactory.get_label_component(text='Comprobar respuesta',
+                                                                label_type=TextType.NORMAL_TEXT,
+                                                                size_policy=(QSizePolicy.Fixed, QSizePolicy.Fixed))
+
+        validate_button_layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
+        validate_button_layout.addWidget(validate_button_text, alignment=Qt.AlignHCenter)
+        return validate_button_layout
+
+    def _get_continue_buttons_layout(self) -> QHBoxLayout:
+        continue_layout = QHBoxLayout()
+
+        icon = IconFactory.get_icon_widget(image_name='continue_button.png')
+        self._continue_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=lambda: self._send_continue_signal(), icon=icon, icon_size=85,
+            tooltip='Continuar', is_disable=True)
+
+        icon = IconFactory.get_icon_widget(image_name='continue_button.png')
+        self._back_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=lambda: self._send_continue_signal(), icon=icon, icon_size=85,
+            tooltip='Ir al ejercicio anterior', is_disable=True)
+
+        continue_layout.addStretch()
+        continue_layout.addWidget(self._back_button)
+        continue_layout.addStretch()
+        continue_layout.addStretch()
+        continue_layout.addWidget(self._continue_button)
+        continue_layout.addStretch()
+        return continue_layout
 
     def mouse_moved(self, e):
         pos = e[0]
@@ -129,41 +167,31 @@ class MaximumMinimumComponent(QWidget):
                         break
 
     def _on_click_point(self):
-        point = self._point_label.text()[5:]
-        if self._step.type in [InverseStepType.maximum_relative_exercise, InverseStepType.minimum_relative_exercise]:
-            self._response_edit.setText(f'{self._response_edit.text()}{point}; ')
-        else:
-            self._response_edit.setText(f'{point}')
+        point = self._point_label.text()[6:]
+        x_value = point[1:-1].split(',')[0]
+        self._response_edit.setText(f'{self._response_edit.text()}{x_value}; ')
 
-    def _get_bottom_buttons_layout(self) -> QHBoxLayout:
+    def _get_bottom_buttons_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
         response_layout = self._get_response_layout()
+        text = 'El formato esperado es el siguiente: "-1; 5;".'
+        placeholder = LabelFactory.get_label_component(text=text, label_type=TextType.NORMAL_TEXT, set_cursive=True)
         layout.addLayout(response_layout)
+        layout.addWidget(placeholder, alignment=Qt.AlignHCenter)
         return layout
 
     def _get_response_layout(self) -> QHBoxLayout:
-        response_layout = QHBoxLayout()
-        is_absolute = self._step.type in [InverseStepType.minimum_absolute_exercise,
-                                          InverseStepType.maximum_absolute_exercise]
-        input_placeholder = '(5, 4)' if is_absolute else '(5, 4); (5, 1)'
+        response_layout = QVBoxLayout()
+        input_placeholder = '-1; 5;'
         self._response_edit = LineEditFactory.get_line_edit_component(placeholder_text=input_placeholder)
-        regex_absolute = QRegExp('([0-9,]*[\ ]*,[\ ]*[0-9,]*)')
-        regex_relative = QRegExp('([0-9,]*[\ ]*,[\ ]*[0-9,]*);' * 4)
-        regex = regex_absolute if is_absolute else regex_relative
+        regex = QRegExp('[\-]?[0-9]*[\ ]*;[\ ]*[\-]?[0-9]*;[\ ]*' * 4)
         validator = QtGui.QRegExpValidator(regex)
         self._response_edit.setValidator(validator)
-        response_text = 'Introduzca el punto asociado: ' if is_absolute else 'Introduzca los puntos asociados: '
-        response_label = LabelFactory.get_label_component(text=response_text, label_type=TextType.NORMAL_TEXT)
-        response_layout.addWidget(response_label)
+        response_text = 'Introduzca las abscisas asociadas: '
+        response_label = LabelFactory.get_label_component(text=response_text, label_type=TextType.SUBTITLE)
+        response_layout.addWidget(response_label, alignment=Qt.AlignHCenter)
         response_layout.addWidget(self._response_edit)
         return response_layout
-
-    def setup_help_data(self):
-        self._set_help_text()
-
-    def _set_help_text(self):
-        self._help_text.setText(self._step.function_help_data.help_text)
-        self._help_text.setStyleSheet(f'color: blue')
 
     def _validate_exercise(self):
         self._is_answer_correct = True
@@ -175,12 +203,10 @@ class MaximumMinimumComponent(QWidget):
             self._update_plot_with_error_data()
 
     def _update_plot_with_error_data(self):
-        self._help_text.setText(f'Recuerda que: "{self._step.function_help_data.help_text}". Por lo que en este caso '
-                                f'habría que delimitar el dominio de la función.')
-        self._help_text.setStyleSheet(f'color: red')
+        print(5)
 
     def _send_continue_signal(self):
         if self._is_answer_correct is not None:
-            self.continue_signal.emit(True)
+            self.continue_signal.emit()
         else:
             self._validate_exercise()

@@ -8,6 +8,7 @@ class InverseStepType(Enum):
     indicate_domain_exercise = 'IndicateDomainExercise'
     indicate_range_exercise = 'IndicateRangeExercise'
     indicate_bounded_range_exercise = 'IndicateBoundedRangeExercise'
+    indicate_roots_exercise = 'IndicateRootsExercise'
     indicate_elementary_exercise = 'IndicateElementaryExercise'
     maximum_relative_exercise = 'MaximumRelativeExercise'
     maximum_absolute_exercise = 'MaximumAbsoluteExercise'

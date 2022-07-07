@@ -61,7 +61,9 @@ class StepDataMapper:
         first_step = self._get_first_domain_concept_step()
         second_step = self._get_second_domain_concept_step()
         third_step = self._get_third_domain_concept_step()
-        return [first_step, second_step, third_step]
+        four_step = self._get_four_domain_concept_step()
+        # return [first_step, second_step, third_step, four_step]
+        return [four_step]
 
     def _get_first_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_domain_exercise
@@ -81,6 +83,13 @@ class StepDataMapper:
         step_type = InverseStepType.indicate_bounded_range_exercise
         question = 'Indica si la siguiente gráfica está acotada para el dominio dado'
         order = 2
+        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+
+    def _get_four_domain_concept_step(self) -> FunctionStep:
+        step_type = InverseStepType.indicate_roots_exercise
+        question = 'Indica, si tiene, las raíces de la siguiente gráfica:'
+        order = 3
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 

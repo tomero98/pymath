@@ -8,6 +8,7 @@ from .inverse_boolean_component import InverseBooleanComponent
 from .inverse_delimited_component import InverseDelimitedComponent
 from .inverse_selection_component import InverseSelectionComponent
 from .maximum_minimum_component import MaximumMinimumComponent
+from .root_domain_component import RootDomainComponent
 from ..models.enums.inverse_step_type import InverseStepType
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
@@ -67,6 +68,8 @@ class FunctionExerciseComponent(QWidget):
             component = DomainIndicateComponent(exercise=self._exercise, step=step)
         elif step.type == InverseStepType.indicate_bounded_range_exercise:
             component = BoundedRangeComponent(exercise=self._exercise, step=step)
+        elif step.type == InverseStepType.indicate_roots_exercise:
+            component = RootDomainComponent(exercise=self._exercise, step=step)
         elif step.type == InverseStepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step)
         elif step.type == InverseStepType.maximum_relative_exercise:

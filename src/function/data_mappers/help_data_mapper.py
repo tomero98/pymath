@@ -24,6 +24,8 @@ class HelpDataMapper:
             help_data = self._get_indicate_range_help()
         elif step_type == InverseStepType.indicate_bounded_range_exercise:
             help_data = self._get_indicate_bounded_range_help()
+        elif step_type == InverseStepType.indicate_roots_exercise:
+            help_data = self._get_indicate_indicate_roots_help()
         elif step_type == InverseStepType.maximum_relative_exercise:
             help_data = self._get_maximum_relative_help()
         elif step_type == InverseStepType.maximum_absolute_exercise:
@@ -136,6 +138,11 @@ class HelpDataMapper:
     @staticmethod
     def _get_indicate_bounded_range_help() -> FunctionHelpData:
         help_text = '¿El rango está acotado?'
+        return FunctionHelpData(help_text=help_text, help_expressions=[])
+
+    @staticmethod
+    def _get_indicate_indicate_roots_help() -> FunctionHelpData:
+        help_text = 'Observa el eje de las abcisas'
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod

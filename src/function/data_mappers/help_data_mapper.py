@@ -135,7 +135,7 @@ class HelpDataMapper:
 
     @staticmethod
     def _get_indicate_bounded_range_help() -> FunctionHelpData:
-        help_text = 'Para que una gráfica se diga que está acotada...'
+        help_text = '¿El rango está acotado?'
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod

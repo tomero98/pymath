@@ -12,7 +12,7 @@ from src.function.models.function_point import FunctionPoint
 class PlotFactory:
     @classmethod
     def get_plot(cls, functions: List[Function], exercise: FunctionExercise, show_title: bool = False,
-                 show_ends: bool = True) -> pyqtgraph.PlotWidget:
+                 show_ends: bool = True, rgb_tuple=None) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget()
         graph.setFixedSize(650, 650)
         graph.setMouseEnabled(x=False, y=False)
@@ -26,6 +26,7 @@ class PlotFactory:
             pen = pyqtgraph.mkPen(color=colors.pop(0), width=5) \
                 if function.is_main_graphic and not has_multiple_main_graphics \
                 else pyqtgraph.mkPen(color=colors.pop(), width=3)
+            pen = pen if not rgb_tuple else pyqtgraph.mkPen(color=rgb_tuple, width=5)
             graph.plot(x_values, y_values, pen=pen)
 
             if show_title and function.is_elementary_graph and function.is_main_graphic and len(functions) == 1:

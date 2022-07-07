@@ -117,15 +117,15 @@ class DatabaseManager:
 
             # Domain exercise
             ('ConceptDomainExercise', 0, None, 3),
-            # ('ConceptDomainExercise', 1, None, 3),
-            # ('ConceptDomainExercise', 2, None, 3),
-            # ('ConceptDomainExercise', 3, None, 3),
-            #
-            # # Elementary functions
-            # ('ElementaryGraphExercise', 0, None, 4),
-            # ('ElementaryGraphExercise', 1, None, 4),
-            # ('ElementaryGraphExercise', 2, None, 4),
-            # ('ElementaryGraphExercise', 3, None, 4),
+            ('ConceptDomainExercise', 1, None, 3),
+            ('ConceptDomainExercise', 2, None, 3),
+            ('ConceptDomainExercise', 3, None, 3),
+
+            # Elementary functions
+            ('ElementaryGraphExercise', 0, None, 4),
+            ('ElementaryGraphExercise', 1, None, 4),
+            ('ElementaryGraphExercise', 2, None, 4),
+            ('ElementaryGraphExercise', 3, None, 4),
             #
             # # Maximum functions
             # ('MaximumPointsExercise', 0, None, 5),
@@ -198,15 +198,15 @@ class DatabaseManager:
             ('x**3-3*x', 0, None),  # 17
             #
             # # Todo: add two domain exercise
-            #
-            # # Sixth exercise
-            # ('math.cosh(x)', '(-3, 3)', 1, None),  # 18
-            #
-            # # Seventh exercise
-            # ('x**2', '[2, 2]', 0, None),  # 19
-            #
-            # # Eight exercise
-            # ('math.tan(x)', '[-3, 3]', 1, None),  # 20
+
+            # Sixth exercise
+            ('math.cosh(x)', 1, None),  # 18
+
+            # Seventh exercise
+            ('x**2', 0, None),  # 19
+
+            # Eight exercise
+            ('math.tan(x)', 1, None),  # 20
             #
             # # Nine exercise
             # ('x**4', '(-2, 2)', 1, None),  # 21
@@ -283,33 +283,33 @@ class DatabaseManager:
 
             # Fifth exercise
             (7, 17, 1, '[-2, 6)'),
-            #
-            # # Sixth exercise
-            # (6, 18, 1),
-            #
-            # # Seventh exercise
-            # (9, 1, 1),
-            # (9, 2, 0),
-            # (9, 3, 0),
-            # (9, 19, 0),
-            #
-            # # Eight exercise
-            # (10, 5, 1),
-            # (10, 6, 0),
-            # (10, 7, 0),
-            # (10, 8, 0),
-            #
-            # # Nine exercise
-            # (11, 9, 1),
-            # (11, 10, 0),
-            # (11, 11, 0),
-            # (11, 20, 0),
-            #
-            # # Tenth exercise
-            # (12, 2, 1),
-            # (12, 21, 0),
-            # (12, 1, 0),
-            # (12, 20, 0),
+
+            # Sixth exercise
+            (6, 18, 1, None),
+
+            # Seventh exercise
+            (9, 1, 1, None),
+            (9, 2, 0, None),
+            (9, 3, 0, None),
+            (9, 19, 0, None),
+
+            # Eight exercise
+            (10, 5, 1, None),
+            (10, 6, 0, None),
+            (10, 7, 0, None),
+            (10, 8, 0, None),
+
+            # Nine exercise
+            (11, 9, 1, None),
+            (11, 10, 0, None),
+            (11, 11, 0, None),
+            (11, 20, 0, None),
+
+            # Tenth exercise
+            (12, 2, 1, None),
+            (12, 21, 0, None),
+            (12, 1, 0, None),
+            (12, 20, 0, None),
             #
             # # Eleventh exercise
             # (13, 23, 1),

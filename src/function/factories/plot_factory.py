@@ -12,11 +12,11 @@ from src.function.models.function_point import FunctionPoint
 class PlotFactory:
     @classmethod
     def get_plot(cls, functions: List[Function], exercise: FunctionExercise, show_title: bool = False,
-                 show_ends: bool = True, rgb_tuple=None) -> pyqtgraph.PlotWidget:
-        graph = pyqtgraph.PlotWidget()
+                 show_ends: bool = True, rgb_tuple=None, show_grid: bool = True, parent=None) -> pyqtgraph.PlotWidget:
+        graph = pyqtgraph.PlotWidget() if not parent else pyqtgraph.PlotWidget(parent)
         graph.setFixedSize(650, 650)
         graph.setMouseEnabled(x=False, y=False)
-        graph.showGrid(x=True, y=True)
+        graph.showGrid(x=show_grid, y=show_grid)
 
         colors = [(255, 255, 255), (255, 255, 0), (128, 0, 128), (255, 153, 51), (255, 51, 204)]
         function_ranges = []
@@ -87,10 +87,10 @@ class PlotFactory:
     @classmethod
     def update_plot_with_points(cls, plot_widget: pyqtgraph.PlotWidget, point_function: List[List[tuple]],
                                 no_points: bool = False, rgb_tuple: tuple = (0, 0, 255), included: bool = False,
-                                point_color: tuple = (0, 0, 255)):
+                                point_color: tuple = (0, 0, 255), pen_width: int = None):
 
         for function in point_function:
-            pen_width = 3
+            pen_width = 3 if not pen_width else pen_width
             pen = pyqtgraph.mkPen(color=rgb_tuple, width=pen_width)
 
             x_values = [point[0] for point in function]

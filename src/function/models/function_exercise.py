@@ -54,12 +54,12 @@ class FunctionExercise:
         points = reduce(lambda a, b: a.symmetric_difference(b), points_list)
         return points
 
-    def get_domain_range_values(self) -> (list, list):
+    def get_domain_range_values(self, small_sample : bool = False) -> (list, list):
         functions = [function for function in self.functions if function.is_main_graphic]
         all_x_values = []
         all_y_values = []
         for function in functions:
-            x_values, y_values = function.get_points()
+            x_values, y_values = function.get_points(small_sample=small_sample)
             all_x_values.extend(x_values)
             all_y_values.extend(y_values)
         return all_x_values, all_y_values

@@ -65,10 +65,10 @@ class DatabaseManager:
     @staticmethod
     def _populate_subtopic_data():
         subtopic_seed = [
-            ('Funciones inversas', 'Ejercicios sobre inversas', 1), # 2
-            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1), # 3
-            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1), # 4
-            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1) # 5
+            ('Funciones inversas', 'Ejercicios sobre inversas', 1),
+            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1),
+            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1),
+            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1)
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -107,36 +107,31 @@ class DatabaseManager:
     def _populate_exercise_data():
         # Domain example: '5, 5'
         exercise_seed = [
-            # Elementary functions exercises
-            ('ElementaryGraphExercise', 0, None, 4), # 1
+            # Inverse exercise
+            ('ConceptInverseExercise', 0, '-3, 3', 2),  # 1
+            ('ConceptInverseExercise', 0, '-3, 3', 2),  # 2
+            ('ConceptInverseExercise', 0, None, 2),  # 3
+            ('ConceptInverseExercise', 0, None, 2),  # 4
+            ('ConceptInverseExercise', 0, None, 2),  # 5
+            ('ConceptInverseExercise', 0, None, 2),  # 6
 
-            # Domain functions exercises
-            ('ConceptDomainExercise', 0, None, 3), # 2
-            ('ConceptDomainExercise', 0, None, 3), # 3
-            ('ConceptDomainExercise', 0, None, 3), # 4
-            ('ConceptDomainExercise', 0, None, 3), # 5
-            ('ConceptDomainExercise', 0, None, 3), # 6
-            ('ConceptDomainExercise', 0, None, 3), # 7
+            # Domain exercise
+            ('ConceptDomainExercise', 0, None, 3),
+            ('ConceptDomainExercise', 1, None, 3),
+            ('ConceptDomainExercise', 2, None, 3),
+            ('ConceptDomainExercise', 3, None, 3),
 
-            # # Inverse exercise
-            # ('ConceptInverseExercise', 0, '-3, 3', 2),  # 1
-            # ('ConceptInverseExercise', 0, '-3, 3', 2),  # 2
-            # ('ConceptInverseExercise', 0, None, 2),  # 3
-            # ('ConceptInverseExercise', 0, None, 2),  # 4
-            # ('ConceptInverseExercise', 0, None, 2),  # 5
-            # ('ConceptInverseExercise', 0, None, 2),  # 6
-            #
-            # # Domain exercise
-            # ('ConceptDomainExercise', 0, None, 3),
-            # ('ConceptDomainExercise', 1, None, 3),
-            # ('ConceptDomainExercise', 2, None, 3),
-            # ('ConceptDomainExercise', 3, None, 3),
+            # Elementary functions
+            ('ElementaryGraphExercise', 0, None, 4),
+            ('ElementaryGraphExercise', 1, None, 4),
+            ('ElementaryGraphExercise', 2, None, 4),
+            ('ElementaryGraphExercise', 3, None, 4),
 
-            # # Maximum functions
-            # ('MaximumPointsExercise', 0, None, 5),
-            # ('MinimumPointsExercise', 1, None, 5),
-            # ('MaximumPointsExercise', 2, None, 5),
-            # ('MinimumPointsExercise', 3, None, 5),
+            # Maximum functions
+            ('MaximumPointsExercise', 0, None, 5),
+            ('MinimumPointsExercise', 1, None, 5),
+            ('MaximumPointsExercise', 2, None, 5),
+            ('MinimumPointsExercise', 3, None, 5),
 
         ]
         sql_query = QSqlQuery()
@@ -175,32 +170,57 @@ class DatabaseManager:
     @staticmethod
     def _populate_graph_data():
         graph_seed = [
-            # Elementary graphs
-            ('x**(1/3)', 1, None),  # 1
-            ('x**3', 1, None),  # 2
-            ('-x**(1/3)', 1, None),  # 3
-            ('x**2', 1, None),  # 4
-            ('math.e**x', 1, None),  # 5
-            ('math.log(x)', 1, None),  # 6
-            ('-math.e**x', 1, None),  # 7
-            ('0.5**x', 1, None),  # 8
-            ('math.cos(x)', 1, None),  # 9
-            ('math.acos(x)', 1, None),  # 10
-            ('math.sin(x)', 1, None),  # 11
-            ('math.asin(x)', 1, None),  # 12
-            ('math.log(x - 1)', 1, None),  # 13
-            ('(x + 2)**2', 1, None),  # 14
-            ('x**2 - 1', 1, None),  # 15
-            ('math.sinh(x + 1)', 1, None),  # 16
+            # First exercise inverse
+            ('x**(1/5)', 1, None),  # 1
+            ('x**5', 1, 1),  # 2
+            ('-(x**(1/5))', 0, None),  # 3
+            ('-x**1/2', 0, None),  # 4
 
-            # Domain graphs
-            ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
-            ('(x + 4) ** 2 - 1', 0, None),  # 18
-            ('- x', 0, None),  # 19
-            ('((x + 3) * (2 - x))**(1 / 2) - 1', 0, None),  # 20
-            ('- abs(x - 2) + 3', 0, None),  # 21
-            ('math.log(3 - x)', 0, None),  # 22
-            ('math.cosh(x)', 0, None),  # 23
+            # # Second exercise inverse
+            ('math.e**x', 1, None),  # 5
+            ('math.log(x)', 1, 5),  # 6
+            ('-math.e**x', 0, None),  # 7
+            ('-(x+4)**(1/2)', 0, None),  # 8
+            #
+            # Third exercise inverse
+            ('math.cos(x)', 1, None),  # 9
+            ('math.acos(x)', 0, 9),  # 10
+            ('math.sin(x)', 1, None),  # 11
+            ('-math.cos(x)', 0, None),  # 12
+            #
+            # Four exercise inverse
+            ('x**4', 1, None),  # 13
+            ('x**(1/4)', 0, 13),  # 14
+            ('-x**4', 0, None),  # 15
+            ('-x**3', 0, None),  # 16
+
+            # Fifth exercise
+            ('x**3-3*x', 0, None),  # 17
+            #
+            # # Todo: add two domain exercise
+
+            # Sixth exercise
+            ('math.cosh(x)', 1, None),  # 18
+
+            # Seventh exercise
+            ('x**2', 0, None),  # 19
+
+            # Eight exercise
+            ('math.tan(x)', 1, None),  # 20
+
+            # Nine exercise
+            ('x**4', 1, None),  # 21
+            ('1/(x**5)', 1, None),  # 22
+
+            # Tenth exercise
+            ('x+2', 0, None),  # 23
+            ('x**2', 0, None),  # 24
+            ('-(x-1)**(1/2)', 0, None),  # 25
+
+            # Twelve exercise
+            ('(x+2)**(3)-3*(x+2)**2', 0, None),  # 26
+            ('x**(1/2)', 0, None),  # 27
+            ('(x-2)**(2)-1', 0, None),  # 28
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -237,46 +257,75 @@ class DatabaseManager:
     @staticmethod
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
-            # Elementary exercise
-            (1, 1, 0, None),
+            # First exercise
+            (1, 1, 1, None),
             (1, 2, 0, None),
             (1, 3, 0, None),
             (1, 4, 0, None),
-            (1, 5, 0, None),
-            (1, 6, 0, None),
-            (1, 7, 0, None),
-            (1, 8, 0, None),
-            (1, 9, 0, None),
-            (1, 10, 0, None),
-            (1, 11, 0, None),
-            (1, 12, 0, None),
-            (1, 13, 0, None),
-            (1, 14, 0, None),
-            (1, 15, 0, None),
-            (1, 16, 0, None),
 
-            # Domain exercises
+            # Second exercise
+            (2, 5, 1, None),
+            (2, 6, 0, None),
+            (2, 7, 0, None),
+            (2, 8, 0, None),
 
-            (2, 17, 1, None),
-            (3, 18, 1, '[-4, -2]'),
-            (3, 19, 1, '(-1, 3]'),
-            (4, 20, 1, '[-3, 2]'),
-            (5, 21, 1, None),
-            (6, 22, 1, None),
-            (7, 23, 1, None),
+            # # Third exercise
+            (3, 9, 1, None),
+            (3, 10, 0, None),
+            (3, 11, 0, None),
+            (3, 12, 0, None),
 
-            # (1, 5, 1, None),
-            # (1, 6, 1, None),
-            # (1, 7, 1, None),
-            # (1, 8, 1, None),
-            # (1, 9, 1, None),
-            # (1, 10, 1, None),
-            # (1, 11, 1, None),
-            # (1, 12, 1, None),
-            # (1, 13, 1, None),
-            # (1, 14, 1, None),
-            # (1, 15, 1, None),
-            # (1, 16, 1, None),
+            # Four exercise
+            (4, 13, 1, None),
+            (4, 14, 0, None),
+            (4, 15, 0, None),
+            (4, 16, 0, None),
+
+            # Fifth exercise
+            (7, 17, 1, '[-2, 6)'),
+
+            # Sixth exercise
+            (6, 18, 1, None),
+
+            # Seventh exercise
+            (9, 1, 1, None),
+            (9, 2, 0, None),
+            (9, 3, 0, None),
+            (9, 19, 0, None),
+
+            # Eight exercise
+            (10, 5, 1, None),
+            (10, 6, 0, None),
+            (10, 7, 0, None),
+            (10, 8, 0, None),
+
+            # Nine exercise
+            (11, 9, 1, None),
+            (11, 10, 0, None),
+            (11, 11, 0, None),
+            (11, 20, 0, None),
+
+            # Tenth exercise
+            (12, 2, 1, None),
+            (12, 21, 0, None),
+            (12, 1, 0, None),
+            (12, 20, 0, None),
+
+            # Eleventh exercise
+            (13, 23, 1, None),
+            (13, 24, 1, None),
+            (13, 25, 1, None),
+
+            # Twelve
+            (14, 18, 1, None),
+
+            # Thirteenth exercise
+            (15, 17, 1, None),
+
+            # Fourteenth exercise
+            (16, 26, 1, None),
+            (16, 27, 1, None),
+            (16, 28, 1, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

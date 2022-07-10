@@ -24,6 +24,7 @@ class DomainIndicateComponent(QWidget):
         self._is_answer_correct = True
         self._need_help_data = need_help_data
         self._is_domain_exercise = step.type == InverseStepType.indicate_domain_exercise
+        self._is_range_exercise = step.type == InverseStepType.indicate_range_exercise
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._help_subtitle_widget: QLabel = None  # noqa
@@ -94,7 +95,8 @@ class DomainIndicateComponent(QWidget):
         return question_layout
 
     def _set_plot_widget(self, exercise: FunctionExercise):
-        self._plot_widget = PlotFactory.get_plot(exercise.functions, exercise=exercise, show_title=True)
+        self._plot_widget = PlotFactory.get_plot(exercise.functions, exercise=exercise, show_title=True,
+                                                 rgb_tuple=(255, 255, 255))
         self.proxy = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
 
     def _get_help_layout(self) -> QVBoxLayout:
@@ -206,9 +208,16 @@ class DomainIndicateComponent(QWidget):
         self._help_button.setDisabled(True)
 
     def _update_plot_with_help_data(self):
-        functions_to_update = self._step.function_help_data.help_expressions
-        PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=functions_to_update,
-                                is_help_data=True, no_points=True, constants=True)
+        x_values, y_values = self._exercise.get_domain_range_values(small_sample=True)
+        points = []
+        if self._is_domain_exercise:
+            values = [(x, y) for x, y in zip(x_values, y_values) if -5 < x < 5 and -5 < y < 5]
+            for x_value, y_value in values:
+                points.append([(x_value, y_value), (0, y_value)])
+        else:
+            pass
+        PlotFactory.update_plot_with_points(plot_widget=self._plot_widget, point_function=points, no_points=True,
+                                            rgb_tuple=(0, 0, 255), pen_width=2)
 
     def _validate_exercise(self):
         expression = self._domain_edit.text()

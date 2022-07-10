@@ -37,8 +37,11 @@ class ElementaryGraphComponent(QWidget):
         question_layout = self._get_question_layout()
         self._set_plot_widget(self._exercise)
 
+        self._layout.addStretch()
         self._layout.addLayout(question_layout)
+        self._layout.addStretch()
         self._layout.addWidget(self._plot_widget)
+        self._layout.addStretch()
         self.setLayout(self._layout)
 
     def _get_question_layout(self) -> QVBoxLayout:
@@ -48,7 +51,7 @@ class ElementaryGraphComponent(QWidget):
         question_label = LabelFactory.get_label_component(text=self._step.question, label_type=TextType.BIG_TITLE,
                                                           need_word_wrap=True, align=Qt.AlignHCenter)
 
-        question_layout.addWidget(question_label)
+        question_layout.addWidget(question_label, alignment=Qt.AlignHCenter)
         question_layout.addSpacing(40)
 
         self._bottom_buttons_layout = self._get_bottom_buttons_layout()
@@ -68,7 +71,8 @@ class ElementaryGraphComponent(QWidget):
         return question_layout
 
     def _set_plot_widget(self, exercise: FunctionExercise):
-        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()], exercise=exercise, show_ends=False)
+        self._plot_widget = PlotFactory.get_plot([exercise.get_main_function()], exercise=exercise, show_ends=False,
+                                                 show_grid=True)
 
     def _get_continue_buttons_layout(self) -> QHBoxLayout:
         continue_layout = QHBoxLayout()
@@ -98,12 +102,14 @@ class ElementaryGraphComponent(QWidget):
             graph_button = self._get_graph_button(index=index, graph=graph)
             layout.addWidget(graph_button)
             self._graph_buttons.append(graph_button)
+            if index < len(self._exercise.functions) - 1:
+                layout.addStretch()
         return layout
 
     def _get_graph_button(self, index: int, graph: Function) -> QPushButton:
         return ButtonFactory.get_button_component(
-            title=graph.get_math_expression(), minimum_width=80, minimum_height=80,
-            function_to_connect=lambda val=index: self._validate_exercise(button_index=index)
+            title=graph.get_math_expression(), minimum_width=90, minimum_height=90,
+            function_to_connect=lambda val=index: self._validate_exercise(button_index=index), text_size=22,
         )
 
     def _validate_exercise(self, button_index):
@@ -114,12 +120,12 @@ class ElementaryGraphComponent(QWidget):
         if not is_answer_correct:
             self._help_text.setText('Incorrecto.')
             correct_button = next(button for button in self._graph_buttons if button.text() == correct_expression)
-            correct_button.setStyleSheet('background: #2F8C53')
+            correct_button.setStyleSheet('background: #2F8C53; font-size: 22px')
         else:
             self._help_text.setText('Correcto.')
         self._help_text.setVisible(True)
         self._help_text.setStyleSheet(f'color: {border_color}')
-        pressed_button.setStyleSheet(f'background: {border_color}')
+        pressed_button.setStyleSheet(f'background: {border_color}; font-size: 22px')
         self._continue_button.setStyleSheet(f'background: {border_color}')
         self._continue_button.setDisabled(False)
         for button in self._graph_buttons:
@@ -133,6 +139,12 @@ class ElementaryGraphComponent(QWidget):
         )
         PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=[error_func], rgb_tuple=(255, 0, 0),
                                 no_points=True)
+        label_functions = [
+            (self._exercise.get_main_function(), 'white'),
+            (error_func, 'red')
+        ]
+        PlotFactory.add_function_labels(plot_widget=self._plot_widget,
+                                        functions_to_labelling_with_color=label_functions)
 
     def _send_continue_signal(self):
         self.continue_signal.emit()

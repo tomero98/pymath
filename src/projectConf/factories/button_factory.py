@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QCursor
+from PyQt5.QtGui import QIcon, QCursor, QFont
 from PyQt5.QtWidgets import QPushButton, QSizePolicy
 
 
@@ -8,7 +8,7 @@ class ButtonFactory:
     def get_button_component(cls, title: str, function_to_connect=None, is_disable: bool = False,
                              size_policy=(QSizePolicy.Fixed, QSizePolicy.Fixed), icon: QIcon = None,
                              icon_size: int = None, tooltip: str = '', minimum_width: int = None,
-                             minimum_height: int = None) -> QPushButton:
+                             minimum_height: int = None, text_size: int = None) -> QPushButton:
         button = QPushButton(title)
         button.setSizePolicy(*size_policy)
         button.pressed.connect(function_to_connect)
@@ -27,4 +27,7 @@ class ButtonFactory:
             button.setIcon(icon)
             button.setIconSize(QSize(icon_size, icon_size))
             button.setStyleSheet('border-radius: 25px')
+
+        if text_size:
+            button.setStyleSheet(f'font-size: {text_size}px')
         return button

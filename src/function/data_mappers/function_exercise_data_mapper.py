@@ -82,4 +82,5 @@ class FunctionExerciseDataMapper:
                         AND
                             inverse_exercise_graph.graph_id = inverse_graphs.inverse_graph_id
             WHERE exercises.topic_id == {topic_id} 
+            ORDER BY RANDOM()
         '''

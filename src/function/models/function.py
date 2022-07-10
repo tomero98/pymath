@@ -102,4 +102,5 @@ class Function:
     def get_math_expression(self):
         return self.expression.replace('math.sqrt', '√').replace('**', '^').replace('math.e', 'e') \
             .replace('math.log', 'ln').replace('math.cosh', 'cosh').replace('math.cos', 'cos') \
-            .replace('math.acos', 'acos').replace('math.sin', 'sin').replace('math.tan', 'tan')
+            .replace('math.acos', 'acos').replace('math.sin', 'sin').replace('math.tan', 'tan') \
+            .replace('math.asin', 'asin')

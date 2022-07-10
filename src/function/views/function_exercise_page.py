@@ -1,3 +1,4 @@
+import random
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -38,6 +39,20 @@ class FunctionExercisePage(Window):
 
     def _get_exercise_data(self, subtopic_id: int):
         self._exercises = FunctionExerciseDataMapper.get_function_exercise(topic_id=subtopic_id)
+        if len(self._exercises) == 1 \
+                and self._exercises[0].type == FunctionExerciseType.elementary_graph_exercise.value:
+            for i in range(4):
+                exercise = FunctionExercise(identifier=i, exercise_type=self._exercises[0].type,
+                                            title=self._exercises[0].title,
+                                            exercise_order=self._exercises[0].exercise_order,
+                                            exercise_domain=self._exercises[0].exercise_domain,
+                                            functions=self._exercises[0].functions[i * 4:i * 4 + 4],
+                                            steps=self._exercises[0].steps)
+                self._exercises.append(exercise)
+                index = random.randint(0, 3)
+                exercise.functions[index].is_main_graphic = True
+
+            self._exercises.pop(0)
 
     def _get_next_exercise(self):
         for exercise in self._exercises:
@@ -153,7 +168,7 @@ class FunctionExercisePage(Window):
             self._current_exercise_component = FunctionExerciseComponent(exercise=next_exercise)
             self._current_exercise_component.continue_signal.connect(self._setup_next_exercise)
             # self._current_exercise_component.exercise_finished_signal.connect(self._save_step)
-            self._layout.addWidget(self._current_exercise_component, alignment=Qt.AlignHCenter)
+            self._layout.addWidget(self._current_exercise_component)
             self._exercise_count += 1
             self._title_label.setText(self._get_title_label())
         except StopIteration:

@@ -35,7 +35,6 @@ class FunctionExercisePage(Window):
         self._header_layout = None
         self._current_exercise_component = None
         self._get_exercise_data(subtopic_id=subtopic.id)
-        self._next_exercise = self._get_next_exercise()
 
     def _get_exercise_data(self, subtopic_id: int):
         self._exercises = FunctionExerciseDataMapper.get_function_exercise(topic_id=subtopic_id)
@@ -55,8 +54,8 @@ class FunctionExercisePage(Window):
             self._exercises.pop(0)
 
     def _get_next_exercise(self):
-        for exercise in self._exercises:
-            yield exercise
+        exercise = self._exercises[self._exercise_count - 1]
+        return exercise
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()
@@ -65,11 +64,10 @@ class FunctionExercisePage(Window):
         self._header_layout = self._get_header_layout()
         self._title_label = LabelFactory.get_label_component(text=self._get_title_label(), label_type=TextType.SUBTITLE)
 
-        self._steps_done_widget = QComboBox()
-        self._steps_done_widget.addItem('Sin ejercicios resueltos                              ')
-        self._steps_done_widget.setDisabled(True)
+        self._combobox_layout = self._get_combobox_layout()
 
         self._current_exercise_component = self._get_current_exercise_component()
+        self._save_step()
         self._set_layout()
 
         main_window.setLayout(self._layout)
@@ -113,14 +111,30 @@ class FunctionExercisePage(Window):
         breadcrumb_layout.addWidget(exercise_label)
         return breadcrumb_layout
 
+    def _get_combobox_layout(self) -> QHBoxLayout:
+        combobox_layout = QHBoxLayout()
+        self._steps_done_widget = QComboBox()
+        self._steps_done_widget.addItem('')
+        self._steps_done_widget.setDisabled(True)
+        combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.NORMAL_TEXT,
+                                                          set_underline=True)
+        combobox_layout.addStretch()
+        combobox_layout.addWidget(combobox_label)
+        combobox_layout.addSpacing(10)
+        combobox_layout.addWidget(self._steps_done_widget)
+        combobox_layout.addStretch()
+
+        self._steps_done_widget.activated.connect(self._update_step_component)
+        return combobox_layout
+
     def _get_current_exercise_component(self):
         try:
-            current_exercise: FunctionExercise = next(self._next_exercise)
+            current_exercise: FunctionExercise = self._get_next_exercise()
             need_help_data = False if current_exercise.type == FunctionExerciseType.elementary_graph_exercise.value \
                 else True
             current_component = FunctionExerciseComponent(exercise=current_exercise, need_help_data=need_help_data)
             current_component.continue_signal.connect(self._setup_next_exercise)
-            # current_component.exercise_finished_signal.connect(self._save_step)
+            current_component.exercise_finished_signal.connect(self._save_step)
             return current_component
         except StopIteration:
             print('No hay ejercicios de este tipo')
@@ -137,7 +151,7 @@ class FunctionExercisePage(Window):
         self._layout.addLayout(self._header_layout)
         self._layout.addWidget(self._title_label, alignment=Qt.AlignHCenter)
         self._layout.addSpacing(10)
-        self._layout.addWidget(self._steps_done_widget, alignment=Qt.AlignHCenter)
+        self._layout.addLayout(self._combobox_layout)
         self._layout.addWidget(self._current_exercise_component)
 
     def keyPressEvent(self, e):
@@ -162,16 +176,16 @@ class FunctionExercisePage(Window):
     def _setup_next_exercise(self):
         try:
             # TODO Guardar el componente
-            next_exercise: FunctionExercise = next(self._next_exercise)
+            self._exercise_count += 1
+            next_exercise: FunctionExercise = self._get_next_exercise()
             self._layout.removeWidget(self._current_exercise_component)
             self._current_exercise_component.setParent(None)
             self._current_exercise_component = FunctionExerciseComponent(exercise=next_exercise)
             self._current_exercise_component.continue_signal.connect(self._setup_next_exercise)
-            # self._current_exercise_component.exercise_finished_signal.connect(self._save_step)
+            self._current_exercise_component.exercise_finished_signal.connect(self._save_step)
             self._layout.addWidget(self._current_exercise_component)
-            self._exercise_count += 1
             self._title_label.setText(self._get_title_label())
-        except StopIteration:
+        except:
             self.back_signal.emit()
 
     def _show_exit_dialog(self):
@@ -194,20 +208,15 @@ class FunctionExercisePage(Window):
         if step_label in self._step_widget_by_label:
             return None
 
-        self._steps_done.append(step)
-
-        if self._steps_done_widget.itemText(0) == 'Sin ejercicios resueltos                              ':
-            self._steps_done_widget.clear()
-
         self._steps_done_widget.addItem(step_label)
+        self._steps_done_widget.adjustSize()
         self._steps_done_widget.setCurrentIndex(self._steps_done_widget.count() - 1)
-        self._step_widget_by_label[step_label] = step
+        self._step_widget_by_label[step_label] = None
 
-        if self._steps_done_widget.count() == 1:
+        if self._steps_done_widget.count() < 2:
             self._steps_done_widget.setDisabled(True)
         else:
             self._steps_done_widget.setDisabled(False)
-            self._steps_done_widget.activated.connect(self._update_step_component)
 
     def _update_step_component(self):
         current_text_label = self._steps_done_widget.currentText()

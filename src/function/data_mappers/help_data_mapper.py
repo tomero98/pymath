@@ -54,41 +54,6 @@ class HelpDataMapper:
 
     def _get_indicate_domain_help(self) -> FunctionHelpData:
         help_text = 'Recuerda que el dominio lo forman los puntos con imagen.'
-        # x_values, y_values = self._exercise.get_domain_range_values()
-        # x_values_by_y_value = defaultdict(list)
-        # y_values_by_x_value = defaultdict(list)
-        # for x_value, y_value in zip(x_values, y_values):
-        #     x_values_by_y_value[y_value].append(x_value)
-        #     y_values_by_x_value[x_value].append(y_value)
-        #
-        # unique_sorted_x_values = sorted(
-        #     [
-        #         x_value
-        #         for x_value in set(x_values)
-        #         if -5 < x_value < 5 and any(True for y_value in y_values_by_x_value[x_value] if -5 < y_value < 5)
-        #     ]
-        # )
-        # unique_sorted_y_values = sorted(
-        #     [
-        #         y_value
-        #         for y_value in set(y_values)
-        #         if -5 < y_value < 5 and any(True for x_value in x_values_by_y_value[y_value] if -5 < x_value < 5)
-        #     ]
-        # )
-        # slicing_x_number = len(unique_sorted_x_values) // 10 if len(unique_sorted_x_values) // 10 != 0 else 1
-        # slicing_y_number = len(unique_sorted_y_values) // 10 if len(unique_sorted_y_values) // 10 != 0 else 1
-        #
-        # graphs = []
-        # for x_value in unique_sorted_x_values[::slicing_x_number]:
-        #     y_value = min(y_val for y_val in y_values_by_x_value[x_value] if -5 < y_val < 5)
-        #     x_graph = Function(function_id=-1, expression=f'{x_value}', domain=f'[-10, {y_value}]',
-        #                        is_main_graphic=False, is_elementary_graph=False, inverse_function=None, is_invert=True)
-        #     graphs.append(x_graph)
-        # for y_value in unique_sorted_y_values[::slicing_y_number]:
-        #     x_value = min(x_val for x_val in x_values_by_y_value[y_value] if -5 < x_val < 5)
-        #     x_graph = Function(function_id=-1, expression=f'{y_value}', domain=f'[-10, {x_value}]',
-        #                        is_main_graphic=False, is_elementary_graph=False, inverse_function=None, is_invert=False)
-        #     graphs.append(x_graph)
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     def _get_constant_graphs(self, x_values, y_values):
@@ -137,12 +102,12 @@ class HelpDataMapper:
 
     @staticmethod
     def _get_indicate_bounded_range_help() -> FunctionHelpData:
-        help_text = '¿El rango está acotado?'
+        help_text = '¿El conjunto imagen de la función está acotado?'
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod
     def _get_indicate_indicate_roots_help() -> FunctionHelpData:
-        help_text = 'Observa el eje de las abcisas'
+        help_text = 'Observa los cortes de la función con el eje de las abscisas.'
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
     @staticmethod

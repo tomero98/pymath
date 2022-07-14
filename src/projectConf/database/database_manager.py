@@ -65,10 +65,10 @@ class DatabaseManager:
     @staticmethod
     def _populate_subtopic_data():
         subtopic_seed = [
-            ('Funciones inversas', 'Ejercicios sobre inversas', 1), # 2
-            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1), # 3
-            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1), # 4
-            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1) # 5
+            ('Funciones inversas', 'Ejercicios sobre inversas', 1),  # 2
+            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1),  # 3
+            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1),  # 4
+            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1)  # 5
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -108,15 +108,15 @@ class DatabaseManager:
         # Domain example: '5, 5'
         exercise_seed = [
             # Elementary functions exercises
-            ('ElementaryGraphExercise', 0, None, 4), # 1
+            ('ElementaryGraphExercise', 0, None, 4),  # 1
 
             # Domain functions exercises
-            ('ConceptDomainExercise', 0, None, 3), # 2
-            ('ConceptDomainExercise', 0, None, 3), # 3
-            ('ConceptDomainExercise', 0, None, 3), # 4
-            ('ConceptDomainExercise', 0, None, 3), # 5
-            ('ConceptDomainExercise', 0, None, 3), # 6
-            ('ConceptDomainExercise', 0, None, 3), # 7
+            ('ConceptDomainExercise', 0, None, 3),  # 2
+            ('ConceptDomainExercise', 0, None, 3),  # 3
+            ('ConceptDomainExercise', 0, None, 3),  # 4
+            ('ConceptDomainExercise', 0, None, 3),  # 5
+            ('ConceptDomainExercise', 0, None, 3),  # 6
+            ('ConceptDomainExercise', 0, None, 3),  # 7
 
             # # Inverse exercise
             # ('ConceptInverseExercise', 0, '-3, 3', 2),  # 1
@@ -256,7 +256,6 @@ class DatabaseManager:
             (1, 16, 0, None),
 
             # Domain exercises
-
             (2, 17, 1, None),
             (3, 18, 1, '[-4, -2]'),
             (3, 19, 1, '(-1, 3]'),
@@ -264,19 +263,6 @@ class DatabaseManager:
             (5, 21, 1, None),
             (6, 22, 1, None),
             (7, 23, 1, None),
-
-            # (1, 5, 1, None),
-            # (1, 6, 1, None),
-            # (1, 7, 1, None),
-            # (1, 8, 1, None),
-            # (1, 9, 1, None),
-            # (1, 10, 1, None),
-            # (1, 11, 1, None),
-            # (1, 12, 1, None),
-            # (1, 13, 1, None),
-            # (1, 14, 1, None),
-            # (1, 15, 1, None),
-            # (1, 16, 1, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

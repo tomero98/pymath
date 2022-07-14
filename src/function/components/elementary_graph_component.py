@@ -15,6 +15,7 @@ from ...projectConf.models.enums.text_type import TextType
 
 class ElementaryGraphComponent(QWidget):
     continue_signal = pyqtSignal()
+    label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep):
         super(ElementaryGraphComponent, self).__init__()

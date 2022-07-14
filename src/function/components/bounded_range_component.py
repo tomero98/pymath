@@ -70,15 +70,13 @@ class BoundedRangeComponent(QWidget):
     def _get_bottom_buttons_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
 
-        icon = IconFactory.get_icon_widget(image_name='ok_button.png')
         self._ok_button = ButtonFactory.get_button_component(
-            title='', minimum_width=80, minimum_height=80, icon=icon, icon_size=80, tooltip='Sí',
+            title='Sí', minimum_width=90, minimum_height=90, text_size=22, tooltip='Sí',
             function_to_connect=lambda: self._validate_exercise(response=True, pressed_button=self._ok_button)
         )
 
-        icon = IconFactory.get_icon_widget(image_name='fail_button.png')
         self._fail_button = ButtonFactory.get_button_component(
-            title='', minimum_width=80, minimum_height=80, icon=icon, icon_size=70, tooltip='No',
+            title='No', minimum_width=90, minimum_height=90, text_size=22, tooltip='No',
             function_to_connect=lambda: self._validate_exercise(response=False, pressed_button=self._fail_button)
         )
 

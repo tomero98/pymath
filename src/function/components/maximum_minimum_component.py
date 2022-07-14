@@ -174,22 +174,20 @@ class MaximumMinimumComponent(QWidget):
     def _get_bottom_buttons_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
         response_layout = self._get_response_layout()
-        text = 'El formato esperado es el siguiente: "-1; 5;".'
+        text = 'El formato esperado para introducir las abscisas es el siguiente: "-1; 5;".'
         placeholder = LabelFactory.get_label_component(text=text, label_type=TextType.NORMAL_TEXT, set_cursive=True)
-        layout.addLayout(response_layout)
         layout.addWidget(placeholder, alignment=Qt.AlignHCenter)
+        layout.addLayout(response_layout)
         return layout
 
     def _get_response_layout(self) -> QHBoxLayout:
         response_layout = QVBoxLayout()
         input_placeholder = '-1; 5;'
-        self._response_edit = LineEditFactory.get_line_edit_component(placeholder_text=input_placeholder)
+        self._response_edit = LineEditFactory.get_line_edit_component(placeholder_text=input_placeholder, font_size=22,
+                                                                      fixed_height=60)
         regex = QRegExp('[\-]?[0-9]*[\ ]*;[\ ]*[\-]?[0-9]*;[\ ]*' * 4)
         validator = QtGui.QRegExpValidator(regex)
         self._response_edit.setValidator(validator)
-        response_text = 'Introduzca las abscisas asociadas: '
-        response_label = LabelFactory.get_label_component(text=response_text, label_type=TextType.SUBTITLE)
-        response_layout.addWidget(response_label, alignment=Qt.AlignHCenter)
         response_layout.addWidget(self._response_edit)
         return response_layout
 

@@ -54,7 +54,7 @@ class FunctionExercise:
         points = reduce(lambda a, b: a.symmetric_difference(b), points_list)
         return points
 
-    def get_domain_range_values(self, small_sample : bool = False) -> (list, list):
+    def get_domain_range_values(self, small_sample: bool = False) -> (list, list):
         functions = [function for function in self.functions if function.is_main_graphic]
         all_x_values = []
         all_y_values = []
@@ -65,8 +65,10 @@ class FunctionExercise:
         return all_x_values, all_y_values
 
     def validate_domain_expression(self, domain_expression: str):
-        domain = self.get_domain_expression()
-        return domain.replace(' ', '') == domain_expression.replace(' ', '')
+        domain = self.get_domain_expression().replace(' ', '')
+        domain_expression = domain_expression.replace(' ', '')
+        domain_expression_list = domain_expression.split('U')
+        return all(expression and expression in domain for expression in domain_expression_list)
 
     def validate_range_expression(self, range_expression: str):
         function_range = self.get_range_expression()
@@ -77,7 +79,9 @@ class FunctionExercise:
         return domain
 
     def get_range_expression(self):
-        function_range = ' U '.join(function.get_range_function() for function in self.functions)
+        function_range = ' U '.join(
+            function.get_range_function(exercise_domain=self.exercise_domain) for function in self.functions
+        )
         return function_range
 
     def has_bounded_range(self):

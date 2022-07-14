@@ -84,9 +84,21 @@ class Function:
         end_interval = self.domain[-1] if x_end != '+inf' else ')'
         return f'{start_interval}{x_start}, {x_end}{end_interval}'
 
-    def get_range_function(self):
+    def get_range_function(self, exercise_domain: tuple):
         if self.expression.isnumeric():
             return self.expression
+
+        x_values, y_values = self.get_points(small_sample=True)
+
+        x_value_by_y_value = dict()
+        y_values_filtered = list()
+        for x_value, y_value in zip(x_values, y_values):
+            if exercise_domain[0] <= x_value <= exercise_domain[1]:
+                x_value_by_y_value[y_value] = x_value
+                y_values_filtered.append(y_value)
+
+        min_y, max_y = min(y_values_filtered), max(y_values_filtered)
+
 
         x_start, x_end = self.domain[1: -1].split(',')
         x_start = float(x_start)

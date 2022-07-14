@@ -40,6 +40,18 @@ class DomainIndicateComponent(QWidget):
 
         self._draw()
 
+    @property
+    def label(self):
+        if self._step.type == InverseStepType.indicate_domain_exercise:
+            label = 'Indicar el dominio.'
+        elif self._step.type == InverseStepType.indicate_range_exercise:
+            label = 'Indicar el rango.'
+        # elif self._step.type == InverseStepType.indicate_bounded_range_exercise:
+        #     label = 'Indicar si la función está acotada.'
+        # elif self._step.type == InverseStepType.indicate_roots_exercise:
+        #     label = 'Indicar si las raíces de la función.'
+        return label
+
     def _draw(self):
         self._layout = QHBoxLayout()
         question_layout = self._get_question_layout()
@@ -61,7 +73,6 @@ class DomainIndicateComponent(QWidget):
         buttons_layout = self._get_bottom_buttons_layout()
 
         question_layout.addWidget(question_label, alignment=Qt.AlignHCenter)
-        question_layout.addSpacing(40)
         question_layout.addLayout(buttons_layout)
         question_layout.addWidget(self._point_label, alignment=Qt.AlignHCenter)
         question_layout.addSpacing(40)
@@ -178,22 +189,21 @@ class DomainIndicateComponent(QWidget):
     def _get_bottom_buttons_layout(self) -> QHBoxLayout:
         layout = QVBoxLayout()
         domain_layout = self._get_domain_layout()
-        text = 'El formato esperado es el siguiente: "(-inf, 8] U (1, +inf) U {5}".'
-        placeholder = LabelFactory.get_label_component(text=text, label_type=TextType.NORMAL_TEXT, set_cursive=True)
-        layout.addLayout(domain_layout)
+        text = 'El formato esperado es similar al siguiente siguiente: "(-inf, 8] U (1, +inf) U {5}".'
+        placeholder = LabelFactory.get_label_component(text=text, label_type=TextType.SUBTITLE, set_cursive=True,
+                                                       need_word_wrap=True)
         layout.addWidget(placeholder, alignment=Qt.AlignHCenter)
+        layout.addLayout(domain_layout)
         return layout
 
     def _get_domain_layout(self) -> QVBoxLayout:
         domain_layout = QVBoxLayout()
         input_placeholder = '(-inf, 8] U (1, +inf)'
-        self._domain_edit = LineEditFactory.get_line_edit_component(placeholder_text=input_placeholder)
+        self._domain_edit = LineEditFactory.get_line_edit_component(placeholder_text=input_placeholder, fixed_height=60,
+                                                                    font_size=28)
         regex = QRegExp('[\(\[0-9\-][\ ]*[\-+inf0-9]+[\ ]*,[\ ]*[\-+inf0-9]+[\ ]*[\)\]][\ ]*U[\ ]*' * 5)
         validator = QtGui.QRegExpValidator(regex)
         self._domain_edit.setValidator(validator)
-        domain_text = f'Introduzca el {"dominio" if self._is_domain_exercise else "rango"} de la función: '
-        domain_label = LabelFactory.get_label_component(text=domain_text, label_type=TextType.SUBTITLE)
-        domain_layout.addWidget(domain_label, alignment=Qt.AlignHCenter)
         domain_layout.addWidget(self._domain_edit)
         return domain_layout
 
@@ -220,6 +230,7 @@ class DomainIndicateComponent(QWidget):
                                             rgb_tuple=(0, 0, 255), pen_width=2)
 
     def _validate_exercise(self):
+        self._validate_button.setDisabled(True)
         expression = self._domain_edit.text()
         domain_is_correct = self._exercise.validate_domain_expression(domain_expression=expression) \
             if self._is_domain_exercise \
@@ -230,7 +241,7 @@ class DomainIndicateComponent(QWidget):
             self._domain_edit.setText(f'{self._domain_edit.text()} != {self._exercise.get_domain_expression()}')
         domain_color = '#2F8C53' if domain_is_correct else 'red'
         self._validate_button.setStyleSheet(f'background: {border_color}')
-        self._domain_edit.setStyleSheet(f'background: {domain_color}')
+        self._domain_edit.setStyleSheet(f'background: {domain_color}; font-size: 28px')
         self._continue_button.setDisabled(False)
         if not self._is_answer_correct:
             self._update_plot_with_error_data()

@@ -62,25 +62,25 @@ class StepDataMapper:
         second_step = self._get_second_domain_concept_step()
         third_step = self._get_third_domain_concept_step()
         four_step = self._get_four_domain_concept_step()
-        return [first_step]
+        return [first_step, second_step, third_step, four_step]
 
     def _get_first_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_domain_exercise
-        question = 'Con la ayuda del ratón, indica el dominio de la siguiente gráfica'
+        question = 'Con la ayuda del ratón, indicar mediante intervalos el dominio de la función representada.'
         order = 0
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 
     def _get_second_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_range_exercise
-        question = 'Con la ayuda del ratón, indica el recorrido de la siguiente gráfica'
+        question = 'Con la ayuda del ratón, indicar mediante intervalos el recorrido de la función representada'
         order = 1
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 
     def _get_third_domain_concept_step(self) -> FunctionStep:
         step_type = InverseStepType.indicate_bounded_range_exercise
-        question = 'Indica si la siguiente gráfica está acotada para el dominio dado'
+        question = 'Indica si la siguiente gráfica está acotada para el dominio dado.'
         order = 2
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
@@ -110,14 +110,14 @@ class StepDataMapper:
 
     def _get_first_maximum_point_step(self):
         step_type = InverseStepType.maximum_relative_exercise
-        question = 'Selecciona, si tiene, los máximos relativos:'
+        question = 'Con ayuda del ratón, encuentra los máximos relativos de la función representada:'
         order = 1
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 
     def _get_second_maximum_point_step(self):
         step_type = InverseStepType.maximum_absolute_exercise
-        question = 'Selecciona, si tiene, el máximo absoluto:'
+        question = 'Con ayuda del ratón, encuentra los máximos absolutos de la función representada:'
         order = 1
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
@@ -129,14 +129,14 @@ class StepDataMapper:
 
     def _get_first_minimum_point_step(self):
         step_type = InverseStepType.minimum_relative_exercise
-        question = 'Selecciona, si tiene, los mínimos relativos:'
+        question = 'Con ayuda del ratón, encuentra los mínimos relativos de la función representada:'
         order = 1
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
 
     def _get_second_minimum_point_step(self):
         step_type = InverseStepType.minimum_absolute_exercise
-        question = 'Selecciona, si tiene, el mínimo absoluto:'
+        question = 'Con ayuda del ratón, encuentra los mínimos absolutos de la función representada:'
         order = 1
         function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)

@@ -15,38 +15,28 @@ class TopicPage(Window):
     continue_signal = pyqtSignal(Topic)
     back_signal = pyqtSignal()
 
-    def __init__(self, topic: Topic = None):
-        self._title = 'Temario' if not topic else topic.title
-        self._description = '' if not topic else topic.description
-        if topic:
-            self._topic = topic
+    def __init__(self):
+        self._title = 'Funciones'
+        self._description = ''
         super(TopicPage, self).__init__(title=self._title)
 
-        topic_id = topic.id if topic else None
-        self._topics: List[Topic] = TopicDataMapper.get_topics(topic_parent_id=topic_id)
+        self._topics: List[Topic] = TopicDataMapper.get_topics()
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()
         layout = QVBoxLayout()
 
-        back_button = self._get_back_button()
         title_label = LabelFactory.get_label_component(text=self._title, label_type=TextType.TITLE,
                                                        align=Qt.AlignHCenter)
         description_label = LabelFactory.get_label_component(text=self._description,
                                                              label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter)
         topic_buttons_layout = self._get_topic_buttons()
-        self._setup_layout(layout=layout, back_button=back_button, title_label=title_label,
-                           description_label=description_label, topic_buttons_layout=topic_buttons_layout)
+        self._setup_layout(layout=layout, title_label=title_label, description_label=description_label,
+                           topic_buttons_layout=topic_buttons_layout)
 
         main_window.setLayout(layout)
         self.setCentralWidget(main_window)
         self.show()
-
-    def _get_back_button(self):
-        icon = IconFactory.get_icon_widget(image_name='back_button.png')
-        button = ButtonFactory.get_button_component(title='', function_to_connect=self._back_signal, icon=icon,
-                                                    icon_size=30, tooltip='Atrás')
-        return button
 
     @pyqtSlot()
     def _get_topic_buttons(self) -> List[QPushButton]:
@@ -90,15 +80,11 @@ class TopicPage(Window):
     def _send_continue_signal(self, topic: Topic):
         self.continue_signal.emit(topic)
 
-    def _back_signal(self):
-        self.back_signal.emit()
-
     @staticmethod
-    def _setup_layout(layout: QVBoxLayout, back_button: QPushButton, title_label: QLabel, description_label: QLabel,
+    def _setup_layout(layout: QVBoxLayout, title_label: QLabel, description_label: QLabel,
                       topic_buttons_layout: List[QPushButton]):
         layout.setContentsMargins(5, 0, 0, 0)
         layout.addSpacing(10)
-        layout.addWidget(back_button, alignment=Qt.AlignRight)
         layout.addSpacing(0)
         layout.addWidget(title_label)
         layout.addWidget(description_label)

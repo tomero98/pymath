@@ -208,7 +208,7 @@ class InverseSelectionComponent(QWidget):
         if self._is_answer_correct:
             self._help_text.setText('Correcto.')
             self._help_text.setStyleSheet(f'color: {border_color}')
-        function = self._exercise.get_function(expression=expression_response) if not self._is_answer_correct \
+        function = self._exercise.get_function_by_expression(expression=expression_response) if not self._is_answer_correct \
             else main_function.inverse_function
         color = (0, 128, 0) if self._is_answer_correct else (255, 0, 0)
         PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=[function], rgb_tuple=color)

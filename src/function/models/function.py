@@ -3,20 +3,35 @@ from typing import List
 
 
 class Function:
+    MAX_Y_VALUE = 5.5
+
     def __init__(self, function_id: int, expression: str, domain: [str, None], is_main_graphic: bool,
-                 is_elementary_graph: bool, inverse_function: ['Function', None], is_invert: bool = False):
+                 is_invert: bool = False):
         self.function_id = function_id
         self.expression = expression
         self.domain = domain
         self.is_main_graphic = is_main_graphic
-        self.is_elementary_graph = is_elementary_graph
-        self.inverse_function = inverse_function
         self.is_invert = is_invert
+        self.x_values, self.y_values = self.get_points()
 
     def get_points(self, small_sample: bool = False) -> (List[int], List[int]):
-        x_values = self._get_domain_values(small_sample=small_sample)
-        y_values = self._get_range_values(x_values=x_values)
+        x_values, y_values = [], []
+        min_x, max_x = self.domain[0], self.domain[1]
+        value = 1000 if not small_sample else 10
+
+        for x_value in [num / value for num in range(min_x * value, max_x * value, 1)]:
+            try:
+                y_value = eval(self.expression.replace('x', str(x_value)))
+                if y_value < self.MAX_Y_VALUE:
+                    x_values.append(x_value)
+                    y_values.append(y_value)
+            except Exception:
+                # TODO Tangente
+                pass
         return x_values, y_values
+
+    def get_small_example_of_point(self):
+        return self.x_values[::25], self.y_values[::25]
 
     def get_constant_points(self):
         min_x, max_x = self.domain[1:-1].split(',')
@@ -27,27 +42,18 @@ class Function:
             max_x, max_y = max_y, max_x
         return (min_x, max_x), (min_y, max_y)
 
-    def _get_domain_values(self, small_sample: bool):
-        value = 1000 if not small_sample else 10
-        min_x, max_x = [int(expression) for expression in self.domain[1:-1].split(',')]
-        return [num / value for num in range(min_x * value, max_x * value, 1)]
+    def get_label_point(self, position: str):
+        num = len(self.x_values) // 6
 
-    def _get_range_values(self, x_values: List[float]):
-        y_values = []
-        x_value_to_del = []
-        for x in x_values:
-            try:
-                y_values.append(eval(self.expression.replace('x', str(x))))
-            except Exception:
-                x_value_to_del.append(x)
-
-        for x in x_value_to_del:
-            x_values.remove(x)
-        return y_values
-
-    def get_center_point(self):
-        random_points = self.get_random_points()
-        return random_points[len(random_points) // 2]
+        if position == 'left_plus':
+            multiply = 2
+        elif position == 'left':
+            multiply = 3
+        elif position == 'right':
+            multiply = 4
+        elif position == 'right_plus':
+            multiply = 5
+        return self.x_values[num * multiply] + 0.25, self.y_values[num * multiply] + 0.25
 
     def get_random_points(self) -> (float, float):
         x_values, y_values = self.get_points(small_sample=True)
@@ -56,12 +62,8 @@ class Function:
         )
         return filter_values
 
-    def get_points_grouped(self, small_sample: bool = False) -> (List[int], List[int]):
-        x_values = self._get_domain_values(small_sample=small_sample) if self.domain else range(-50, 50)
-        points = [(x, eval(self.expression.replace('x', str(x)))) for x in x_values]
-        return points
-
     def get_points_range(self):
+        # Para obtener para cada punto un rango que permita no tener que ser muy preciso
         x_values, y_values = self.get_points(small_sample=True)
         points = zip(x_values, y_values)
         return self.get_range(points=points)
@@ -98,7 +100,6 @@ class Function:
                 y_values_filtered.append(y_value)
 
         min_y, max_y = min(y_values_filtered), max(y_values_filtered)
-
 
         x_start, x_end = self.domain[1: -1].split(',')
         x_start = float(x_start)

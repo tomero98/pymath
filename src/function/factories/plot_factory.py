@@ -22,7 +22,7 @@ class PlotFactory:
         function_ranges = []
         has_multiple_main_graphics = len([function for function in functions if function.is_main_graphic]) > 1
         for function in functions:
-            x_values, y_values = function.get_points()
+            x_values, y_values = function.x_values, function.y_values
             pen = pyqtgraph.mkPen(color=colors.pop(0), width=5) \
                 if function.is_main_graphic and not has_multiple_main_graphics \
                 else pyqtgraph.mkPen(color=colors.pop(), width=3)
@@ -105,10 +105,11 @@ class PlotFactory:
 
     @classmethod
     def add_function_labels(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_labelling_with_color: list):
+        positions = ['left', 'right', 'left_plus', 'right_plus']
         for function, color in functions_to_labelling_with_color:
             font = QFont()
-            font.setPixelSize(20)
-            x_value, y_value = function.get_center_point()
+            font.setPixelSize(25)
+            x_value, y_value = function.get_label_point(position=positions.pop(0))
             label = TextItem(anchor=(0.5, 0.5))
             text = function.get_math_expression()
             label.setText(text=text)

@@ -18,15 +18,16 @@ class Controller:
         self._app = PyMathApp(sys_argv=[])
 
     def _start_app_flow(self):
-        # self._setup_exercise_page(subtopic=Topic(identifier=3, title='Funciones',
-        #                                          description='Ejercicios sobre funciones', topic_parent_id=None))
-        self._setup_subtopic_page()
+        self._setup_exercise_page(
+            topic=Topic(identifier=1, title='Funciones inversas', description='Ejercicios sobre funciones inversas')
+        )
+        # self._setup_front_page()
 
     def _setup_front_page(self):
         front_page = WelcomePage()
         front_page.draw()
         self._current_view = front_page
-        self._current_view.continue_signal.connect(self._setup_subtopic_page)
+        self._current_view.continue_signal.connect(self._setup_topic_page)
         self._current_view.close_signal.connect(self._close_page)
 
     def _setup_topic_page(self):
@@ -34,19 +35,10 @@ class Controller:
         topic_page.draw()
         self._current_view = topic_page
         self._current_view.close_signal.connect(self._close_page)
-        self._current_view.continue_signal.connect(self._setup_subtopic_page)
-
-    def _setup_subtopic_page(self):
-        topic = Topic(identifier=1, title='Funciones', description='Ejercicios sobre funciones', topic_parent_id=None)
-        topic_page = TopicPage(topic=topic)
-        topic_page.draw()
-        self._current_view = topic_page
-        self._current_view.close_signal.connect(self._close_page)
         self._current_view.continue_signal.connect(self._setup_exercise_page)
-        self._current_view.back_signal.connect(self._setup_topic_page)
 
-    def _setup_exercise_page(self, subtopic: Topic):
-        exercise_page = FunctionExercisePage(subtopic=subtopic)
+    def _setup_exercise_page(self, topic: Topic):
+        exercise_page = FunctionExercisePage(topic=topic)
         exercise_page.draw()
         exercise_page.back_signal.connect(self._back_page)
         self._current_view = exercise_page
@@ -56,7 +48,7 @@ class Controller:
 
     def _back_page(self):
         self._current_view.close()
-        self._setup_subtopic_page()
+        self._setup_topic_page()
 
     def _execute_app(self):
         self._app.exec()

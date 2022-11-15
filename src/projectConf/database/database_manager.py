@@ -21,10 +21,11 @@ class DatabaseManager:
 
     def _create_database(self):
         self._setup_topic_data()
-        self._setup_subtopic_data()
         self._setup_exercise_data()
         self._setup_graph_data()
         self._setup_exercise_graph_data()
+        self._setup_user_data()
+        self._setup_exercise_resume()
 
     def _setup_topic_data(self):
         self._create_topic_table()
@@ -38,49 +39,30 @@ class DatabaseManager:
             CREATE TABLE topics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 title VARCHAR(64) NOT NULL,
-                description VARCHAR(128),
-                topic_parent_id INT,
-                FOREIGN KEY (topic_parent_id) REFERENCES topics(id)
+                description VARCHAR(128)
                 )
             """
         )
 
     @staticmethod
     def _populate_topic_data():
-        topic_seed = ['Funciones']
-        sql_query = QSqlQuery()
-        sql_query.prepare(
-            """
-            INSERT INTO topics (title) VALUES (?)
-            """
-        )
-
-        for title in topic_seed:
-            sql_query.addBindValue(title)
-            sql_query.exec()
-
-    def _setup_subtopic_data(self):
-        self._populate_subtopic_data()
-
-    @staticmethod
-    def _populate_subtopic_data():
-        subtopic_seed = [
-            ('Funciones inversas', 'Ejercicios sobre inversas', 1),  # 2
-            ('Dominio y recorrido', 'Ejercicios sobre dominio y recorrido', 1),  # 3
-            ('Gráficas elementales', 'Ejercicios para reconocer gráficas elementales', 1),  # 4
-            ('Máximos y mínimos', 'Ejercicios para detectar máximos y mínimos', 1)  # 5
+        topic_seed = [
+            {'title': 'Funciones inversas', 'description': 'Ejercicios sobre inversas'},  # 1
+            {'title': 'Dominio y recorrido', 'description': 'Ejercicios sobre dominio y recorrido'},  # 2
+            {'title': 'Gráficas elementales', 'description': 'Ejercicios para reconocer gráficas elementales'},  # 3
+            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para detectar máximos y mínimos'},  # 4
         ]
+
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO topics (title, description, topic_parent_id) VALUES (?, ?, ?)
+            INSERT INTO topics (title, description) VALUES (?, ?)
             """
         )
 
-        for title, description, parent_topic_id in subtopic_seed:
-            sql_query.addBindValue(title)
-            sql_query.addBindValue(description)
-            sql_query.addBindValue(parent_topic_id)
+        for topic in topic_seed:
+            sql_query.addBindValue(topic['title'])
+            sql_query.addBindValue(topic['description'])
             sql_query.exec()
 
     def _setup_exercise_data(self):
@@ -94,8 +76,8 @@ class DatabaseManager:
             """
             CREATE TABLE exercises (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-                type VARCHAR(64) NOT NULL,
-                'order' INT NOT NULL, 
+                exercise_type VARCHAR(64) NOT NULL,
+                is_active INT NOT NULL, 
                 domain VARCHAR(64),
                 topic_id INT NOT NULL,
                 FOREIGN KEY (topic_id) REFERENCES topics(id)
@@ -108,49 +90,50 @@ class DatabaseManager:
         # Domain example: '5, 5'
         exercise_seed = [
             # Elementary functions exercises
-            ('ElementaryGraphExercise', 0, None, 4),  # 1
+            {'exercise_type': 'ElementaryGraphExercise', 'is_active': 1, 'domain': None, 'topic_id': 3}  # 1
+            # ('ElementaryGraphExercise', 0, None, 4),  # 1
 
-            # Domain functions exercises
-            ('ConceptDomainExercise', 0, None, 3),  # 2
-            ('ConceptDomainExercise', 0, None, 3),  # 3
-            ('ConceptDomainExercise', 0, None, 3),  # 4
-            ('ConceptDomainExercise', 0, None, 3),  # 5
-            ('ConceptDomainExercise', 0, None, 3),  # 6
-            ('ConceptDomainExercise', 0, None, 3),  # 7
+            # # Domain functions exercises
+            # ('ConceptDomainExercise', 0, None, 2),  # 2
+            # ('ConceptDomainExercise', 0, None, 2),  # 3
+            # ('ConceptDomainExercise', 0, None, 2),  # 4
+            # ('ConceptDomainExercise', 0, None, 2),  # 5
+            # ('ConceptDomainExercise', 0, None, 2),  # 6
+            # ('ConceptDomainExercise', 0, None, 2),  # 7
 
             # # Inverse exercise
-            # ('ConceptInverseExercise', 0, '-3, 3', 2),  # 1
-            # ('ConceptInverseExercise', 0, '-3, 3', 2),  # 2
-            # ('ConceptInverseExercise', 0, None, 2),  # 3
-            # ('ConceptInverseExercise', 0, None, 2),  # 4
-            # ('ConceptInverseExercise', 0, None, 2),  # 5
-            # ('ConceptInverseExercise', 0, None, 2),  # 6
+            # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 1
+            # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 2
+            # ('ConceptInverseExercise', 0, None, 1),  # 3
+            # ('ConceptInverseExercise', 0, None, 1),  # 4
+            # ('ConceptInverseExercise', 0, None, 1),  # 5
+            # ('ConceptInverseExercise', 0, None, 1),  # 6
             #
             # # Domain exercise
-            # ('ConceptDomainExercise', 0, None, 3),
-            # ('ConceptDomainExercise', 1, None, 3),
-            # ('ConceptDomainExercise', 2, None, 3),
-            # ('ConceptDomainExercise', 3, None, 3),
+            # ('ConceptDomainExercise', 0, None, 2),
+            # ('ConceptDomainExercise', 1, None, 2),
+            # ('ConceptDomainExercise', 2, None, 2),
+            # ('ConceptDomainExercise', 3, None, 2),
 
             # # Maximum functions
-            # ('MaximumPointsExercise', 0, None, 5),
-            # ('MinimumPointsExercise', 1, None, 5),
-            # ('MaximumPointsExercise', 2, None, 5),
-            # ('MinimumPointsExercise', 3, None, 5),
+            # ('MaximumPointsExercise', 0, None, 4),
+            # ('MinimumPointsExercise', 1, None, 4),
+            # ('MaximumPointsExercise', 2, None, 4),
+            # ('MinimumPointsExercise', 3, None, 4),
 
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercises (type, 'order', domain, topic_id) VALUES (?, ?, ?, ?)
+            INSERT INTO exercises (exercise_type, is_active, domain, topic_id) VALUES (?, ?, ?, ?)
             """
         )
 
-        for exercise_type, exercise_order, domain, topic_id in exercise_seed:
-            sql_query.addBindValue(exercise_type)
-            sql_query.addBindValue(exercise_order)
-            sql_query.addBindValue(domain)
-            sql_query.addBindValue(topic_id)
+        for exercise in exercise_seed:
+            sql_query.addBindValue(exercise['exercise_type'])
+            sql_query.addBindValue(exercise['is_active'])
+            sql_query.addBindValue(exercise['domain'])
+            sql_query.addBindValue(exercise['topic_id'])
             sql_query.exec()
 
     def _setup_graph_data(self):
@@ -164,10 +147,7 @@ class DatabaseManager:
             """
             CREATE TABLE graphs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-                expression VARCHAR(64) NOT NULL,
-                is_elementary_graph INT,
-                inverse_graph_id INT,
-                FOREIGN KEY (inverse_graph_id) REFERENCES graphs(id)
+                expression VARCHAR(64) NOT NULL
                 )
             """
         )
@@ -176,43 +156,41 @@ class DatabaseManager:
     def _populate_graph_data():
         graph_seed = [
             # Elementary graphs
-            ('x**(1/3)', 1, None),  # 1
-            ('x**3', 1, None),  # 2
-            ('-x**(1/3)', 1, None),  # 3
-            ('x**2', 1, None),  # 4
-            ('math.e**x', 1, None),  # 5
-            ('math.log(x)', 1, None),  # 6
-            ('-math.e**x', 1, None),  # 7
-            ('0.5**x', 1, None),  # 8
-            ('math.cos(x)', 1, None),  # 9
-            ('math.acos(x)', 1, None),  # 10
-            ('math.sin(x)', 1, None),  # 11
-            ('math.asin(x)', 1, None),  # 12
-            ('math.log(x - 1)', 1, None),  # 13
-            ('(x + 2)**2', 1, None),  # 14
-            ('x**2 - 1', 1, None),  # 15
-            ('math.sinh(x + 1)', 1, None),  # 16
+            {'expression': 'x**(1/3)'},  # 1
+            {'expression': 'x**3'},  # 2
+            {'expression': '-x ** (1 / 3)'},  # 3
+            {'expression': 'x**2'},  # 4
+            {'expression': 'math.e**x'},  # 5
+            {'expression': 'math.log(x)'},  # 6
+            {'expression': '-math.e**x'},  # 7
+            {'expression': '0.5**x'},  # 8
+            {'expression': 'math.cos(x)'},  # 9
+            {'expression': 'math.acos(x)'},  # 10
+            {'expression': 'math.sin(x)'},  # 11
+            {'expression': 'math.asin(x)'},  # 12
+            {'expression': 'math.log(x - 1)'},  # 13
+            {'expression': '(x + 2)**2'},  # 14
+            {'expression': 'x**2 - 1'},  # 15
+            {'expression': 'math.sinh(x + 1)'},  # 16
 
             # Domain graphs
-            ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
-            ('(x + 4) ** 2 - 1', 0, None),  # 18
-            ('- x', 0, None),  # 19
-            ('((x + 3) * (2 - x))**(1 / 2) - 1', 0, None),  # 20
-            ('- abs(x - 2) + 3', 0, None),  # 21
-            ('math.log(3 - x)', 0, None),  # 22
-            ('math.cosh(x)', 0, None),  # 23
+            # ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
+            # ('(x + 4) ** 2 - 1', 0, None),  # 18
+            # ('- x', 0, None),  # 19
+            # ('((x + 3) * (2 - x))**(1 / 2) - 1', 0, None),  # 20
+            # ('- abs(x - 2) + 3', 0, None),  # 21
+            # ('math.log(3 - x)', 0, None),  # 22
+            # ('math.cosh(x)', 0, None),  # 23
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO graphs (expression, is_elementary_graph, inverse_graph_id) VALUES (?, ?,?)
+            INSERT INTO graphs (expression) VALUES (?)
             """
         )
 
-        for expression, is_elementary_graph, inverse_graph_id in graph_seed:
-            sql_query.addBindValue(expression)
-            sql_query.addBindValue(is_elementary_graph)
-            sql_query.addBindValue(inverse_graph_id)
+        for graph in graph_seed:
+            sql_query.addBindValue(graph['expression'])
             sql_query.exec()
 
     def _setup_exercise_graph_data(self):
@@ -228,8 +206,10 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 exercise_id INT NOT NULL,
                 graph_id INT NOT NULL,
+                domain VARCHAR(64),
                 is_main_graphic INT,
-                domain VARCHAR(64)
+                FOREIGN KEY (exercise_id) REFERENCES exercises(id),
+                FOREIGN KEY (graph_id) REFERENCES graphs(id)
                 )
             """
         )
@@ -238,42 +218,97 @@ class DatabaseManager:
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
             # Elementary exercise
-            (1, 1, 0, None),
-            (1, 2, 0, None),
-            (1, 3, 0, None),
-            (1, 4, 0, None),
-            (1, 5, 0, None),
-            (1, 6, 0, None),
-            (1, 7, 0, None),
-            (1, 8, 0, None),
-            (1, 9, 0, None),
-            (1, 10, 0, None),
-            (1, 11, 0, None),
-            (1, 12, 0, None),
-            (1, 13, 0, None),
-            (1, 14, 0, None),
-            (1, 15, 0, None),
-            (1, 16, 0, None),
+            {'exercise_id': 1, 'graph_id': 1, 'domain': None, 'is_main_graphic': 0},  # 1
+            {'exercise_id': 1, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 2
+            {'exercise_id': 1, 'graph_id': 3, 'domain': None, 'is_main_graphic': 0},  # 3
+            {'exercise_id': 1, 'graph_id': 4, 'domain': None, 'is_main_graphic': 0},  # 4
+            {'exercise_id': 1, 'graph_id': 5, 'domain': None, 'is_main_graphic': 0},  # 5
+            {'exercise_id': 1, 'graph_id': 6, 'domain': None, 'is_main_graphic': 0},  # 6
+            {'exercise_id': 1, 'graph_id': 7, 'domain': None, 'is_main_graphic': 0},  # 7
+            {'exercise_id': 1, 'graph_id': 8, 'domain': None, 'is_main_graphic': 0},  # 8
+            {'exercise_id': 1, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 9
+            {'exercise_id': 1, 'graph_id': 10, 'domain': None, 'is_main_graphic': 0},  # 10
+            {'exercise_id': 1, 'graph_id': 11, 'domain': None, 'is_main_graphic': 0},  # 11
+            {'exercise_id': 1, 'graph_id': 12, 'domain': None, 'is_main_graphic': 0},  # 12
+            {'exercise_id': 1, 'graph_id': 13, 'domain': None, 'is_main_graphic': 0},  # 13
+            {'exercise_id': 1, 'graph_id': 14, 'domain': None, 'is_main_graphic': 0},  # 14
+            {'exercise_id': 1, 'graph_id': 15, 'domain': None, 'is_main_graphic': 0},  # 15
+            {'exercise_id': 1, 'graph_id': 16, 'domain': None, 'is_main_graphic': 0},  # 16
 
             # Domain exercises
-            (2, 17, 1, None),
-            (3, 18, 1, '[-4, -2]'),
-            (3, 19, 1, '(-1, 3]'),
-            (4, 20, 1, '[-3, 2]'),
-            (5, 21, 1, None),
-            (6, 22, 1, None),
-            (7, 23, 1, None),
+            # (2, 17, 1, None),
+            # (3, 18, 1, '[-4, -2]'),
+            # (3, 19, 1, '(-1, 3]'),
+            # (4, 20, 1, '[-3, 2]'),
+            # (5, 21, 1, None),
+            # (6, 22, 1, None),
+            # (7, 23, 1, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercise_graphs (exercise_id, graph_id, is_main_graphic, domain) VALUES (?, ?, ?, ?)
+            INSERT INTO exercise_graphs (exercise_id, graph_id, domain, is_main_graphic) VALUES (?, ?, ?, ?)
             """
         )
 
-        for exercise_id, graph_id, is_main_graphic, domain in exercise_graph_seed:
-            sql_query.addBindValue(exercise_id)
-            sql_query.addBindValue(graph_id)
-            sql_query.addBindValue(is_main_graphic)
-            sql_query.addBindValue(domain)
+        for exercise_graph in exercise_graph_seed:
+            sql_query.addBindValue(exercise_graph['exercise_id'])
+            sql_query.addBindValue(exercise_graph['graph_id'])
+            sql_query.addBindValue(exercise_graph['domain'])
+            sql_query.addBindValue(exercise_graph['is_main_graphic'])
             sql_query.exec()
+
+    def _setup_user_data(self):
+        self._create_user_table()
+        self._populate_user_data()
+
+    @staticmethod
+    def _create_user_table():
+        sql_query = QSqlQuery()
+        sql_query.exec(
+            """
+            CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+                nickname VARCHAR(64) NOT NULL
+                )
+            """
+        )
+
+    @staticmethod
+    def _populate_user_data():
+        user_seed = [
+            {'nickname': 'Anonymous'},  # 1
+        ]
+
+        sql_query = QSqlQuery()
+        sql_query.prepare(
+            """
+            INSERT INTO users (nickname) VALUES (?)
+            """
+        )
+
+        for user in user_seed:
+            sql_query.addBindValue(user['nickname'])
+            sql_query.exec()
+
+    def _setup_exercise_resume(self):
+        self._create_exercise_resume()
+
+    @staticmethod
+    def _create_exercise_resume():
+        sql_query = QSqlQuery()
+        sql_query.exec(
+            """
+            CREATE TABLE exercise_resumes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+                is_correct INT NOT NULL,
+                user_id INT NOT NULL,
+                step_type VARCHAR(64) NOT NULL,
+                exercise_id INT NOT NULL,
+                graph_id INT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (exercise_id) REFERENCES exercises(id),
+                FOREIGN KEY (graph_id) REFERENCES graphs(id)
+                )
+            """
+        )

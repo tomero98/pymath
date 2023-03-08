@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class  InverseStepType(Enum):
+class StepType(Enum):
     boolean_inverse_exercise = 'ConceptInverseExercise'
     selection_inverse_exercise = 'SelectionInverseExercise'
     delimited_inverse_exercise = 'DelimitedInverseExercise'
@@ -10,6 +10,7 @@ class  InverseStepType(Enum):
     indicate_bounded_range_exercise = 'IndicateBoundedRangeExercise'
     indicate_roots_exercise = 'IndicateRootsExercise'
     indicate_elementary_exercise = 'IndicateElementaryExercise'
+    indicate_elementary_shift_exercise = 'IndicateElementaryShiftExercise'
     maximum_relative_exercise = 'MaximumRelativeExercise'
     maximum_absolute_exercise = 'MaximumAbsoluteExercise'
     minimum_relative_exercise = 'MinimumRelativeExercise'

@@ -2,12 +2,12 @@ import random
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QLabel, QComboBox
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QComboBox
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
 from src.function.data_mappers.function_exercise_data_mapper import FunctionExerciseDataMapper
 from src.function.models.enums.inverse_exercise_type import FunctionExerciseType
-from src.function.models.enums.inverse_step_type import InverseStepType
+from src.function.models.enums.step_type import StepType
 from src.function.models.exercise_resume import ExerciseResume
 from src.function.models.function_exercise import FunctionExercise
 from src.projectConf.components import Window
@@ -34,24 +34,12 @@ class FunctionExercisePage(Window):
         self._steps_done_widget: QComboBox = None  # noqa
         self._header_layout = None
         self._current_exercise_component = None
+
         self._get_exercise_data(topic_id=topic.id)
 
     def _get_exercise_data(self, topic_id: int):
-        # TODO: Change when user can customize number of exercises
+        # TODO CUSTOM NUM EXERCISES
         self._exercises = FunctionExerciseDataMapper.get_function_exercise(topic_id=topic_id)
-        if len(self._exercises) == 1 \
-                and self._exercises[0].type == FunctionExerciseType.elementary_graph_exercise.value:
-            for i in range(4):
-                exercise = FunctionExercise(identifier=i, exercise_type=self._exercises[0].type,
-                                            title=self._exercises[0].title,
-                                            exercise_domain=self._exercises[0].exercise_domain,
-                                            functions=self._exercises[0].functions[i * 4:i * 4 + 4],
-                                            steps=self._exercises[0].steps, exercise_order=i)
-                self._exercises.append(exercise)
-                index = random.randint(0, 3)
-                exercise.functions[index].is_main_graphic = True
-
-            self._exercises.pop(0)
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()
@@ -122,8 +110,7 @@ class FunctionExercisePage(Window):
     def _get_first_exercise_component(self):
         try:
             first_exercise = self._exercises[0]
-            need_help_data = False if first_exercise.type == FunctionExerciseType.elementary_graph_exercise.value \
-                else True
+            need_help_data = True
             current_component = FunctionExerciseComponent(exercise=first_exercise, need_help_data=need_help_data,
                                                           resume_by_exercise_step_id=self._resume_by_exercise_step_id)
             current_component.continue_signal.connect(self._setup_next_exercise)
@@ -185,7 +172,7 @@ class FunctionExercisePage(Window):
         except:
             self.back_signal.emit()
 
-    def _set_exercise_component(self, next_exercise: FunctionExercise, step_type: InverseStepType = None):
+    def _set_exercise_component(self, next_exercise: FunctionExercise, step_type: StepType = None):
         self._layout.removeWidget(self._current_exercise_component)
         self._current_exercise_component.setParent(None)
         self._current_exercise_component = FunctionExerciseComponent(

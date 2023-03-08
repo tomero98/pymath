@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List
 
-from ..models.enums.inverse_step_type import InverseStepType
+from ..models.enums.step_type import StepType
 from ..models.function import Function
 from ..models.function_exercise import FunctionExercise
 from ..models.function_help_data import FunctionHelpData
@@ -12,38 +12,49 @@ class HelpDataMapper:
     def __init__(self, exercise: FunctionExercise):
         self._exercise = exercise
 
-    def get_help_data(self, step_type: InverseStepType) -> FunctionHelpData:
+    def get_help_data(self, step_type: StepType) -> FunctionHelpData:
         help_data = None
-        if step_type == InverseStepType.boolean_inverse_exercise:
+        if step_type == StepType.boolean_inverse_exercise:
             help_data = self._get_inverse_concept_help()
-        elif step_type == InverseStepType.selection_inverse_exercise:
+        elif step_type == StepType.selection_inverse_exercise:
             help_data = self._get_selection_inverse_help()
-        elif step_type == InverseStepType.indicate_domain_exercise:
+        elif step_type == StepType.indicate_domain_exercise:
             help_data = self._get_indicate_domain_help()
-        elif step_type == InverseStepType.indicate_range_exercise:
+        elif step_type == StepType.indicate_range_exercise:
             help_data = self._get_indicate_range_help()
-        elif step_type == InverseStepType.indicate_bounded_range_exercise:
+        elif step_type == StepType.indicate_bounded_range_exercise:
             help_data = self._get_indicate_bounded_range_help()
-        elif step_type == InverseStepType.indicate_roots_exercise:
+        elif step_type == StepType.indicate_roots_exercise:
             help_data = self._get_indicate_indicate_roots_help()
-        elif step_type == InverseStepType.maximum_relative_exercise:
+        elif step_type == StepType.maximum_relative_exercise:
             help_data = self._get_maximum_relative_help()
-        elif step_type == InverseStepType.maximum_absolute_exercise:
+        elif step_type == StepType.maximum_absolute_exercise:
             help_data = self._get_maximum_absolute_help()
-        elif step_type == InverseStepType.minimum_relative_exercise:
+        elif step_type == StepType.minimum_relative_exercise:
             help_data = self._get_minimum_relative_help()
-        elif step_type == InverseStepType.minimum_absolute_exercise:
+        elif step_type == StepType.minimum_absolute_exercise:
             help_data = self._get_minimum_absolute_help()
         return help_data
 
-    def _get_inverse_concept_help(self) -> FunctionHelpData:
-        help_text = '¿Tiene imágenes repetidas?'
-        function = self._exercise.get_main_function()
-        x_values, y_values = function.get_points(small_sample=True)
+    def _get_inverse_concept_help(self) -> List[FunctionHelpData]:
+        help_text = 'En la gráfica siguiente se puede observar como las constantes no cortan la gráfica en dos puntos.' \
+                    ' Indicando que no tiene imágenes repetidas.'
+        main_function = Function(function_id=1000, expression='x**3', domain='(2, 2)', is_main_graphic=True,
+                                 is_invert=False)
+        support_functions, support_points = self._get_constant_functions(x_values=main_function.x_values,
+                                                                         y_values=main_function.y_values)
+        first_help_data = FunctionHelpData(texts=[help_text], functions=[main_function, *support_functions],
+                                           points=support_points, order=0)
 
-        graphs, function_points = self._get_constant_graphs(x_values=x_values, y_values=y_values)
-        return FunctionHelpData(help_text=help_text, help_expressions=graphs,
-                                help_points=function_points)
+        help_text = 'En la gráfica siguiente se puede observar como las constantes cortan la gráfica en dos puntos.' \
+                    ' Indicando que tiene imágenes repetidas.'
+        main_function = Function(function_id=1000, expression='x**2', domain='(2, 2)', is_main_graphic=True,
+                                 is_invert=False)
+        support_functions, support_points = self._get_constant_functions(x_values=main_function.x_values,
+                                                                         y_values=main_function.y_values)
+        second_help_data = FunctionHelpData(texts=[help_text], functions=[main_function, *support_functions],
+                                            points=support_points, order=0)
+        return [first_help_data, second_help_data]
 
     @staticmethod
     def _get_selection_inverse_help() -> FunctionHelpData:
@@ -56,7 +67,7 @@ class HelpDataMapper:
         help_text = 'Recuerda que el dominio lo forman los puntos con imagen.'
         return FunctionHelpData(help_text=help_text, help_expressions=[])
 
-    def _get_constant_graphs(self, x_values, y_values):
+    def _get_constant_functions(self, x_values, y_values):
         unique_elements = set()
         duplicated_elements = []
         x_values_by_y_value = defaultdict(list)

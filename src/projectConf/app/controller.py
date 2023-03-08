@@ -19,7 +19,7 @@ class Controller:
 
     def _start_app_flow(self):
         self._setup_exercise_page(
-            topic=Topic(identifier=1, title='Funciones inversas', description='Ejercicios sobre funciones inversas')
+            topic=Topic(identifier=3, title='Gráficas elementales', description='Ejercicios sobre funciones')
         )
         # self._setup_front_page()
 

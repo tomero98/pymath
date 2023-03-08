@@ -1,7 +1,7 @@
 from typing import List
 
 from .enums.inverse_exercise_type import FunctionExerciseType
-from .enums.inverse_step_type import InverseStepType
+from .enums.step_type import StepType
 from .function import Function
 from .function_step import FunctionStep
 
@@ -16,6 +16,12 @@ class FunctionExercise:
         self.exercise_order = exercise_order
         self.functions = functions
         self.steps = steps
+
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
 
     def has_main_function_inverse(self) -> bool:
         main_function = next(function for function in self.functions if function.is_main_graphic)
@@ -72,11 +78,11 @@ class FunctionExercise:
         points = []
         for function in self.functions:
             points.extend(function.get_points_range())
-        if step_type == InverseStepType.maximum_absolute_exercise:
+        if step_type == StepType.maximum_absolute_exercise:
             value = self._get_maximum_absolute_value(points=points)
-        elif step_type == InverseStepType.maximum_relative_exercise:
+        elif step_type == StepType.maximum_relative_exercise:
             value = self._get_maximum_relative_value(points=points)
-        elif step_type == InverseStepType.minimum_absolute_exercise:
+        elif step_type == StepType.minimum_absolute_exercise:
             value = self._get_minimum_absolute_value(points=points)
         else:
             value = self._get_minimum_relative_value(points=points)

@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayo
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from ..factories import PlotFactory
-from ..models.enums.inverse_step_type import InverseStepType
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
 from ...projectConf.factories import LabelFactory, ButtonFactory

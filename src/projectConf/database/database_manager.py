@@ -24,8 +24,8 @@ class DatabaseManager:
         self._setup_exercise_data()
         self._setup_graph_data()
         self._setup_exercise_graph_data()
-        self._setup_user_data()
-        self._setup_exercise_resume()
+        # self._setup_user_data()
+        # self._setup_exercise_resume()
 
     def _setup_topic_data(self):
         self._create_topic_table()
@@ -77,7 +77,6 @@ class DatabaseManager:
             CREATE TABLE exercises (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 exercise_type VARCHAR(64) NOT NULL,
-                is_active INT NOT NULL, 
                 domain VARCHAR(64),
                 topic_id INT NOT NULL,
                 FOREIGN KEY (topic_id) REFERENCES topics(id)
@@ -90,8 +89,7 @@ class DatabaseManager:
         # Domain example: '5, 5'
         exercise_seed = [
             # Elementary functions exercises
-            {'exercise_type': 'ElementaryGraphExercise', 'is_active': 1, 'domain': None, 'topic_id': 3}  # 1
-            # ('ElementaryGraphExercise', 0, None, 4),  # 1
+            {'exercise_type': 'ElementaryGraphExercise', 'domain': None, 'topic_id': 3},  # 1
 
             # # Domain functions exercises
             # ('ConceptDomainExercise', 0, None, 2),  # 2
@@ -102,6 +100,8 @@ class DatabaseManager:
             # ('ConceptDomainExercise', 0, None, 2),  # 7
 
             # # Inverse exercise
+            # {'exercise_type': 'ConceptInverseExercise', 'domain': '-3, 3', 'topic_id': 1}  # 2
+
             # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 1
             # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 2
             # ('ConceptInverseExercise', 0, None, 1),  # 3
@@ -125,13 +125,12 @@ class DatabaseManager:
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercises (exercise_type, is_active, domain, topic_id) VALUES (?, ?, ?, ?)
+            INSERT INTO exercises (exercise_type, domain, topic_id) VALUES (?, ?, ?)
             """
         )
 
         for exercise in exercise_seed:
             sql_query.addBindValue(exercise['exercise_type'])
-            sql_query.addBindValue(exercise['is_active'])
             sql_query.addBindValue(exercise['domain'])
             sql_query.addBindValue(exercise['topic_id'])
             sql_query.exec()
@@ -158,20 +157,13 @@ class DatabaseManager:
             # Elementary graphs
             {'expression': 'x**(1/3)'},  # 1
             {'expression': 'x**3'},  # 2
-            {'expression': '-x ** (1 / 3)'},  # 3
-            {'expression': 'x**2'},  # 4
+            {'expression': '(x)**2'},  # 3
+            {'expression': 'x**(1/2)'},  # 4
             {'expression': 'math.e**x'},  # 5
-            {'expression': 'math.log(x)'},  # 6
-            {'expression': '-math.e**x'},  # 7
-            {'expression': '0.5**x'},  # 8
-            {'expression': 'math.cos(x)'},  # 9
-            {'expression': 'math.acos(x)'},  # 10
-            {'expression': 'math.sin(x)'},  # 11
-            {'expression': 'math.asin(x)'},  # 12
-            {'expression': 'math.log(x - 1)'},  # 13
-            {'expression': '(x + 2)**2'},  # 14
-            {'expression': 'x**2 - 1'},  # 15
-            {'expression': 'math.sinh(x + 1)'},  # 16
+            {'expression': 'math.log(x)'},  # 7
+            {'expression': 'math.cos(x)'},  # 8
+            {'expression': 'math.sin(x)'},  # 9
+            {'expression': 'math.tan(x)'},  # 10
 
             # Domain graphs
             # ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
@@ -181,6 +173,9 @@ class DatabaseManager:
             # ('- abs(x - 2) + 3', 0, None),  # 21
             # ('math.log(3 - x)', 0, None),  # 22
             # ('math.cosh(x)', 0, None),  # 23
+
+            # Inverse graphs
+            # {'expression': 'x**(3)'},  # 17
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -227,22 +222,6 @@ class DatabaseManager:
             {'exercise_id': 1, 'graph_id': 7, 'domain': None, 'is_main_graphic': 0},  # 7
             {'exercise_id': 1, 'graph_id': 8, 'domain': None, 'is_main_graphic': 0},  # 8
             {'exercise_id': 1, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 9
-            {'exercise_id': 1, 'graph_id': 10, 'domain': None, 'is_main_graphic': 0},  # 10
-            {'exercise_id': 1, 'graph_id': 11, 'domain': None, 'is_main_graphic': 0},  # 11
-            {'exercise_id': 1, 'graph_id': 12, 'domain': None, 'is_main_graphic': 0},  # 12
-            {'exercise_id': 1, 'graph_id': 13, 'domain': None, 'is_main_graphic': 0},  # 13
-            {'exercise_id': 1, 'graph_id': 14, 'domain': None, 'is_main_graphic': 0},  # 14
-            {'exercise_id': 1, 'graph_id': 15, 'domain': None, 'is_main_graphic': 0},  # 15
-            {'exercise_id': 1, 'graph_id': 16, 'domain': None, 'is_main_graphic': 0},  # 16
-
-            # Domain exercises
-            # (2, 17, 1, None),
-            # (3, 18, 1, '[-4, -2]'),
-            # (3, 19, 1, '(-1, 3]'),
-            # (4, 20, 1, '[-3, 2]'),
-            # (5, 21, 1, None),
-            # (6, 22, 1, None),
-            # (7, 23, 1, None),
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -256,7 +235,7 @@ class DatabaseManager:
             sql_query.addBindValue(exercise_graph['graph_id'])
             sql_query.addBindValue(exercise_graph['domain'])
             sql_query.addBindValue(exercise_graph['is_main_graphic'])
-            sql_query.exec()
+            res = sql_query.exec()
 
     def _setup_user_data(self):
         self._create_user_table()

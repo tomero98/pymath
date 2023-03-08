@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayo
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from ..factories import PlotFactory
-from ..models.enums.inverse_step_type import InverseStepType
+from ..models.enums.step_type import StepType
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
 from ...projectConf.factories import LabelFactory, ButtonFactory
@@ -23,8 +23,8 @@ class DomainIndicateComponent(QWidget):
         self._step = step
         self._is_answer_correct = True
         self._need_help_data = need_help_data
-        self._is_domain_exercise = step.type == InverseStepType.indicate_domain_exercise
-        self._is_range_exercise = step.type == InverseStepType.indicate_range_exercise
+        self._is_domain_exercise = step.type == StepType.indicate_domain_exercise
+        self._is_range_exercise = step.type == StepType.indicate_range_exercise
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._help_subtitle_widget: QLabel = None  # noqa
@@ -42,13 +42,13 @@ class DomainIndicateComponent(QWidget):
 
     @property
     def label(self):
-        if self._step.type == InverseStepType.indicate_domain_exercise:
+        if self._step.type == StepType.indicate_domain_exercise:
             label = 'Indicar el dominio.'
-        elif self._step.type == InverseStepType.indicate_range_exercise:
+        elif self._step.type == StepType.indicate_range_exercise:
             label = 'Indicar el rango.'
-        # elif self._step.type == InverseStepType.indicate_bounded_range_exercise:
+        # elif self._step.type == StepType.indicate_bounded_range_exercise:
         #     label = 'Indicar si la función está acotada.'
-        # elif self._step.type == InverseStepType.indicate_roots_exercise:
+        # elif self._step.type == StepType.indicate_roots_exercise:
         #     label = 'Indicar si las raíces de la función.'
         return label
 

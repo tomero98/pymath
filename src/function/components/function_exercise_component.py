@@ -4,12 +4,13 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 from .bounded_range_component import BoundedRangeComponent
 from .domain_indicate_component import DomainIndicateComponent
 from .elementary_graph_component import ElementaryGraphComponent
+from .elementary_shift_graph_component import ElementaryShiftGraphComponent
 from .inverse_boolean_component import InverseBooleanComponent
 from .inverse_delimited_component import InverseDelimitedComponent
 from .inverse_selection_component import InverseSelectionComponent
 from .maximum_minimum_component import MaximumMinimumComponent
 from .root_domain_component import RootDomainComponent
-from ..models.enums.inverse_step_type import InverseStepType
+from ..models.enums.step_type import StepType
 from ..models.enums.resume_state import ResumeState
 from ..models.exercise_resume import ExerciseResume
 from ..models.function_exercise import FunctionExercise
@@ -22,7 +23,7 @@ class FunctionExerciseComponent(QWidget):
     resume_signal = pyqtSignal(dict)
     exercise_finished_signal = pyqtSignal()
 
-    def __init__(self, exercise: FunctionExercise, need_help_data: bool = False, step_type: InverseStepType = None,
+    def  __init__(self, exercise: FunctionExercise, need_help_data: bool = False, step_type: StepType = None,
                  resume_by_exercise_step_id: dict = {}):
         super(FunctionExerciseComponent, self).__init__()
         self._exercise = exercise
@@ -62,27 +63,29 @@ class FunctionExerciseComponent(QWidget):
 
     def _get_step_component(self, step: FunctionStep, need_help_data: bool = False):
         resume = self._get_current_step_resume(step=step, need_help_data=need_help_data)
-        if step.type == InverseStepType.boolean_inverse_exercise:
+        if step.type == StepType.boolean_inverse_exercise:
             component = InverseBooleanComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.selection_inverse_exercise:
+        elif step.type == StepType.selection_inverse_exercise:
             component = InverseSelectionComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.delimited_inverse_exercise:
+        elif step.type == StepType.delimited_inverse_exercise:
             component = InverseDelimitedComponent(exercise=self._exercise, step=step)
-        elif step.type in [InverseStepType.indicate_domain_exercise, InverseStepType.indicate_range_exercise]:
+        elif step.type in [StepType.indicate_domain_exercise, StepType.indicate_range_exercise]:
             component = DomainIndicateComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.indicate_bounded_range_exercise:
+        elif step.type == StepType.indicate_bounded_range_exercise:
             component = BoundedRangeComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.indicate_roots_exercise:
+        elif step.type == StepType.indicate_roots_exercise:
             component = RootDomainComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.indicate_elementary_exercise:
+        elif step.type == StepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
-        elif step.type == InverseStepType.maximum_relative_exercise:
+        elif step.type == StepType.indicate_elementary_shift_exercise:
+            component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume)
+        elif step.type == StepType.maximum_relative_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.maximum_absolute_exercise:
+        elif step.type == StepType.maximum_absolute_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.minimum_relative_exercise:
+        elif step.type == StepType.minimum_relative_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == InverseStepType.minimum_absolute_exercise:
+        elif step.type == StepType.minimum_absolute_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
         component.continue_signal.connect(self._setup_next_step_component)
         component.back_signal.connect(self._setup_back_step_component)

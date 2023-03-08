@@ -5,7 +5,8 @@ from .function_point import FunctionPoint
 
 
 class FunctionHelpData:
-    def __init__(self, help_text: str, help_expressions: List[Function], help_points: List[FunctionPoint] = None):
-        self.help_text = help_text
-        self.help_expressions = help_expressions
-        self.help_points = help_points
+    def __init__(self, order: int, texts: List[str], functions: List[Function], points: List[FunctionPoint] = None):
+        self.order = order
+        self.texts = texts
+        self.functions = functions
+        self.points = points

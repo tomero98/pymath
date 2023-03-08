@@ -1,8 +1,10 @@
+import random
 from typing import List
 
 from PyQt5.QtSql import QSqlQuery
 
 from .step_data_mapper import StepDataMapper
+from ..models.enums.inverse_exercise_type import FunctionExerciseType
 from ..models.function import Function
 from ..models.function_exercise import FunctionExercise
 
@@ -10,6 +12,7 @@ from ..models.function_exercise import FunctionExercise
 class FunctionExerciseDataMapper:
     @classmethod
     def get_function_exercise(cls, topic_id: int) -> List[FunctionExercise]:
+        # TODO CODE IMPROVE: mover a una clase el acceso a bd
         query = cls._get_function_exercise_query(topic_id=topic_id)
         result = QSqlQuery()
         result.exec(query)
@@ -19,20 +22,22 @@ class FunctionExerciseDataMapper:
         while result.next():
             exercise_id = result.value('exercise_id')
             if exercise_id not in exercises_by_id:
-                cls._initialize_exercise_values(exercises_by_id=exercises_by_id, query_result=result,
-                                                exercise_order=exercise_order)
+                exercise = cls._initialize_exercise_values(query_result=result, exercise_order=exercise_order)
+                exercises_by_id[exercise_id] = exercise
                 exercise_order += 1
             exercise = exercises_by_id[exercise_id]
             cls._setup_exercises(query_result=result, exercise=exercise)
 
-        for exercise in exercises_by_id.values():
-            step_mapper = StepDataMapper(exercise=exercise)
-            steps = step_mapper.get_steps()
-            exercise.steps = steps
-        return list(exercises_by_id.values())
+        exercises = list(exercises_by_id.values())
+        if exercises[0].type == FunctionExerciseType.elementary_graph_exercise.value:
+            exercises = cls._setup_elementary_graph(main_exercise=exercises[0])
+
+        cls._setup_steps(exercises=exercises)
+        return exercises
 
     @staticmethod
     def _get_function_exercise_query(topic_id: int):
+        # TODO CUSTOM NUM EXERCISES
         return f'''
             SELECT exercises.id                    AS exercise_id,
                    exercises.exercise_type         AS exercise_type,
@@ -42,25 +47,23 @@ class FunctionExerciseDataMapper:
                    exercise_graphs.is_main_graphic AS is_main_graphic,
                    exercise_graphs.domain          AS graph_domain
             FROM exercises
-                     INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
-                     INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id
-                        WHERE exercises.topic_id == {topic_id} AND exercises.is_active is TRUE
-                        ORDER BY RANDOM()
+            INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
+            INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id WHERE exercises.topic_id == {topic_id}
+            ORDER BY RANDOM()
         '''
 
     @staticmethod
-    def _initialize_exercise_values(exercises_by_id: dict, query_result: QSqlQuery, exercise_order: int):
+    def _initialize_exercise_values(query_result: QSqlQuery, exercise_order: int) -> FunctionExercise:
         exercise_id = query_result.value('exercise_id')
         exercise_type = query_result.value('exercise_type')
         title = FunctionExercise.get_title_by_exercise_type(exercise_type=exercise_type)
         domain = query_result.value('exercise_domain')
         domain = (-5, 5) if not bool(domain) else tuple(map(int, domain.split(',')))
-        exercise = FunctionExercise(identifier=exercise_id, exercise_type=exercise_type, exercise_domain=domain,
-                                    title=title, functions=[], steps=[], exercise_order=exercise_order)
-        exercises_by_id[exercise_id] = exercise
+        return FunctionExercise(identifier=exercise_id, exercise_type=exercise_type, exercise_domain=domain,
+                                title=title, functions=[], steps=[], exercise_order=exercise_order)
 
     @staticmethod
-    def _setup_exercises(query_result: QSqlQuery, exercise: FunctionExercise):
+    def _setup_exercises(query_result: QSqlQuery, exercise: FunctionExercise) -> None:
         function_id = query_result.value('graph_id')
         function_expression = query_result.value('graph_expression')
         function_domain = query_result.value('graph_domain')
@@ -70,3 +73,27 @@ class FunctionExerciseDataMapper:
         function = Function(function_id=function_id, expression=function_expression, domain=function_domain,
                             is_main_graphic=is_main_graphic)
         exercise.functions.append(function)
+
+    @staticmethod
+    def _setup_elementary_graph(main_exercise: FunctionExercise) -> List[FunctionExercise]:
+        # TODO CUSTOM NUM EXERCISES
+        import itertools
+        list_functions = list(itertools.combinations([function for function in main_exercise.functions], 4))
+        exercises = []
+        for i in range(4):
+            index = random.randint(0, len(list_functions))
+            functions = list_functions[index]
+            exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
+                                        exercise_domain=main_exercise.exercise_domain, functions=[*functions],
+                                        steps=main_exercise.steps, exercise_order=i)
+            exercises.append(exercise)
+            index = random.randint(0, 3)
+            exercise.functions[index].is_main_graphic = True
+        return exercises
+
+    @staticmethod
+    def _setup_steps(exercises: List[FunctionExercise]) -> None:
+        for exercise in exercises:
+            step_mapper = StepDataMapper(exercise=exercise)
+            steps = step_mapper.get_steps()
+            exercise.steps = steps

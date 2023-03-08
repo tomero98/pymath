@@ -113,7 +113,7 @@ class Function:
         return f'{start_interval}{y_start}, {y_end}{end_interval}'
 
     def get_math_expression(self):
-        return self.expression.replace('**2', '²').replace('**3', '³').replace('math.sqrt', '√') \
+        return self.expression.replace('(x)**', 'x**').replace('**2', '²').replace('**3', '³').replace('math.sqrt', '√') \
             .replace('**', '^').replace('math.e', 'e').replace('math.log', 'ln').replace('math.cosh', 'cosh') \
             .replace('math.cos', 'cos').replace('math.acos', 'acos').replace('math.sin', 'sin') \
             .replace('math.tan', 'tan').replace('math.asin', 'asin')

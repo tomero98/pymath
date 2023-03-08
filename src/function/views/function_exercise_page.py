@@ -10,6 +10,7 @@ from src.function.models.enums.inverse_exercise_type import FunctionExerciseType
 from src.function.models.enums.step_type import StepType
 from src.function.models.exercise_resume import ExerciseResume
 from src.function.models.function_exercise import FunctionExercise
+from src.function.models.function_step import FunctionStep
 from src.projectConf.components import Window
 from src.projectConf.factories import ButtonFactory, LabelFactory
 from src.projectConf.factories.dialog_factory import DialogFactory
@@ -28,7 +29,7 @@ class FunctionExercisePage(Window):
         self._exercises: List[FunctionExercise] = []  # noqa
         self._steps_done = []
         self._step_widget_by_label = {}
-        self._resume_by_exercise_step_id = {}
+        self._resume_by_exercise_id_step_id = {}
 
         self._layout: QVBoxLayout = None  # noqa
         self._steps_done_widget: QComboBox = None  # noqa
@@ -49,7 +50,7 @@ class FunctionExercisePage(Window):
 
         self._combobox_layout = self._get_combobox_layout()
 
-        self._current_exercise_component = self._get_first_exercise_component()
+        self._setup_first_exercise_component()
         self._save_step()
         self._set_layout()
 
@@ -107,20 +108,26 @@ class FunctionExercisePage(Window):
         self._steps_done_widget.activated.connect(self._update_step_component)
         return combobox_layout
 
-    def _get_first_exercise_component(self):
+    def _setup_first_exercise_component(self):
         try:
             first_exercise = self._exercises[0]
             need_help_data = True
-            current_component = FunctionExerciseComponent(exercise=first_exercise, need_help_data=need_help_data,
-                                                          resume_by_exercise_step_id=self._resume_by_exercise_step_id)
-            current_component.continue_signal.connect(self._setup_next_exercise)
-            current_component.back_exercise_signal.connect(self._setup_back_exercise)
-            current_component.resume_signal.connect(self._setup_resume)
-            current_component.exercise_finished_signal.connect(self._save_step)
-            return current_component
+            self._current_exercise_component = FunctionExerciseComponent(
+                exercise=first_exercise, need_help_data=need_help_data,
+                resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
+            )
+
+            self._setup_signals(component=self._current_exercise_component)
+            self._current_exercise_component.draw()
         except IndexError:
             print('No hay ejercicios de este tipo')
             sys.exit(0)
+
+    def _setup_signals(self, component) -> None:
+        component.continue_signal.connect(self._setup_next_exercise)
+        component.back_exercise_signal.connect(self._setup_back_exercise)
+        component.resume_signal.connect(self._setup_resume)
+        component.exercise_finished_signal.connect(self._save_step)
 
     def _set_layout(self):
         self._layout.setContentsMargins(10, 5, 0, 0)
@@ -150,38 +157,33 @@ class FunctionExercisePage(Window):
     def _close_dialog(self):
         self._dialog_widget.close()
 
-    def _setup_next_exercise(self, resume: ExerciseResume):
+    def _setup_next_exercise(self, current_exercise_id: int):
         try:
             current_exercise_order = next(
-                exercise.exercise_order for exercise in self._exercises if exercise.id == resume.exercise_id
+                exercise.exercise_order for exercise in self._exercises if exercise.id == current_exercise_id
             )
             next_exercise = self._exercises[current_exercise_order + 1]
-
             self._set_exercise_component(next_exercise=next_exercise)
         except:
             self.back_signal.emit()
 
-    def _setup_back_exercise(self, resume: ExerciseResume):
-        try:
-            current_exercise_order = next(
-                exercise.exercise_order for exercise in self._exercises if exercise.id == resume.exercise_id
-            )
-            next_exercise = self._exercises[current_exercise_order - 1]
+    def _setup_back_exercise(self, current_exercise_id: int):
+        current_exercise_order = next(
+            exercise.exercise_order for exercise in self._exercises if exercise.id == current_exercise_id
+        )
+        next_exercise = self._exercises[current_exercise_order - 1]
+        self._set_exercise_component(next_exercise=next_exercise, start_step=next_exercise.steps[-1])
 
-            self._set_exercise_component(next_exercise=next_exercise, step_type=next_exercise.steps[-1].type)
-        except:
-            self.back_signal.emit()
-
-    def _set_exercise_component(self, next_exercise: FunctionExercise, step_type: StepType = None):
+    def _set_exercise_component(self, next_exercise: FunctionExercise, start_step: FunctionStep = None):
         self._layout.removeWidget(self._current_exercise_component)
         self._current_exercise_component.setParent(None)
         self._current_exercise_component = FunctionExerciseComponent(
-            exercise=next_exercise, step_type=step_type, resume_by_exercise_step_id=self._resume_by_exercise_step_id
+            exercise=next_exercise, start_step=start_step,
+            resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
         )
-        self._current_exercise_component.continue_signal.connect(self._setup_next_exercise)
-        self._current_exercise_component.back_exercise_signal.connect(self._setup_back_exercise)
-        self._current_exercise_component.resume_signal.connect(self._setup_resume)
-        self._current_exercise_component.exercise_finished_signal.connect(self._save_step)
+
+        self._setup_signals(component=self._current_exercise_component)
+        self._current_exercise_component.draw()
         self._layout.addWidget(self._current_exercise_component)
 
     def _show_exit_dialog(self):
@@ -219,5 +221,8 @@ class FunctionExercisePage(Window):
         step_component = self._step_widget_by_label[current_text_label]
         self._current_exercise_component.set_step_component_by_combobox(step_component)
 
-    def _setup_resume(self, resume_by_exercise_step_id: dict):
-        self._resume_by_exercise_step_id = resume_by_exercise_step_id
+    def _setup_resume(self, resume: ExerciseResume):
+        self._resume_by_exercise_id_step_id[(resume.exercise_id, resume.step_type)] = resume
+        self._current_exercise_component.update_resume_dict(
+            resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
+        )

@@ -1,8 +1,8 @@
 import random
-
-from PyQt5.QtCore import pyqtSignal
+from typing import List
 
 from .selection_component import SelectionComponent
+from ..models.enums.resume_state import ResumeState
 from ..models.exercise_resume import ExerciseResume
 from ..models.function import Function
 from ..models.function_exercise import FunctionExercise
@@ -10,10 +10,6 @@ from ..models.function_step import FunctionStep
 
 
 class ElementaryShiftGraphComponent(SelectionComponent):
-    continue_signal = pyqtSignal(ExerciseResume)
-    back_signal = pyqtSignal(ExerciseResume)
-    resume_signal = pyqtSignal(ExerciseResume)
-
     label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):
@@ -47,10 +43,22 @@ class ElementaryShiftGraphComponent(SelectionComponent):
         function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False)
         functions.append(function)
 
+        if not self._resume or self._resume.resume_state == ResumeState.pending:
+            self._select_main_function_random(functions=functions)
+        else:
+            self._select_main_function_using_resume(functions=functions)
+        self._functions = functions
+
+    def _select_main_function_random(self, functions: List[Function]):
         index = random.randint(0, 3)
         self._main_function = functions[index]
         self._main_function.is_main_graphic = True
-        self._functions = functions
+
+    def _select_main_function_using_resume(self, functions: List[Function]):
+        self._main_function = next(
+            function for function in functions if function.expression == self._resume.graph_expression
+        )
+        self._main_function.is_main_graphic = True
 
     def _get_functions_to_display_as_options(self):
         return self._functions

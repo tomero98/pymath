@@ -1,5 +1,3 @@
-from PyQt5.QtCore import pyqtSignal
-
 from .selection_component import SelectionComponent
 from ..models.exercise_resume import ExerciseResume
 from ..models.function_exercise import FunctionExercise
@@ -7,10 +5,6 @@ from ..models.function_step import FunctionStep
 
 
 class ElementaryGraphComponent(SelectionComponent):
-    continue_signal = pyqtSignal(ExerciseResume)
-    back_signal = pyqtSignal(ExerciseResume)
-    resume_signal = pyqtSignal(ExerciseResume)
-
     label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):

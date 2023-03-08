@@ -17,16 +17,12 @@ from ...projectConf.models.enums.text_type import TextType
 
 
 class SelectionComponent(Component):
-    continue_signal = pyqtSignal(ExerciseResume)
-    back_signal = pyqtSignal(ExerciseResume)
     resume_signal = pyqtSignal(ExerciseResume)
 
     label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):
-        super(SelectionComponent, self).__init__()
-        self._exercise = exercise
-        self._step = step
+        super(SelectionComponent, self).__init__(exercise=exercise, step=step, resume=resume)
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._help_subtitle_widget: QLabel = None  # noqa
@@ -36,13 +32,8 @@ class SelectionComponent(Component):
         self._main_window_layout: QHBoxLayout = None  # noqa
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
 
-        self._resume = resume
-
         self._setup_data()
         self._draw()
-
-        if self._resume.resume_state != ResumeState.pending:
-            self._apply_resume()
 
     def _setup_data(self):
         pass
@@ -50,7 +41,7 @@ class SelectionComponent(Component):
     def _draw(self):
         self._layout = QHBoxLayout()
         question_layout = self._get_question_layout()
-        self._set_plot_widget(self._exercise)
+        self._set_plot_widget()
 
         self._layout.addStretch()
         self._layout.addLayout(question_layout)
@@ -84,9 +75,9 @@ class SelectionComponent(Component):
 
         return question_layout
 
-    def _set_plot_widget(self, exercise: FunctionExercise):
+    def _set_plot_widget(self):
         function = self._get_function_to_draw()
-        self._plot_widget = PlotFactory.get_plot([function], exercise=exercise, show_ends=False, show_grid=True)
+        self._plot_widget = PlotFactory.get_plot([function], exercise=self._exercise, show_ends=False, show_grid=True)
 
     def _get_continue_buttons_layout(self) -> QHBoxLayout:
         continue_layout = QHBoxLayout()
@@ -131,7 +122,7 @@ class SelectionComponent(Component):
 
     def _apply_resume(self):
         pressed_button = next(button for button in self._graph_buttons if button.text() == self._resume.response)
-        correct_expression = self._exercise.get_main_function().get_math_expression()
+        correct_expression = self._get_function_to_draw().get_math_expression()
         self._set_graph(pressed_button=pressed_button, correct_expression=correct_expression,
                         is_answer_correct=pressed_button.text() == correct_expression)
 
@@ -147,11 +138,7 @@ class SelectionComponent(Component):
         is_answer_correct = pressed_button.text() == correct_expression
         self._set_graph(pressed_button=pressed_button, correct_expression=correct_expression,
                         is_answer_correct=is_answer_correct)
-
-        resume_state = ResumeState.success if is_answer_correct else ResumeState.error
-        self._resume.resume_state = resume_state
-        self._resume.response = pressed_button.text()
-        self.resume_signal.emit(self._resume)
+        self._update_resume(pressed_button=pressed_button, is_answer_correct=is_answer_correct)
 
     def _set_graph(self, pressed_button: QPushButton, correct_expression: str, is_answer_correct: bool):
         border_color = '#2F8C53' if is_answer_correct else 'red'
@@ -185,3 +172,9 @@ class SelectionComponent(Component):
         label_functions = [(self._get_function_to_draw(), 'white'), (error_func, 'red')]
         PlotFactory.add_function_labels(plot_widget=self._plot_widget,
                                         functions_to_labelling_with_color=label_functions)
+
+    def _update_resume(self, pressed_button: QPushButton, is_answer_correct: bool):
+        resume_state = ResumeState.success if is_answer_correct else ResumeState.error
+        self._resume.resume_state = resume_state
+        self._resume.response = pressed_button.text()
+        self.resume_signal.emit(self._resume)

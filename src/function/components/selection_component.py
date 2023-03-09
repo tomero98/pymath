@@ -32,9 +32,6 @@ class SelectionComponent(Component):
         self._main_window_layout: QHBoxLayout = None  # noqa
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
 
-        self._setup_data()
-        self._draw()
-
     def _setup_data(self):
         pass
 

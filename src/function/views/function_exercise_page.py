@@ -1,4 +1,3 @@
-import random
 import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -6,8 +5,6 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QCom
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
 from src.function.data_mappers.function_exercise_data_mapper import FunctionExerciseDataMapper
-from src.function.models.enums.inverse_exercise_type import FunctionExerciseType
-from src.function.models.enums.step_type import StepType
 from src.function.models.exercise_resume import ExerciseResume
 from src.function.models.function_exercise import FunctionExercise
 from src.function.models.function_step import FunctionStep
@@ -28,7 +25,6 @@ class FunctionExercisePage(Window):
         self._topic = topic
         self._exercises: List[FunctionExercise] = []  # noqa
         self._steps_done = []
-        self._step_widget_by_label = {}
         self._resume_by_exercise_id_step_id = {}
 
         self._layout: QVBoxLayout = None  # noqa
@@ -51,7 +47,6 @@ class FunctionExercisePage(Window):
         self._combobox_layout = self._get_combobox_layout()
 
         self._setup_first_exercise_component()
-        self._save_step()
         self._set_layout()
 
         main_window.setLayout(self._layout)
@@ -95,7 +90,6 @@ class FunctionExercisePage(Window):
     def _get_combobox_layout(self) -> QHBoxLayout:
         combobox_layout = QHBoxLayout()
         self._steps_done_widget = QComboBox()
-        self._steps_done_widget.addItem('')
         self._steps_done_widget.setDisabled(True)
         combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.NORMAL_TEXT,
                                                           set_underline=True)
@@ -127,7 +121,6 @@ class FunctionExercisePage(Window):
         component.continue_signal.connect(self._setup_next_exercise)
         component.back_exercise_signal.connect(self._setup_back_exercise)
         component.resume_signal.connect(self._setup_resume)
-        component.exercise_finished_signal.connect(self._save_step)
 
     def _set_layout(self):
         self._layout.setContentsMargins(10, 5, 0, 0)
@@ -199,30 +192,26 @@ class FunctionExercisePage(Window):
     def _no_exit_dialog(self):
         self._exit_dialog_widget.close()
 
-    def _save_step(self):
-        step = self._current_exercise_component._current_step_component
-        step_label = f'Ejercicio: {step.label}'
+    def _update_step_component(self, *args, **kwargs):
+        current_text_label = self._steps_done_widget.currentText()
+        # TODO: create a dict key (exercise_id, step) by label and update method set_step_component
+        # self._current_exercise_component.set_step_component_by_combobox(step_component)
 
-        if step_label in self._step_widget_by_label:
-            return None
+    def _setup_resume(self, resume: ExerciseResume):
+        key = (resume.exercise_id, resume.step_type)
+        if key not in self._resume_by_exercise_id_step_id:
+            self._save_step_in_steps_done_widget(resume=resume)
+        self._resume_by_exercise_id_step_id[key] = resume
+        self._current_exercise_component.update_resume_dict(
+            resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
+        )
+
+    def _save_step_in_steps_done_widget(self, resume: ExerciseResume):
+        current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)
+        step = self._current_exercise_component._current_step_component
+        step_label = f'Ejercicio {current_exercise.exercise_order + 1}: {step.label}'
 
         self._steps_done_widget.addItem(step_label)
         self._steps_done_widget.adjustSize()
         self._steps_done_widget.setCurrentIndex(self._steps_done_widget.count() - 1)
-        self._step_widget_by_label[step_label] = None
-
-        if self._steps_done_widget.count() < 2:
-            self._steps_done_widget.setDisabled(True)
-        else:
-            self._steps_done_widget.setDisabled(False)
-
-    def _update_step_component(self):
-        current_text_label = self._steps_done_widget.currentText()
-        step_component = self._step_widget_by_label[current_text_label]
-        self._current_exercise_component.set_step_component_by_combobox(step_component)
-
-    def _setup_resume(self, resume: ExerciseResume):
-        self._resume_by_exercise_id_step_id[(resume.exercise_id, resume.step_type)] = resume
-        self._current_exercise_component.update_resume_dict(
-            resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
-        )
+        self._steps_done_widget.setDisabled(self._steps_done_widget.count() < 2)

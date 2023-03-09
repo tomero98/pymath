@@ -10,7 +10,7 @@ from ..models.function_step import FunctionStep
 
 
 class ElementaryShiftGraphComponent(SelectionComponent):
-    label = 'Seleccionar la función.'
+    label = 'Seleccionar el desplazamiento.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):
         self._main_function = None

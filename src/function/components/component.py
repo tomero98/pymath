@@ -22,7 +22,18 @@ class Component(QWidget):
         self._step = step
         self._resume = resume
 
-    def setup_resume(self):
+    def draw(self):
+        self._setup_data()
+        self._draw()
+        self._setup_resume()
+
+    def _setup_data(self):
+        pass
+
+    def _draw(self):
+        pass
+
+    def _setup_resume(self):
         if not self._resume:
             self._initialize_resume()
         elif self._resume.resume_state != ResumeState.pending:

@@ -10,7 +10,6 @@ from .inverse_delimited_component import InverseDelimitedComponent
 from .inverse_selection_component import InverseSelectionComponent
 from .maximum_minimum_component import MaximumMinimumComponent
 from .root_domain_component import RootDomainComponent
-from ..models.enums.resume_state import ResumeState
 from ..models.enums.step_type import StepType
 from ..models.exercise_resume import ExerciseResume
 from ..models.function_exercise import FunctionExercise
@@ -21,7 +20,6 @@ class FunctionExerciseComponent(QWidget):
     continue_signal = pyqtSignal(int)
     back_exercise_signal = pyqtSignal(int)
     resume_signal = pyqtSignal(ExerciseResume)
-    exercise_finished_signal = pyqtSignal()
 
     def __init__(self, exercise: FunctionExercise, need_help_data: bool = False, start_step: FunctionStep = None,
                  resume_by_exercise_id_step_id: dict = {}):
@@ -47,6 +45,7 @@ class FunctionExerciseComponent(QWidget):
         layout = QHBoxLayout()
         self._current_step_component = self._get_first_step_component(need_help_data)
         layout.addWidget(self._current_step_component)
+        self._current_step_component.draw()
         return layout
 
     def _get_first_step_component(self, need_help_data: bool):
@@ -86,7 +85,6 @@ class FunctionExerciseComponent(QWidget):
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
 
         self._setup_signals(component=component)
-        component.setup_resume()
 
         return component
 
@@ -132,6 +130,7 @@ class FunctionExerciseComponent(QWidget):
         self._current_step_component.setParent(None)
         self._current_step_component = self._get_step_component(next_step) if not step_component else step_component
         self._step_component_layout.insertWidget(2, self._current_step_component)
+        self._current_step_component.draw()
 
     def _setup_resume(self, resume: ExerciseResume):
         self.resume_signal.emit(resume)

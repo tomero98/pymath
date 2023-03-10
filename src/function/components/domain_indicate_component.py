@@ -9,7 +9,7 @@ from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
 from ...projectConf.factories import LabelFactory, ButtonFactory
 from ...projectConf.factories.icon_factory import IconFactory
-from ...projectConf.factories.line_edit import LineEditFactory
+from ...projectConf.factories.line_edit_factory import LineEditFactory
 from ...projectConf.models.enums.text_type import TextType
 
 

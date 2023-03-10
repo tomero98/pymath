@@ -17,7 +17,7 @@ class Function:
     def get_points(self, small_sample: bool = False) -> (List[int], List[int]):
         x_values, y_values = [], []
         min_x, max_x = self.domain[0], self.domain[1]
-        value = 1000 if not small_sample else 10
+        value = 10 if not small_sample else 10
 
         for x_value in [num / value for num in range(min_x * value, max_x * value, 1)]:
             try:
@@ -42,7 +42,7 @@ class Function:
             max_x, max_y = max_y, max_x
         return (min_x, max_x), (min_y, max_y)
 
-    def get_label_point(self, position: str):
+    def get_label_point(self, position: str = 'left'):
         num = len(self.x_values) // 6
 
         if position == 'left_plus':

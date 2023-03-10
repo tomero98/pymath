@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QCursor, QFont
+from PyQt5.QtGui import QIcon, QCursor
 from PyQt5.QtWidgets import QPushButton, QSizePolicy
 
 

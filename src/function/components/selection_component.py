@@ -21,8 +21,13 @@ class SelectionComponent(Component):
 
     label = 'Seleccionar la función.'
 
-    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):
-        super(SelectionComponent, self).__init__(exercise=exercise, step=step, resume=resume)
+    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
+                 need_help_data: bool = False, show_main_function_limits: bool = False,
+                 show_function_labels: bool = False):
+        super(SelectionComponent, self).__init__(
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
+            show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
+        )
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._help_subtitle_widget: QLabel = None  # noqa
@@ -53,9 +58,13 @@ class SelectionComponent(Component):
 
         question_label = LabelFactory.get_label_component(text=self._step.question, label_type=TextType.BIG_TITLE,
                                                           need_word_wrap=True, align=Qt.AlignHCenter)
-
         question_layout.addWidget(question_label, alignment=Qt.AlignHCenter)
-        question_layout.addSpacing(40)
+
+        if self._need_help_data:
+            help_button_layout = self._get_help_button_layout()
+            question_layout.addLayout(help_button_layout)
+
+        question_layout.addSpacing(20)
 
         self._bottom_buttons_layout = self._get_function_expression_buttons_layout()
         question_layout.addLayout(self._bottom_buttons_layout)

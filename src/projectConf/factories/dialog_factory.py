@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout
 
-from src.projectConf.factories import LabelFactory
-from src.projectConf.models.enums.text_type import TextType
+from .label_factory import LabelFactory
+from ..models.enums import TextType
 
 
 class DialogFactory:

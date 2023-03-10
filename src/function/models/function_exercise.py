@@ -1,6 +1,6 @@
 from typing import List
 
-from .enums.inverse_exercise_type import FunctionExerciseType
+from .enums.function_exercise_type import FunctionExerciseType
 from .enums.step_type import StepType
 from .function import Function
 from .function_step import FunctionStep

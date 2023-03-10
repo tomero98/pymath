@@ -74,7 +74,8 @@ class FunctionExerciseComponent(QWidget):
         elif step.type == StepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
         elif step.type == StepType.indicate_elementary_shift_exercise:
-            component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume)
+            component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume,
+                                                      need_help_data=True)
         elif step.type == StepType.maximum_relative_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
         elif step.type == StepType.maximum_absolute_exercise:

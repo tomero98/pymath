@@ -4,9 +4,7 @@ import pyqtgraph
 from PyQt5.QtGui import QFont
 from pyqtgraph import TextItem
 
-from src.function.models.function import Function
-from src.function.models.function_exercise import FunctionExercise
-from src.function.models.function_point import FunctionPoint
+from src.function.models import Function, FunctionExercise, Point
 
 
 class PlotFactory:
@@ -52,7 +50,7 @@ class PlotFactory:
 
     @classmethod
     def update_plot(cls, plot_widget: pyqtgraph.PlotWidget, functions_to_update: List[Function],
-                    help_points: List[FunctionPoint] = None, is_help_data: bool = False,
+                    help_points: List[Point] = None, is_help_data: bool = False,
                     rgb_tuple: tuple = (0, 0, 255), no_points: bool = False, constants: bool = False,
                     show_ends: bool = True):
         if not help_points:

@@ -4,9 +4,8 @@ from typing import List
 from PyQt5.QtSql import QSqlQuery
 
 from .step_data_mapper import StepDataMapper
-from ..models.enums.inverse_exercise_type import FunctionExerciseType
-from ..models.function import Function
-from ..models.function_exercise import FunctionExercise
+from ..models import Function, FunctionExercise
+from ..models.enums import FunctionExerciseType
 
 
 class FunctionExerciseDataMapper:

@@ -12,10 +12,11 @@ from ..models.function_step import FunctionStep
 class ElementaryShiftGraphComponent(SelectionComponent):
     label = 'Seleccionar el desplazamiento.'
 
-    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):
+    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):
         self._main_function = None
 
-        super(ElementaryShiftGraphComponent, self).__init__(exercise=exercise, step=step, resume=resume)
+        super(ElementaryShiftGraphComponent, self).__init__(exercise=exercise, step=step, resume=resume,
+                                                            need_help_data=need_help_data, show_function_labels=True)
 
     def _setup_data(self):
         self._setup_functions()

@@ -1,10 +1,8 @@
 from typing import List
 
 from .help_data_mapper import HelpDataMapper
-from ..models.enums.inverse_exercise_type import FunctionExerciseType
-from ..models.enums.step_type import StepType
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
+from ..models import FunctionExercise, FunctionStep
+from ..models.enums import FunctionExerciseType, StepType
 
 
 class StepDataMapper:
@@ -35,8 +33,8 @@ class StepDataMapper:
         step_type = StepType.boolean_inverse_exercise
         question = 'Indica si la siguiente gráfica tiene inversa para todo el dominio mostrado'
         order = 0
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_second_inverse_concept_step(self, exercise: FunctionExercise) -> FunctionStep:
         function_has_inverse = exercise.has_main_function_inverse()
@@ -47,8 +45,8 @@ class StepDataMapper:
         step_type = StepType.selection_inverse_exercise
         question = 'Selecciona la gráfica que representa la inversa en el dominio dado para la función:'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     @staticmethod
     def _get_delimited_inverse_range_step():
@@ -68,48 +66,49 @@ class StepDataMapper:
         step_type = StepType.indicate_domain_exercise
         question = 'Con la ayuda del ratón, indicar mediante intervalos el dominio de la función representada.'
         order = 0
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_second_domain_concept_step(self) -> FunctionStep:
         step_type = StepType.indicate_range_exercise
         question = 'Con la ayuda del ratón, indicar mediante intervalos el recorrido de la función representada'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_third_domain_concept_step(self) -> FunctionStep:
         step_type = StepType.indicate_bounded_range_exercise
         question = 'Indica si la siguiente gráfica está acotada para el dominio dado.'
         order = 2
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_four_domain_concept_step(self) -> FunctionStep:
         step_type = StepType.indicate_roots_exercise
         question = 'Indica, si tiene, las raíces de la siguiente gráfica:'
         order = 3
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_elementary_graph_exercise_steps(self):
         first_step = self._get_first_elementary_graph_step()
         second_step = self._get_second_elementary_graph_step()
-        return [first_step, second_step]
+        # return [first_step, second_step]
+        return [second_step]
 
     @staticmethod
     def _get_first_elementary_graph_step():
         step_type = StepType.indicate_elementary_exercise
         question = 'Selecciona la expresión de la gráfica mostrada:'
         order = 0
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=None)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=None)
 
-    @staticmethod
-    def _get_second_elementary_graph_step():
+    def _get_second_elementary_graph_step(self):
         step_type = StepType.indicate_elementary_shift_exercise
         question = 'Selecciona la expresión de la gráfica mostrada:'
         order = 1
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=None)
+        help_data_list = self._help_data_mapper.get_help_data(step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list)
 
     def _get_maximum_points_exercise_steps(self):
         first_step = self._get_first_maximum_point_step()
@@ -120,15 +119,15 @@ class StepDataMapper:
         step_type = StepType.maximum_relative_exercise
         question = 'Con ayuda del ratón, encuentra los máximos relativos de la función representada:'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_second_maximum_point_step(self):
         step_type = StepType.maximum_absolute_exercise
         question = 'Con ayuda del ratón, encuentra los máximos absolutos de la función representada:'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_minimum_points_exercise_steps(self):
         first_step = self._get_first_minimum_point_step()
@@ -139,12 +138,12 @@ class StepDataMapper:
         step_type = StepType.minimum_relative_exercise
         question = 'Con ayuda del ratón, encuentra los mínimos relativos de la función representada:'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
 
     def _get_second_minimum_point_step(self):
         step_type = StepType.minimum_absolute_exercise
         question = 'Con ayuda del ratón, encuentra los mínimos absolutos de la función representada:'
         order = 1
-        function_help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, function_help_data=function_help_data)
+        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)

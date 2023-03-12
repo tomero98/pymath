@@ -1,6 +1,6 @@
 import math  # noqa
 from typing import List
-
+from functools import lru_cache
 
 class Function:
     MAX_Y_VALUE = 5.5
@@ -14,6 +14,7 @@ class Function:
         self.is_invert = is_invert
         self.x_values, self.y_values = self.get_points()
 
+    @lru_cache(maxsize=2)
     def get_points(self, small_sample: bool = False) -> (List[int], List[int]):
         x_values, y_values = [], []
         min_x, max_x = self.domain[0], self.domain[1]

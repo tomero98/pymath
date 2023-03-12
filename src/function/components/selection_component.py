@@ -8,7 +8,6 @@ from .component import Component
 from ..factories import PlotFactory
 from ..models.enums.resume_state import ResumeState
 from ..models.exercise_resume import ExerciseResume
-from ..models.function import Function
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
 from ...projectConf.factories import LabelFactory, ButtonFactory
@@ -18,8 +17,6 @@ from ...projectConf.models.enums.text_type import TextType
 
 class SelectionComponent(Component):
     resume_signal = pyqtSignal(ExerciseResume)
-
-    label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
@@ -81,9 +78,22 @@ class SelectionComponent(Component):
 
         return question_layout
 
-    def _set_plot_widget(self):
-        function = self._get_function_to_draw()
-        self._plot_widget = PlotFactory.get_plot([function], exercise=self._exercise, show_ends=False, show_grid=True)
+    def _get_function_expression_buttons_layout(self) -> QHBoxLayout:
+        layout = QHBoxLayout()
+        layout.addStretch()
+        options = self._get_options_to_display()
+        for index, option in enumerate(options):
+            graph_button = self._get_graph_button(index=index, option=option)
+            layout.addWidget(graph_button)
+            self._graph_buttons.append(graph_button)
+            layout.addStretch()
+        return layout
+
+    def _get_graph_button(self, index: int, option: str) -> QPushButton:
+        return ButtonFactory.get_button_component(
+            title=option, minimum_width=90, minimum_height=90, text_size=22,
+            function_to_connect=lambda val=index: self._validate_exercise(button_index=index),
+        )
 
     def _get_continue_buttons_layout(self) -> QHBoxLayout:
         continue_layout = QHBoxLayout()
@@ -109,34 +119,27 @@ class SelectionComponent(Component):
         continue_layout.addStretch()
         return continue_layout
 
-    def _get_function_expression_buttons_layout(self) -> QHBoxLayout:
-        layout = QHBoxLayout()
-        functions_to_draw = self._get_functions_to_display_as_options()
-        for index, graph in enumerate(functions_to_draw):
-            graph_button = self._get_graph_button(index=index, graph=graph)
-            layout.addWidget(graph_button)
-            self._graph_buttons.append(graph_button)
-            if index < len(self._exercise.functions) - 1:
-                layout.addStretch()
-        return layout
-
-    def _get_graph_button(self, index: int, graph: Function) -> QPushButton:
-        return ButtonFactory.get_button_component(
-            title=graph.get_math_expression(), minimum_width=90, minimum_height=90,
-            function_to_connect=lambda val=index: self._validate_exercise(button_index=index), text_size=22,
-        )
+    def _set_plot_widget(self):
+        function = self._get_function_to_draw()
+        self._plot_widget = PlotFactory.get_plot([function], exercise=self._exercise, show_ends=False, show_grid=True)
 
     def _apply_resume(self):
         pressed_button = next(button for button in self._graph_buttons if button.text() == self._resume.response)
-        correct_expression = self._get_function_to_draw().get_math_expression()
+        correct_expression = self._get_correct_expression()
         self._set_graph(pressed_button=pressed_button, correct_expression=correct_expression,
                         is_answer_correct=pressed_button.text() == correct_expression)
 
-    def _get_functions_to_display_as_options(self):
+    def _get_options_to_display(self):
         pass
 
     def _get_function_to_draw(self):
         pass
+
+    def _get_correct_expression(self):
+        pass
+
+    def _get_error_function(self, expression: [str, None]):
+        return None
 
     def _validate_exercise(self, button_index):
         pressed_button = self._graph_buttons[button_index]
@@ -152,10 +155,15 @@ class SelectionComponent(Component):
             self._help_text.setText('Incorrecto.')
             correct_button = next(button for button in self._graph_buttons if button.text() == correct_expression)
             correct_button.setStyleSheet('background: #2F8C53; font-size: 22px')
+            self._update_plot_with_error_data(pressed_button.text())
         else:
             self._help_text.setText('Correcto.')
         self._help_text.setVisible(True)
         self._help_text.setStyleSheet(f'color: {border_color}')
+
+        for button in self._graph_buttons:
+            button.setDisabled(True)
+
         pressed_button.setStyleSheet(f'background: {border_color}; font-size: 22px')
         self._continue_button.setStyleSheet(f'background: {border_color}')
         self._continue_button.setDisabled(False)
@@ -163,21 +171,14 @@ class SelectionComponent(Component):
         if self._exercise.exercise_order != 0 or self._step.order != 0:
             self._back_button.setDisabled(False)
 
-        for button in self._graph_buttons:
-            button.setDisabled(True)
-        if not is_answer_correct:
-            self._update_plot_with_error_data(pressed_button.text())
-
     def _update_plot_with_error_data(self, expression: str):
-        error_func = next(
-            function for function in self._get_functions_to_display_as_options()
-            if function.get_math_expression() == expression
-        )
-        PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=[error_func], rgb_tuple=(255, 0, 0),
-                                no_points=True)
-        label_functions = [(self._get_function_to_draw(), 'white'), (error_func, 'red')]
-        PlotFactory.add_function_labels(plot_widget=self._plot_widget,
-                                        functions_to_labelling_with_color=label_functions)
+        error_function = self._get_error_function(expression=expression)
+        if error_function:
+            PlotFactory.update_plot(plot_widget=self._plot_widget, functions_to_update=[error_function],
+                                    rgb_tuple=(255, 0, 0), no_points=True)
+            label_functions = [(self._get_function_to_draw(), 'white'), (error_function, 'red')]
+            PlotFactory.add_function_labels(plot_widget=self._plot_widget,
+                                            functions_to_labelling_with_color=label_functions)
 
     def _update_resume(self, pressed_button: QPushButton, is_answer_correct: bool):
         resume_state = ResumeState.success if is_answer_correct else ResumeState.error

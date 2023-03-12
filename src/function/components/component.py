@@ -17,8 +17,6 @@ class Component(QWidget):
     back_signal = pyqtSignal(StepType)
     resume_signal = pyqtSignal(ExerciseResume)
 
-    label = 'Seleccionar la función.'
-
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
                  show_function_labels: bool = False):

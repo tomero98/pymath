@@ -12,8 +12,8 @@ class StepDataMapper:
 
     def get_steps(self) -> List[FunctionStep]:
         steps = []
-        if self._exercise.type == FunctionExerciseType.inverse_concept_exercise.value:
-            steps = self._get_inverse_concept_exercise_steps()
+        if self._exercise.type == FunctionExerciseType.inverse_graph_exercise.value:
+            steps = self._get_inverse_graph_exercise_steps()
         elif self._exercise.type == FunctionExerciseType.domain_concept_exercise.value:
             steps = self._get_domain_concept_exercise_steps()
         elif self._exercise.type == FunctionExerciseType.elementary_graph_exercise.value:
@@ -24,29 +24,28 @@ class StepDataMapper:
             steps = self._get_minimum_points_exercise_steps()
         return steps
 
-    def _get_inverse_concept_exercise_steps(self) -> List[FunctionStep]:
+    def _get_inverse_graph_exercise_steps(self) -> List[FunctionStep]:
         first_step = self._get_first_inverse_concept_step()
         # second_step = self._get_second_inverse_concept_step(exercise=self._exercise)
         return [first_step]
 
     def _get_first_inverse_concept_step(self) -> FunctionStep:
-        step_type = StepType.boolean_inverse_exercise
+        step_type = StepType.inverse_concept_exercise
         question = 'Indica si la siguiente gráfica tiene inversa para todo el dominio mostrado'
         order = 0
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
+        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list)
 
     def _get_second_inverse_concept_step(self, exercise: FunctionExercise) -> FunctionStep:
         function_has_inverse = exercise.has_main_function_inverse()
-        step = self._get_inverse_select_step() if function_has_inverse else self._get_delimited_inverse_range_step()
-        return step
+        return self._get_inverse_select_step() if function_has_inverse else self._get_delimited_inverse_range_step()
 
     def _get_inverse_select_step(self):
         step_type = StepType.selection_inverse_exercise
         question = 'Selecciona la gráfica que representa la inversa en el dominio dado para la función:'
         order = 1
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
+        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list)
 
     @staticmethod
     def _get_delimited_inverse_range_step():

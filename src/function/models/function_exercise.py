@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import List
 
 from .enums.function_exercise_type import FunctionExerciseType
@@ -17,24 +18,24 @@ class FunctionExercise:
         self.functions = functions
         self.steps = steps
 
-    ####################################################################################################################
-    ####################################################################################################################
-    ####################################################################################################################
-    ####################################################################################################################
-    ####################################################################################################################
-
+    @lru_cache(maxsize=1)
     def has_main_function_inverse(self) -> bool:
-        main_function = next(function for function in self.functions if function.is_main_graphic)
+        main_function = self.get_main_function()
         _, y_values = main_function.get_points()
         return len(set(y_values)) == len(y_values)
+
+    def get_main_function(self) -> Function:
+        return next(function for function in self.functions if function.is_main_graphic)
+
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
 
     def get_inverse_graph(self) -> Function:
         main_function = next(function for function in self.functions if function.is_main_graphic)
         return main_function.inverse_function
-
-    def get_main_function(self) -> Function:
-        main_function = next(function for function in self.functions if function.is_main_graphic)
-        return main_function
 
     def get_function_by_expression(self, expression: str) -> Function:
         function = next(function for function in self.functions if function.expression == expression)
@@ -102,7 +103,7 @@ class FunctionExercise:
 
     @classmethod
     def get_title_by_exercise_type(cls, exercise_type) -> str:
-        if exercise_type == FunctionExerciseType.inverse_concept_exercise.value:
+        if exercise_type == FunctionExerciseType.inverse_graph_exercise.value:
             title = 'Funciones inversas'
         elif exercise_type == FunctionExerciseType.domain_concept_exercise.value:
             title = 'Dominio y recorrido'

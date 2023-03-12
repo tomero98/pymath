@@ -2,12 +2,12 @@ import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QSizePolicy
 
-from ..factories import PlotFactory
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
-from ...projectConf.factories import LabelFactory, ButtonFactory
-from ...projectConf.factories.icon_factory import IconFactory
-from ...projectConf.models.enums.text_type import TextType
+from src.function.factories import PlotFactory
+from src.function.models.function_exercise import FunctionExercise
+from src.function.models.function_step import FunctionStep
+from src.projectConf.factories import LabelFactory, ButtonFactory
+from src.projectConf.factories.icon_factory import IconFactory
+from src.projectConf.models.enums.text_type import TextType
 
 
 class BoundedRangeComponent(QWidget):

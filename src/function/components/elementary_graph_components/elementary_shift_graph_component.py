@@ -1,12 +1,9 @@
 import random
 from typing import List
 
-from .selection_component import SelectionComponent
-from ..models.enums.resume_state import ResumeState
-from ..models.exercise_resume import ExerciseResume
-from ..models.function import Function
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
+from ..selection_component import SelectionComponent
+from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
+from ...models.enums import ResumeState
 
 
 class ElementaryShiftGraphComponent(SelectionComponent):
@@ -61,11 +58,14 @@ class ElementaryShiftGraphComponent(SelectionComponent):
         )
         self._main_function.is_main_graphic = True
 
-    def _get_functions_to_display_as_options(self):
-        return self._functions
+    def _get_options_to_display(self):
+        return [function.get_math_expression() for function in self._functions]
 
     def _get_function_to_draw(self):
         return self._main_function
 
     def _get_correct_expression(self):
         return self._main_function.get_math_expression()
+
+    def _get_error_function(self, expression: str) -> Function:
+        return next(function for function in self._functions if function.get_math_expression() == expression)

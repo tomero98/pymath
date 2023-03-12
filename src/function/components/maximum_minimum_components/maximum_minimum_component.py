@@ -3,13 +3,13 @@ from PyQt5.QtCore import pyqtSignal, Qt, QRegExp
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QLineEdit, QApplication, QSizePolicy
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
-from ..factories import PlotFactory
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
-from ...projectConf.factories import LabelFactory, ButtonFactory
-from ...projectConf.factories.icon_factory import IconFactory
-from ...projectConf.factories.line_edit_factory import LineEditFactory
-from ...projectConf.models.enums.text_type import TextType
+from src.function.factories import PlotFactory
+from src.function.models.function_exercise import FunctionExercise
+from src.function.models.function_step import FunctionStep
+from src.projectConf.factories import LabelFactory, ButtonFactory
+from src.projectConf.factories.icon_factory import IconFactory
+from src.projectConf.factories.line_edit_factory import LineEditFactory
+from src.projectConf.models.enums.text_type import TextType
 
 
 class MaximumMinimumComponent(QWidget):

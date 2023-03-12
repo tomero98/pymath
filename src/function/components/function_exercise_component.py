@@ -1,19 +1,12 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 
-from .bounded_range_component import BoundedRangeComponent
-from .domain_indicate_component import DomainIndicateComponent
-from .elementary_graph_component import ElementaryGraphComponent
-from .elementary_shift_graph_component import ElementaryShiftGraphComponent
-from .inverse_boolean_component import InverseBooleanComponent
-from .inverse_delimited_component import InverseDelimitedComponent
-from .inverse_selection_component import InverseSelectionComponent
-from .maximum_minimum_component import MaximumMinimumComponent
-from .root_domain_component import RootDomainComponent
-from ..models.enums.step_type import StepType
-from ..models.exercise_resume import ExerciseResume
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
+from .domain_components import RootDomainComponent, BoundedRangeComponent, DomainIndicateComponent
+from .elementary_graph_components import ElementaryGraphComponent, ElementaryShiftGraphComponent
+from .inverse_components import InverseDelimitedComponent, InverseSelectionComponent, InverseConceptComponent
+from .maximum_minimum_components import MaximumMinimumComponent
+from ..models import ExerciseResume, FunctionExercise, FunctionStep
+from ..models.enums import StepType
 
 
 class FunctionExerciseComponent(QWidget):
@@ -59,18 +52,20 @@ class FunctionExerciseComponent(QWidget):
     def _get_step_component(self, step: FunctionStep, need_help_data: bool = False):
         resume = self._get_step_resume(step=step)
 
-        if step.type == StepType.boolean_inverse_exercise:
-            component = InverseBooleanComponent(exercise=self._exercise, step=step)
+        if step.type == StepType.inverse_concept_exercise:
+            component = InverseConceptComponent(exercise=self._exercise, step=step, resume=resume, need_help_data=False)
         elif step.type == StepType.selection_inverse_exercise:
             component = InverseSelectionComponent(exercise=self._exercise, step=step)
         elif step.type == StepType.delimited_inverse_exercise:
             component = InverseDelimitedComponent(exercise=self._exercise, step=step)
+
         elif step.type in [StepType.indicate_domain_exercise, StepType.indicate_range_exercise]:
             component = DomainIndicateComponent(exercise=self._exercise, step=step)
         elif step.type == StepType.indicate_bounded_range_exercise:
             component = BoundedRangeComponent(exercise=self._exercise, step=step)
         elif step.type == StepType.indicate_roots_exercise:
             component = RootDomainComponent(exercise=self._exercise, step=step)
+
         elif step.type == StepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
         elif step.type == StepType.indicate_elementary_shift_exercise:

@@ -14,7 +14,7 @@ class HelpDataMapper:
 
     def get_help_data(self, step_type: StepType) -> List[HelpData]:
         help_data = None
-        if step_type == StepType.boolean_inverse_exercise:
+        if step_type == StepType.inverse_concept_exercise:
             help_data = self._get_inverse_concept_help()
         elif step_type == StepType.selection_inverse_exercise:
             help_data = self._get_selection_inverse_help()

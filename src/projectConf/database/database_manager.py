@@ -87,9 +87,14 @@ class DatabaseManager:
     @staticmethod
     def _populate_exercise_data():
         # Domain example: '5, 5'
+        sql_query = QSqlQuery()
         exercise_seed = [
             # Elementary functions exercises
             {'exercise_type': 'ElementaryGraphExercise', 'domain': None, 'topic_id': 3},  # 1
+
+            # Inverse exercise
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 2
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1}  # 3
 
             # # Domain functions exercises
             # ('ConceptDomainExercise', 0, None, 2),  # 2
@@ -98,9 +103,6 @@ class DatabaseManager:
             # ('ConceptDomainExercise', 0, None, 2),  # 5
             # ('ConceptDomainExercise', 0, None, 2),  # 6
             # ('ConceptDomainExercise', 0, None, 2),  # 7
-
-            # # Inverse exercise
-            # {'exercise_type': 'ConceptInverseExercise', 'domain': '-3, 3', 'topic_id': 1}  # 2
 
             # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 1
             # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 2
@@ -122,7 +124,6 @@ class DatabaseManager:
             # ('MinimumPointsExercise', 3, None, 4),
 
         ]
-        sql_query = QSqlQuery()
         sql_query.prepare(
             """
             INSERT INTO exercises (exercise_type, domain, topic_id) VALUES (?, ?, ?)
@@ -158,12 +159,17 @@ class DatabaseManager:
             {'expression': 'x**(1/3)'},  # 1
             {'expression': 'x**3'},  # 2
             {'expression': '(x)**2'},  # 3
-            {'expression': 'x**(1/2)'},  # 4
+            {'expression': '(x)**(1/2)'},  # 4
             {'expression': 'math.e**x'},  # 5
             {'expression': 'math.log(x)'},  # 7
             {'expression': 'math.cos(x)'},  # 8
             {'expression': 'math.sin(x)'},  # 9
             {'expression': 'math.tan(x)'},  # 10
+
+            # Inverse graphs
+            {'expression': '(x)**(1/3)'},  # 11
+            {'expression': '-(x)**(1/3)'},  # 12
+            {'expression': '-(x)**3 * (-x**2)'},  # 13
 
             # Domain graphs
             # ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
@@ -222,6 +228,14 @@ class DatabaseManager:
             {'exercise_id': 1, 'graph_id': 7, 'domain': None, 'is_main_graphic': 0},  # 7
             {'exercise_id': 1, 'graph_id': 8, 'domain': None, 'is_main_graphic': 0},  # 8
             {'exercise_id': 1, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 9
+
+            # Inverse exercise
+            {'exercise_id': 2, 'graph_id': 2, 'domain': None, 'is_main_graphic': True},  # 10
+            {'exercise_id': 2, 'graph_id': 11, 'domain': None, 'is_main_graphic': False},  # 11
+            {'exercise_id': 2, 'graph_id': 12, 'domain': None, 'is_main_graphic': False},  # 12
+            {'exercise_id': 2, 'graph_id': 13, 'domain': None, 'is_main_graphic': False},  # 13
+
+            {'exercise_id': 3, 'graph_id': 3, 'domain': None, 'is_main_graphic': True},  # 14
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(

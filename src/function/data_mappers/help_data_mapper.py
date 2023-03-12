@@ -10,10 +10,13 @@ class HelpDataMapper:
 
     def get_help_data(self, step_type: StepType) -> List[HelpData]:
         help_data_list = []
-        if step_type == StepType.boolean_inverse_exercise:
+        if step_type == StepType.inverse_concept_exercise:
             help_data_list = self._get_inverse_concept_help()
         elif step_type == StepType.selection_inverse_exercise:
             help_data_list = self._get_selection_inverse_help()
+        elif step_type == StepType.delimited_inverse_exercise:
+            help_data_list = self._get_delimited_inverse_help()
+
         elif step_type == StepType.indicate_domain_exercise:
             help_data_list = self._get_indicate_domain_help()
         elif step_type == StepType.indicate_range_exercise:
@@ -22,6 +25,7 @@ class HelpDataMapper:
             help_data_list = self._get_indicate_bounded_range_help()
         elif step_type == StepType.indicate_roots_exercise:
             help_data_list = self._get_indicate_indicate_roots_help()
+
         elif step_type == StepType.maximum_relative_exercise:
             help_data_list = self._get_maximum_relative_help()
         elif step_type == StepType.maximum_absolute_exercise:
@@ -30,6 +34,7 @@ class HelpDataMapper:
             help_data_list = self._get_minimum_relative_help()
         elif step_type == StepType.minimum_absolute_exercise:
             help_data_list = self._get_minimum_absolute_help()
+
         elif step_type == StepType.indicate_elementary_shift_exercise:
             help_data_list = self._get_indicate_elementary_shift_exercise_help()
         return help_data_list
@@ -69,13 +74,16 @@ class HelpDataMapper:
         function = Function(function_id=0, expression='(x)**2 - 1', domain=(-3, 3), is_main_graphic=False)
         return HelpStep(order=1, functions=[function], text='El desplazamiento hacía abajo', function_color='purple')
 
-    ########################################
-
     def _get_inverse_concept_help(self):
-        pass
+        return None
 
     def _get_selection_inverse_help(self):
-        pass
+        return None
+
+    def _get_delimited_inverse_help(self):
+        return None
+
+    ########################################
 
     def _get_indicate_domain_help(self):
         pass

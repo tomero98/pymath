@@ -1,8 +1,8 @@
-from ..selection_component import SelectionComponent
+from ..option_selection_component import OptionSelectionComponent
 from ...models import ExerciseResume, FunctionExercise, FunctionStep, Function
 
 
-class ElementaryGraphComponent(SelectionComponent):
+class ElementaryGraphComponent(OptionSelectionComponent):
     label = 'Seleccionar la función.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume):

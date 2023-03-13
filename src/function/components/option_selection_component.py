@@ -4,34 +4,29 @@ import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton, QHBoxLayout
 
+from src.projectConf.factories import LabelFactory, ButtonFactory, IconFactory
+from src.projectConf.models.enums import TextType
 from .component import Component
 from ..factories import PlotFactory
-from ..models.enums.resume_state import ResumeState
-from ..models.exercise_resume import ExerciseResume
-from ..models.function_exercise import FunctionExercise
-from ..models.function_step import FunctionStep
-from ...projectConf.factories import LabelFactory, ButtonFactory
-from ...projectConf.factories.icon_factory import IconFactory
-from ...projectConf.models.enums.text_type import TextType
+from ..models import ExerciseResume, FunctionExercise, FunctionStep
+from ..models.enums import ResumeState
 
 
-class SelectionComponent(Component):
+class OptionSelectionComponent(Component):
     resume_signal = pyqtSignal(ExerciseResume)
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
                  show_function_labels: bool = False):
-        super(SelectionComponent, self).__init__(
+        super(OptionSelectionComponent, self).__init__(
             exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
             show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
         )
 
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
-        self._help_subtitle_widget: QLabel = None  # noqa
         self._graph_buttons: List[QPushButton] = []  # noqa
         self._help_text: QLabel = None  # noqa
         self._layout: QVBoxLayout = None  # noqa
-        self._main_window_layout: QHBoxLayout = None  # noqa
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
 
     def _setup_data(self):

@@ -1,9 +1,9 @@
-from ..selection_component import SelectionComponent
+from ..option_selection_component import OptionSelectionComponent
 from ...models import ExerciseResume, FunctionExercise, FunctionStep
 
 
-class InverseConceptComponent(SelectionComponent):
-    label = 'Indicar si la función tiene inversa: '
+class InverseConceptComponent(OptionSelectionComponent):
+    label = 'Indicar si existe inversa: '
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):
         super(InverseConceptComponent, self).__init__(exercise=exercise, step=step, resume=resume,

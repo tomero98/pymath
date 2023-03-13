@@ -1,12 +1,12 @@
 import random
 from typing import List
 
-from ..selection_component import SelectionComponent
+from ..option_selection_component import OptionSelectionComponent
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
 from ...models.enums import ResumeState
 
 
-class ElementaryShiftGraphComponent(SelectionComponent):
+class ElementaryShiftGraphComponent(OptionSelectionComponent):
     label = 'Seleccionar el desplazamiento.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):

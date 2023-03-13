@@ -5,13 +5,11 @@ from functools import lru_cache
 class Function:
     MAX_Y_VALUE = 5.5
 
-    def __init__(self, function_id: int, expression: str, domain: [str, None], is_main_graphic: bool,
-                 is_invert: bool = False):
+    def __init__(self, function_id: int, expression: str, domain: [str, None], is_main_graphic: bool):
         self.function_id = function_id
         self.expression = expression
         self.domain = domain
         self.is_main_graphic = is_main_graphic
-        self.is_invert = is_invert
         self.x_values, self.y_values = self.get_points()
 
     @lru_cache(maxsize=2)

@@ -161,15 +161,14 @@ class DatabaseManager:
             {'expression': '(x)**2'},  # 3
             {'expression': '(x)**(1/2)'},  # 4
             {'expression': 'math.e**x'},  # 5
-            {'expression': 'math.log(x)'},  # 7
-            {'expression': 'math.cos(x)'},  # 8
-            {'expression': 'math.sin(x)'},  # 9
-            {'expression': 'math.tan(x)'},  # 10
+            {'expression': 'math.log(x)'},  # 6
+            {'expression': 'math.cos(x)'},  # 7
+            {'expression': 'math.sin(x)'},  # 8
+            {'expression': 'math.tan(x)'},  # 9
 
             # Inverse graphs
-            {'expression': '(x)**(1/3)'},  # 11
-            {'expression': '-(x)**(1/3)'},  # 12
-            {'expression': '-(x)**3 * (-x**2)'},  # 13
+            {'expression': '-x**(1/3)'},  # 10
+            {'expression': '-(x)**3 * (-x**2)'},  # 11
 
             # Domain graphs
             # ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
@@ -231,9 +230,8 @@ class DatabaseManager:
 
             # Inverse exercise
             {'exercise_id': 2, 'graph_id': 2, 'domain': None, 'is_main_graphic': True},  # 10
-            {'exercise_id': 2, 'graph_id': 11, 'domain': None, 'is_main_graphic': False},  # 11
-            {'exercise_id': 2, 'graph_id': 12, 'domain': None, 'is_main_graphic': False},  # 12
-            {'exercise_id': 2, 'graph_id': 13, 'domain': None, 'is_main_graphic': False},  # 13
+            {'exercise_id': 2, 'graph_id': 10, 'domain': None, 'is_main_graphic': False},  # 11
+            {'exercise_id': 2, 'graph_id': 11, 'domain': None, 'is_main_graphic': False},  # 12
 
             {'exercise_id': 3, 'graph_id': 3, 'domain': None, 'is_main_graphic': True},  # 14
         ]

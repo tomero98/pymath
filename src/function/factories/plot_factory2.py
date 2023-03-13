@@ -22,27 +22,47 @@ class PlotFactory2:
 
     @classmethod
     def set_functions(cls, graph: pyqtgraph.PlotWidget, functions: List[Function], function_width: int = 3,
-                      color: str = 'blue', show_limits: bool = False) -> None:
-        colors = [(255, 255, 255), (255, 255, 0), (128, 0, 128), (255, 153, 51), (255, 51, 204)]
+                      color: [str, Tuple] = '', show_limits: bool = False, click_function=None) -> None:
+        # pink red green blue
+        colors = [(255, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
         for function in functions:
             x_values, y_values = function.x_values, function.y_values
             color_selected = color if color else colors.pop()
-            pen = pyqtgraph.mkPen(color=color_selected, width=function_width)
-            graph.plot(x_values, y_values, pen=pen)
+            plot_data_item = PlotFactory2.set_graph_using_points(
+                graph=graph, x_values=x_values, y_values=y_values, color=color_selected, function_width=function_width,
+                function_name=function.expression, click_function=click_function
+            )
 
             if show_limits:
-                is_first_point_included = function.domain[0] == '['
-                first_point_filling = 'w' if is_first_point_included else 'black'
-                graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
+                PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
 
-                is_last_point_included = function.domain[-1] == ']'
-                last_point_filling = 'w' if is_last_point_included else 'black'
-                graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
+    @classmethod
+    def _setup_limits(cls, graph: pyqtgraph.PlotWidget, function: Function, x_values: List[int], y_values: List[int]):
+        is_first_point_included = function.domain[0] == '['
+        first_point_filling = 'w' if is_first_point_included else 'black'
+        graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
+
+        is_last_point_included = function.domain[-1] == ']'
+        last_point_filling = 'w' if is_last_point_included else 'black'
+        graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
 
     @classmethod
     def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: str = '') -> None:
         for point in points:
             graph.plot([point.x], [point.y], symbol='o', symbolBrush=color, symbolSize='12')
+
+    @classmethod
+    def set_graph_using_points(cls, graph: pyqtgraph.PlotWidget, x_values: List[int], y_values: List[int],
+                               color: [str, Tuple] = 'yellow', function_width: int = 3, function_name: str = '',
+                               click_function=None):
+        pen = pyqtgraph.mkPen(color=color, width=function_width)
+        plot_data_item = graph.plot(x_values, y_values, pen=pen, name=function_name)
+
+        if click_function:
+            plot_data_item.setCurveClickable(state=2, width=10)
+            plot_data_item.curve.sigClicked.connect(click_function)
+            plot_data_item.curve.metaData['name'] = function_name
+        return plot_data_item
 
     @classmethod
     def set_labels(cls, graph: pyqtgraph.PlotWidget, functions: list) -> None:

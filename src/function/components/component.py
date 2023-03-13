@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 
@@ -34,10 +36,20 @@ class Component(QWidget):
         self._draw()
         self._setup_resume()
 
+    @abstractmethod
     def _setup_data(self):
         pass
 
+    @abstractmethod
     def _draw(self):
+        pass
+
+    @abstractmethod
+    def _apply_resume(self):
+        pass
+
+    @abstractmethod
+    def _get_function_to_draw(self):
         pass
 
     def _setup_resume(self):
@@ -45,12 +57,6 @@ class Component(QWidget):
             self._initialize_resume()
         elif self._resume.resume_state != ResumeState.pending:
             self._apply_resume()
-
-    def _apply_resume(self):
-        pass
-
-    def _get_function_to_draw(self):
-        pass
 
     def _send_continue_signal(self):
         self.continue_signal.emit(self._step.type)

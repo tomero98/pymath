@@ -26,8 +26,9 @@ class StepDataMapper:
 
     def _get_inverse_graph_exercise_steps(self) -> List[FunctionStep]:
         first_step = self._get_first_inverse_concept_step()
-        # second_step = self._get_second_inverse_concept_step(exercise=self._exercise)
-        return [first_step]
+        second_step = self._get_second_inverse_concept_step(exercise=self._exercise)
+        # return [first_step, second_step]
+        return [second_step]
 
     def _get_first_inverse_concept_step(self) -> FunctionStep:
         step_type = StepType.inverse_concept_exercise

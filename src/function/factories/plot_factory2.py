@@ -28,7 +28,7 @@ class PlotFactory2:
         for function in functions:
             x_values, y_values = function.x_values, function.y_values
             color_selected = color if color else colors.pop()
-            plot_data_item = PlotFactory2.set_graph_using_points(
+            PlotFactory2.set_graph_using_points(
                 graph=graph, x_values=x_values, y_values=y_values, color=color_selected, function_width=function_width,
                 function_name=function.expression, click_function=click_function
             )

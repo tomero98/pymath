@@ -1,25 +1,24 @@
 from abc import abstractmethod
-from typing import List
 
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout
 
 from src.projectConf.factories import LabelFactory, ButtonFactory, IconFactory
 from src.projectConf.models.enums import TextType
 from .component import Component
-from ..factories import PlotFactory, PlotFactory2
-from ..models import ExerciseResume, FunctionExercise, FunctionStep, Function
+from ..factories import PlotFactory2
+from ..models import ExerciseResume, FunctionExercise, FunctionStep
 from ..models.enums import ResumeState
 
 
-class ClickSelectionComponent(Component):
+class GraphInteractionComponent(Component):
     resume_signal = pyqtSignal(ExerciseResume)
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
-                 show_function_labels: bool = False):
-        super(ClickSelectionComponent, self).__init__(
+                 show_function_labels: bool = False, need_validate_button: bool = False):
+        super(GraphInteractionComponent, self).__init__(
             exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
             show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
         )
@@ -28,9 +27,18 @@ class ClickSelectionComponent(Component):
         self._help_text: QLabel = None  # noqa
         self._layout: QVBoxLayout = None  # noqa
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
+        self._need_validate_button: bool = need_validate_button
 
     @abstractmethod
     def _get_correct_expression(self):
+        pass
+
+    @abstractmethod
+    def _is_exercise_correct(self, expression_selected):
+        pass
+
+    @abstractmethod
+    def _on_click_validation_button(self):
         pass
 
     def _setup_data(self):
@@ -66,6 +74,9 @@ class ClickSelectionComponent(Component):
             text='', label_type=TextType.SUBTITLE, align=Qt.AlignHCenter, need_word_wrap=True, set_visible=False
         )
         question_layout.addWidget(self._help_text)
+
+        if self._need_validate_button:
+            self._setup_validate_button(layout=question_layout)
         question_layout.addSpacing(25)
 
         continue_buttons_layout = self._get_continue_buttons_layout()
@@ -73,6 +84,13 @@ class ClickSelectionComponent(Component):
         question_layout.addStretch()
 
         return question_layout
+
+    def _setup_validate_button(self, layout: QVBoxLayout) -> None:
+        validate_button = ButtonFactory.get_button_component(
+            title='Comprobar ejercicio', minimum_width=90, minimum_height=90, text_size=22, tooltip='Validar',
+            function_to_connect=lambda: self._on_click_validation_button()
+        )
+        layout.addWidget(validate_button, alignment=Qt.AlignHCenter)
 
     def _get_continue_buttons_layout(self) -> QHBoxLayout:
         continue_layout = QHBoxLayout()
@@ -103,56 +121,14 @@ class ClickSelectionComponent(Component):
         PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._exercise.get_main_function()],
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
 
-    def _setup_plot_listeners(self):
-        self.proxy = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
-        self.proxy2 = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseClicked, rateLimit=60, slot=self.on_click)
-
     def _apply_resume(self):
-        correct_expression = self._get_correct_expression()
         expression_selected = self._resume.response
-        is_answer_correct = expression_selected == correct_expression
-        if expression_selected != 'inverse':
-            function = next(
-                function for function in self._exercise.functions if function.expression == expression_selected)
-        else:
-            function = None
-        self._set_graph(function=function, is_answer_correct=is_answer_correct)
+        self._validate_exercise(expression_selected=expression_selected, is_resume=True)
 
-    def _validate_exercise(self, expression_selected):
-        correct_expression = self._get_correct_expression()
-        is_answer_correct = expression_selected == correct_expression
-        if expression_selected != 'inverse':
-            function = next(
-                function for function in self._exercise.functions if function.expression == expression_selected)
-        else:
-            function = None
-        self._set_graph(function=function, is_answer_correct=is_answer_correct)
-        self._update_resume(expression_selected=expression_selected, is_answer_correct=is_answer_correct)
-
-    def _set_graph(self, function: Function, is_answer_correct: bool):
-        border_color = '#2F8C53' if is_answer_correct else 'red'
-        if not is_answer_correct:
-            self._help_text.setText('Incorrecto.')
-            self._update_plot_with_error_data(function=function)
-        else:
-            self._help_text.setText('Correcto.')
-        self._help_text.setVisible(True)
-        self._help_text.setStyleSheet(f'color: {border_color}')
-
-        self._continue_button.setStyleSheet(f'background: {border_color}')
-        self._continue_button.setDisabled(False)
-
-        if self._exercise.exercise_order != 0 or self._step.order != 0:
-            self._back_button.setDisabled(False)
-
-    def _update_plot_with_error_data(self, function: Function):
-        PlotFactory2.reset_graph(self._plot_widget)
-
-        main_function = self._exercise.get_main_function()
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[main_function], function_width=5, color='white')
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[function], function_width=3, color='red')
-        PlotFactory2.set_graph_using_points(graph=self._plot_widget, x_values=main_function.y_values,
-                                            y_values=main_function.x_values, function_width=3, color='green')
+    def _validate_exercise(self, expression_selected, is_resume: bool = False):
+        is_answer_correct = self._is_exercise_correct(expression_selected=expression_selected)
+        if not is_resume:
+            self._update_resume(expression_selected=expression_selected, is_answer_correct=is_answer_correct)
 
     def _update_resume(self, expression_selected: str, is_answer_correct: bool):
         resume_state = ResumeState.success if is_answer_correct else ResumeState.error

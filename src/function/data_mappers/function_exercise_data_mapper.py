@@ -48,7 +48,7 @@ class FunctionExerciseDataMapper:
             FROM exercises
             INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
             INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id
-            WHERE exercises.topic_id == {topic_id} AND exercises.id = 2
+            WHERE exercises.topic_id == {topic_id} AND exercises.id = 3
             ORDER BY RANDOM()
         '''
 

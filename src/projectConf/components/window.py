@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QMenu, QAction
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget
 
 
 class Window(QMainWindow):
@@ -12,18 +12,9 @@ class Window(QMainWindow):
         super().__init__()
         self.setFixedSize(1400, 875)
         self.setWindowTitle(title)
-        self.setStyleSheet("background-color: white;")
+        self.setObjectName('application')
+        self.setStyleSheet('QWidget#application {background-color: #FBF4FF;}')
         self.center()
-        self._create_menu_bar()
-
-    def _create_menu_bar(self):
-        menu_bar = self.menuBar()
-        menu_bar.setStyleSheet('background-color: grey')
-        file_menu = QMenu("&File", self)
-        exit_action = QAction("&Exit", self)
-        exit_action.triggered.connect(self._exit_app)
-        file_menu.addAction(exit_action)
-        menu_bar.addMenu(file_menu)
 
     def _exit_app(self):
         sys.exit(0)

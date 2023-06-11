@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QCursor
-from PyQt5.QtWidgets import QPushButton, QSizePolicy
+from PyQt5.QtWidgets import QPushButton, QSizePolicy, QGraphicsDropShadowEffect
 
 
 class ButtonFactory:
@@ -8,7 +8,8 @@ class ButtonFactory:
     def get_button_component(cls, title: str, function_to_connect=None, is_disable: bool = False,
                              size_policy=(QSizePolicy.Fixed, QSizePolicy.Fixed), icon: QIcon = None,
                              icon_size: int = None, tooltip: str = '', minimum_width: int = None,
-                             minimum_height: int = None, text_size: int = None) -> QPushButton:
+                             minimum_height: int = None, text_size: int = None,
+                             secondary_button: bool = False) -> QPushButton:
         button = QPushButton(title)
         button.setSizePolicy(*size_policy)
         button.pressed.connect(function_to_connect)
@@ -30,4 +31,23 @@ class ButtonFactory:
 
         if text_size:
             button.setStyleSheet(f'font-size: {text_size}px')
+
+        if secondary_button:
+            button.setObjectName('secondary')
+            button.setStyleSheet("""
+            #secondary {
+                background-color: #CBC5F8;
+                border: 1px solid #4831FF; 
+                border-radius: 10px;
+                padding: 3px;
+            }
+            
+            #secondary:hover {
+                border: 3px solid #4831FF; 
+            }
+            """)
+            effect = QGraphicsDropShadowEffect()
+            effect.setOffset(0, 0)
+            effect.setBlurRadius(5)
+            button.setGraphicsEffect(effect)
         return button

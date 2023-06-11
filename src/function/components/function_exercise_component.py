@@ -1,9 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 
-from .domain_components import RootDomainComponent, BoundedRangeComponent, DomainIndicateComponent
+from .domain_components import RootDomainComponent, BoundedRangeComponent, DomainIndicateComponent, \
+    DomainDefinitionComponent
 from .elementary_graph_components import ElementaryGraphComponent, ElementaryShiftGraphComponent
-from .inverse_components import InverseDelimitedComponent, InverseSelectionComponent, InverseConceptComponent
+from .inverse_components import InverseDelimitedComponent, InverseConceptComponent
 from .maximum_minimum_components import MaximumMinimumComponent
 from ..models import ExerciseResume, FunctionExercise, FunctionStep
 from ..models.enums import StepType
@@ -55,8 +56,13 @@ class FunctionExerciseComponent(QWidget):
         if step.type == StepType.inverse_concept_exercise:
             component = InverseConceptComponent(exercise=self._exercise, step=step, resume=resume, need_help_data=False)
         elif step.type == StepType.selection_inverse_exercise:
-            component = InverseSelectionComponent(exercise=self._exercise, step=step, resume=resume,
+            # component = InverseSelectionComponent(exercise=self._exercise, step=step, resume=resume,
+            #                                       need_help_data=False)
+            # component = MaximumMinimumComponent(exercise=self._exercise, step=step, resume=resume,
+            #                                     need_help_data=False)
+            component = DomainDefinitionComponent(exercise=self._exercise, step=step, resume=resume,
                                                   need_help_data=False)
+
         elif step.type == StepType.delimited_inverse_exercise:
             component = InverseDelimitedComponent(exercise=self._exercise, step=step, resume=resume,
                                                   need_help_data=False)

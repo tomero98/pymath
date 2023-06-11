@@ -12,14 +12,14 @@ from ..models import ExerciseResume, FunctionExercise, FunctionStep
 from ..models.enums import ResumeState
 
 
-class GraphInteractionComponent(Component):
+class GraphInteractionValidationComponent(Component):
     resume_signal = pyqtSignal(ExerciseResume)
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
                  show_function_labels: bool = False, need_validate_button: bool = False,
                  add_interaction_to_main_graph: bool = False):
-        super(GraphInteractionComponent, self).__init__(
+        super(GraphInteractionValidationComponent, self).__init__(
             exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
             show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
         )
@@ -74,6 +74,12 @@ class GraphInteractionComponent(Component):
             help_button_layout = self._get_help_button_layout()
             question_layout.addLayout(help_button_layout)
 
+        question_layout.addSpacing(10)
+
+        self._coordinates_label = LabelFactory.get_label_component(
+            text='', label_type=TextType.SUBTITLE, align=Qt.AlignHCenter, need_word_wrap=True, set_visible=False
+        )
+        question_layout.addWidget(self._coordinates_label)
         question_layout.addSpacing(10)
 
         self._help_text = LabelFactory.get_label_component(

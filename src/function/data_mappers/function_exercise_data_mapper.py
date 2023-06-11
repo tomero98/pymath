@@ -48,7 +48,7 @@ class FunctionExerciseDataMapper:
             FROM exercises
             INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
             INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id
-            WHERE exercises.topic_id == {topic_id} AND exercises.id = 3
+            WHERE exercises.topic_id == {topic_id} AND exercises.id = 2
             ORDER BY RANDOM()
         '''
 
@@ -59,19 +59,23 @@ class FunctionExerciseDataMapper:
         title = FunctionExercise.get_title_by_exercise_type(exercise_type=exercise_type)
         domain = query_result.value('exercise_domain')
         domain = (-5, 5) if not bool(domain) else tuple(map(int, domain.split(',')))
-        return FunctionExercise(identifier=exercise_id, exercise_type=exercise_type, exercise_domain=domain,
+        return FunctionExercise(identifier=exercise_id, exercise_type=exercise_type, plot_range=domain,
                                 title=title, functions=[], steps=[], exercise_order=exercise_order)
 
     @staticmethod
     def _setup_exercises(query_result: QSqlQuery, exercise: FunctionExercise) -> None:
         function_id = query_result.value('graph_id')
         function_expression = query_result.value('graph_expression')
+
         function_domain = query_result.value('graph_domain')
-        function_domain = tuple(map(int, function_domain.split(','))) if bool(function_domain) \
-            else (exercise.exercise_domain[0] - 1, exercise.exercise_domain[1] + 1)
+        domain = function_domain if bool(function_domain) else '(-inf, +inf)'
+        x_values_range = tuple(map(int, function_domain[1:-1].split(','))) if bool(function_domain) \
+            else (exercise.plot_range[0] - 1, exercise.plot_range[1] + 1)
+
         is_main_graphic = bool(query_result.value('is_main_graphic'))
-        function = Function(function_id=function_id, expression=function_expression, domain=function_domain,
-                            is_main_graphic=is_main_graphic)
+        function = Function(function_id=function_id, expression=function_expression, x_values_range=x_values_range,
+                            is_main_graphic=is_main_graphic, domain=domain)
+        function.setup_data(plot_range=exercise.plot_range)
         exercise.functions.append(function)
 
     @staticmethod
@@ -84,7 +88,7 @@ class FunctionExerciseDataMapper:
             index = random.randint(0, len(list_functions))
             functions = list_functions[index]
             exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
-                                        exercise_domain=main_exercise.exercise_domain, functions=[*functions],
+                                        plot_range=main_exercise.plot_range, functions=[*functions],
                                         steps=main_exercise.steps, exercise_order=i)
             exercises.append(exercise)
             index = random.randint(0, 3)

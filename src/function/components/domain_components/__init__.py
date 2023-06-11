@@ -1,3 +1,4 @@
 from .bounded_range_component import BoundedRangeComponent
+from .domain_definition_component import DomainDefinitionComponent
 from .domain_indicate_component import DomainIndicateComponent
 from .root_domain_component import RootDomainComponent

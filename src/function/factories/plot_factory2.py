@@ -47,7 +47,7 @@ class PlotFactory2:
         graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
 
     @classmethod
-    def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: str = '') -> None:
+    def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: [str, tuple] = '') -> None:
         for point in points:
             graph.plot([point.x], [point.y], symbol='o', symbolBrush=color, symbolSize='12')
 
@@ -63,6 +63,20 @@ class PlotFactory2:
             plot_data_item.curve.sigClicked.connect(click_function)
             plot_data_item.curve.metaData['name'] = function_name
         return plot_data_item
+
+    @classmethod
+    def set_labels2(cls, graph: pyqtgraph.PlotWidget, points: List[Tuple[Point, Tuple[tuple, str]]]) -> None:
+        for point, point_info in points:
+            color, text = point_info
+            x_value, y_value = point.x, point.y
+            font = QFont()
+            font.setPixelSize(25)
+            label = TextItem(anchor=(0.5, 0.5))
+            label.setText(text=text)
+            label.setPos(x_value, y_value)
+            label.setFont(font)
+            label.setColor(color)
+            graph.addItem(label)
 
     @classmethod
     def set_labels(cls, graph: pyqtgraph.PlotWidget, functions: list) -> None:

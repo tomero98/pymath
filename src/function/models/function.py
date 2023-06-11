@@ -1,39 +1,184 @@
 import math  # noqa
-from typing import List
 from functools import lru_cache
+from typing import List, Tuple
+
+from sympy import symbols, limit, oo, diff, solve
+from sympy.core.numbers import Rational
+
 
 class Function:
-    MAX_Y_VALUE = 5.5
-
-    def __init__(self, function_id: int, expression: str, domain: [str, None], is_main_graphic: bool):
+    def __init__(self, function_id: int, expression: str, x_values_range: Tuple[int, int], is_main_graphic: bool,
+                 domain: str = ''):
         self.function_id = function_id
         self.expression = expression
-        self.domain = domain
+        self.x_values_range = x_values_range
         self.is_main_graphic = is_main_graphic
+        self.vertical_asymptotes = []
+        self.horizontal_asymptotes = []
+        self.x_values, self.y_values = [], []
+        self.domain = domain
+        self.real_range = ''
+
+    def setup_data(self, plot_range: Tuple[int, int]):
         self.x_values, self.y_values = self.get_points()
+        self.domain = self.get_domain(domain=self.domain)
+        self.horizontal_asymptotes = self.get_horizontal_asymptotes()
+        self.real_range = self.get_range_expression(plot_range=plot_range)
 
     @lru_cache(maxsize=2)
-    def get_points(self, small_sample: bool = False) -> (List[int], List[int]):
-        x_values, y_values = [], []
-        min_x, max_x = self.domain[0], self.domain[1]
-        value = 10 if not small_sample else 10
+    def get_points(self) -> (List[int], List[int]):
+        all_x_values, all_y_values = [], []
+        min_x, max_x = self.x_values_range[0], self.x_values_range[1]
+        value = 10
 
-        for x_value in [num / value for num in range(min_x * value, max_x * value, 1)]:
+        x_values, y_values = [], []
+        for x_value in [num / value for num in range(min_x * value, max_x * value + 1, 1)]:
             try:
                 y_value = eval(self.expression.replace('x', str(x_value)))
-                if y_value < self.MAX_Y_VALUE:
-                    x_values.append(x_value)
-                    y_values.append(y_value)
-            except Exception:
-                # TODO Tangente
-                pass
-        return x_values, y_values
 
-    def get_small_example_of_point(self):
-        return self.x_values[::25], self.y_values[::25]
+                x_values.append(x_value)
+                y_values.append(y_value)
+            except Exception:
+                self.vertical_asymptotes.append(x_value)
+                if x_values:
+                    all_x_values.append(x_values)
+                    all_y_values.append(y_values)
+                    x_values, y_values = [], []
+
+        if x_values:
+            all_x_values.append(x_values)
+            all_y_values.append(y_values)
+        return all_x_values, all_y_values
+
+    @lru_cache(maxsize=1)
+    def get_domain(self, domain: str) -> str:
+        if not self.vertical_asymptotes:
+            return domain
+
+        domain_parts = domain.split(',')
+        return self._get_asymptote_domain(asymptotes=self.vertical_asymptotes, domain_parts=domain_parts)
+
+    @lru_cache(maxsize=1)
+    def get_range_expression(self, plot_range: Tuple[int, int]) -> str:
+        # TODO cast to float user input in validation of range because 1 != 1.0 and user not gonna write 1.0
+        range_parts = []
+        all_y_values = [item for y_list in self.y_values for item in y_list]
+        min_y, max_y = min(all_y_values), max(all_y_values)
+        if min_y < plot_range[0]:
+            range_parts.append('(-inf')
+        else:
+            value = ''
+            if min_y == all_y_values[0]:
+                value = '[' if self.domain[0] == '[' or '-inf' in self.domain else '('
+            if value != '[' and min_y == all_y_values[-1]:
+                value = '[' if self.domain[-1] == ']' or '+inf' in self.domain else '('
+            if not value:
+                value = '['
+            range_parts.append(f'{value}{min_y}')
+
+        if max_y > plot_range[1]:
+            range_parts.append(' +inf)')
+        else:
+            value = ''
+            if max_y == all_y_values[0]:
+                value = ']' if self.domain[0] == '[' or '-inf' in self.domain else ')'
+            if value != ']' and max_y == all_y_values[-1]:
+                value = ']' if self.domain[-1] == ']' or '+inf' in self.domain else ')'
+            if not value:
+                value = ']'
+            range_parts.append(f' {max_y}{value}')
+
+        if not self.horizontal_asymptotes:
+            return ','.join(range_parts)
+        else:
+            return self._get_asymptote_domain(asymptotes=self.horizontal_asymptotes, domain_parts=range_parts)
+
+    def _get_asymptote_domain(self, asymptotes: List[int], domain_parts: List[str]) -> str:
+        asymptotes = sorted(asymptotes)
+        asymptote_domains_list = []
+        for index, asymptote in enumerate(asymptotes[:-1]):
+            asymptote_domain = f'({asymptote}, {asymptotes[index + 1]})'
+            asymptote_domains_list.append(asymptote_domain)
+
+        asymptote_domains = ' U '.join(asymptote_domains_list)
+        if asymptote_domains:
+            return f'{domain_parts[0]}, {asymptotes[0]}) U {asymptote_domains} U ({asymptotes[-1]},{domain_parts[-1]}'
+        else:
+            return f'{domain_parts[0]}, {asymptotes[0]}) U ({asymptotes[-1]},{domain_parts[-1]}'
+
+    @lru_cache(maxsize=1)
+    def get_horizontal_asymptotes(self) -> List:
+        sympy_expression = self.get_sympy_expression()
+        if 'cos' in sympy_expression or 'sin' in sympy_expression:
+            return []
+
+        asymptotes = []
+        asymptote_one = limit(sympy_expression, symbols('x'), -oo)
+        if isinstance(asymptote_one, Rational):
+            asymptotes.append(round(float(asymptote_one), 2))
+        asymptote_two = limit(sympy_expression, symbols('x'), oo)
+        if asymptote_one != asymptote_two and isinstance(asymptote_two, Rational):
+            asymptotes.append(round(float(asymptote_two), 2))
+
+        return asymptotes
+
+    @lru_cache(maxsize=1)
+    def get_maximum_minimum_points(self, plot_range: Tuple[float, float]) -> [List, Tuple, List, Tuple]:
+        x_symbol = symbols('x')
+        first_derivative = diff(self.expression, x_symbol)
+        roots = solve(first_derivative, x_symbol)
+        roots = [root for root in roots if plot_range[0] < round(float(root), 2) < plot_range[1]]
+
+        maximum_values = []
+        minimum_values = []
+        second_derivative = diff(first_derivative, x_symbol)
+        for root in roots:
+            second_derivative_value = round(float(second_derivative.subs(x_symbol, root)), 2)
+            if second_derivative_value:
+                x_value = str(round(float(root), 2))
+                y_value = eval(self.expression.replace('x', x_value))
+                minimum_values.append((float(x_value), float(y_value)))
+            elif second_derivative_value < 0:
+                x_value = str(round(float(root), 2))
+                y_value = eval(self.expression.replace('x', x_value))
+                maximum_values.append((float(x_value), float(y_value)))
+
+        maximum = None
+        maximum_absolute = None
+        for value in maximum_values:
+            if value[1] == maximum:
+                maximum_absolute = None
+
+            if maximum is None or value[1] > maximum:
+                maximum = value[1]
+                maximum_absolute = value
+
+        if maximum_absolute:
+            maximum_values = [value for value in maximum_values if value[0] != maximum_absolute[0]]
+
+        minimum = None
+        minimum_absolute = None
+        for value in minimum_values:
+            if value[1] == minimum:
+                minimum_absolute = None
+
+            if minimum is None or value[1] < minimum:
+                minimum = value[1]
+                minimum_absolute = value
+        if minimum_absolute:
+            minimum_values = [value for value in maximum_values if value[0] != minimum_absolute[0]]
+
+        return maximum_values, maximum_absolute, minimum_values, minimum_absolute
+
+    ########################################################################################################################
+    ########################################################################################################################
+    ########################################################################################################################
+    ########################################################################################################################
+    ########################################################################################################################
+    ########################################################################################################################
 
     def get_constant_points(self):
-        min_x, max_x = self.domain[1:-1].split(',')
+        min_x, max_x = self.x_values_range[1:-1].split(',')
         min_x, max_x = float(min_x), float(max_x)
         min_y, max_y = [eval(self.expression.replace('x', str(x))) for x in (min_x, max_x)]
         if self.is_invert:
@@ -55,64 +200,17 @@ class Function:
         return self.x_values[num * multiply] + 0.25, self.y_values[num * multiply] + 0.25
 
     def get_random_points(self) -> (float, float):
-        x_values, y_values = self.get_points(small_sample=True)
+        x_values, y_values = self.get_points()
         filter_values = list(
             (x_value, y_value) for x_value, y_value in zip(x_values, y_values) if -2 < x_value < 4 and -2 < y_value < 4
         )
         return filter_values
 
-    def get_points_range(self):
-        # Para obtener para cada punto un rango que permita no tener que ser muy preciso
-        x_values, y_values = self.get_points(small_sample=True)
-        points = zip(x_values, y_values)
-        return self.get_range(points=points)
-
-    def get_range(self, points):
-        point_range = []
-        for x, y in points:
-            x_range = (round(x - 0.2, 2), round(x + 0.2, 2))
-            y_range = (round(y - 0.2, 2), round(y + 0.2, 2))
-            point_range.append((x_range, y_range))
-        return point_range
-
-    def get_domain_function(self):
-        x_start, x_end = self.domain[1: -1].split(',')
-        x_start = int(x_start)
-        x_end = int(x_end)
-        x_start = x_start if -5 < x_start else '-inf'
-        x_end = x_end if x_end < 5 else '+inf'
-        start_interval = self.domain[0] if x_start != '-inf' else '('
-        end_interval = self.domain[-1] if x_end != '+inf' else ')'
-        return f'{start_interval}{x_start}, {x_end}{end_interval}'
-
-    def get_range_function(self, exercise_domain: tuple):
-        if self.expression.isnumeric():
-            return self.expression
-
-        x_values, y_values = self.get_points(small_sample=True)
-
-        x_value_by_y_value = dict()
-        y_values_filtered = list()
-        for x_value, y_value in zip(x_values, y_values):
-            if exercise_domain[0] <= x_value <= exercise_domain[1]:
-                x_value_by_y_value[y_value] = x_value
-                y_values_filtered.append(y_value)
-
-        min_y, max_y = min(y_values_filtered), max(y_values_filtered)
-
-        x_start, x_end = self.domain[1: -1].split(',')
-        x_start = float(x_start)
-        x_end = float(x_end)
-        y_start = round(eval(self.expression.replace('x', str(x_start))), 2)
-        y_start = y_start if -5 < y_start else '-inf'
-        y_end = round(eval(self.expression.replace('x', str(x_end))), 2)
-        y_end = y_end if y_end < 5 else '+inf'
-        start_interval = self.domain[0] if y_start != '-inf' else '('
-        end_interval = self.domain[-1] if y_end != '+inf' else ')'
-        return f'{start_interval}{y_start}, {y_end}{end_interval}'
-
-    def get_math_expression(self):
+    def get_math_expression(self) -> str:
         return self.expression.replace('(x)**', 'x**').replace('**2', '²').replace('**3', '³').replace('math.sqrt', '√') \
             .replace('**', '^').replace('math.e', 'e').replace('math.log', 'ln').replace('math.cosh', 'cosh') \
             .replace('math.cos', 'cos').replace('math.acos', 'acos').replace('math.sin', 'sin') \
             .replace('math.tan', 'tan').replace('math.asin', 'asin')
+
+    def get_sympy_expression(self) -> str:
+        return self.expression.replace('math.e', 'E')

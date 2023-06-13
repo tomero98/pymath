@@ -12,7 +12,7 @@ class PlotFactory2:
     def get_plot(cls, parent=None, show_grid: bool = True,
                  function_range: Tuple[int, int] = (5, 5)) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget() if not parent else pyqtgraph.PlotWidget(parent)
-        graph.setFixedSize(650, 650)
+        graph.setFixedSize(700, 700)
         graph.setMouseEnabled(x=False, y=False)
         graph.showGrid(x=show_grid, y=show_grid)
         graph.getAxis('left').setTextPen('yellow')
@@ -27,14 +27,16 @@ class PlotFactory2:
         colors = [(255, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
         for function in functions:
             x_values, y_values = function.x_values, function.y_values
-            color_selected = color if color else colors.pop()
-            PlotFactory2.set_graph_using_points(
-                graph=graph, x_values=x_values, y_values=y_values, color=color_selected, function_width=function_width,
-                function_name=function.expression, click_function=click_function
-            )
+            for x_set, y_set in zip(x_values, y_values):
+                color_selected = color if color else colors.pop()
+                PlotFactory2.set_graph_using_points(
+                    graph=graph, x_values=x_set, y_values=y_set, color=color_selected,
+                    function_width=function_width,
+                    function_name=function.expression, click_function=click_function
+                )
 
-            if show_limits:
-                PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
+            # if show_limits:
+            #     PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
 
     @classmethod
     def _setup_limits(cls, graph: pyqtgraph.PlotWidget, function: Function, x_values: List[int], y_values: List[int]):

@@ -3,10 +3,11 @@ from typing import Union, List
 import pyqtgraph
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QRegExp, Qt
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QLabel
 from pyqtgraph import LinearRegionItem
 
-from src.projectConf.factories import ButtonFactory, LineEditFactory
+from src.projectConf.factories import ButtonFactory, LineEditFactory, LabelFactory
+from src.projectConf.models.enums import TextType
 from .graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...factories import PlotFactory2
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Point
@@ -26,25 +27,35 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._linear_region_items: List[LinearRegionItem] = []
         self._domain_expression_edit_label: QLineEdit = None  # noqa
         self._create_range_button: QPushButton = None  # noqa
+        self._domain_expression_label: QLabel = None  # noqa
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
+        self._domain_expression_edit_layout = self._get_domain_expression_edit_layout()
+
+    def _get_domain_expression_edit_layout(self) -> QHBoxLayout:
+        layout = QHBoxLayout()
+
+        self._domain_expression_label = LabelFactory.get_label_component(
+            text='Dominio:', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter
+        )
         self._domain_expression_edit_label = self._get_domain_expression_edit_label()
-        self._create_range_button = self._get_create_range_button()
+        layout.addStretch()
+        layout.addWidget(self._domain_expression_label, alignment=Qt.AlignVCenter)
+        layout.addWidget(self._domain_expression_edit_label)
+        layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
+        layout.addStretch()
+        return layout
 
     def _get_domain_expression_edit_label(self) -> QLineEdit:
-        domain_edit = LineEditFactory.get_line_edit_component(placeholder_text='', fixed_height=60,
-                                                              font_size=28)
+        domain_edit = LineEditFactory.get_line_edit_component(
+            placeholder_text='(-inf, 3] U (5, +inf)', fixed_height=40, fixed_width=300,
+            font_size=TextType.NORMAL_TEXT.value
+        )
         regex = QRegExp('[\(\[0-9\-][\ ]*[\-+inf0-9]+[\ ]*,[\ ]*[\-+inf0-9]+[\ ]*[\)\]][\ ]*U[\ ]*' * 5)
         validator = QtGui.QRegExpValidator(regex)
         domain_edit.setValidator(validator)
         return domain_edit
-
-    def _get_create_range_button(self) -> QPushButton:
-        return ButtonFactory.get_button_component(
-            title='Crear rango', minimum_width=90, minimum_height=90, text_size=22, tooltip='Crear rango',
-            function_to_connect=lambda: self._on_click_create_range_button()
-        )
 
     def _on_click_create_range_button(self):
         linear_region_item = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort',
@@ -57,26 +68,11 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         pass
 
     def _setup_layout(self):
-        self._layout.addStretch()
-
-        question_layout = QVBoxLayout()
-        question_layout.setContentsMargins(5, 25, 5, 5)
-
-        question_layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
-        if self._need_help_data:
-            help_button_layout = QVBoxLayout()
-            help_button_layout.addWidget(self._help_button, alignment=Qt.AlignHCenter)
-            help_button_layout.addWidget(self._help_text_label, alignment=Qt.AlignHCenter)
-
-            question_layout.addLayout(help_button_layout)
-
-        question_layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
-        question_layout.addWidget(self._domain_expression_edit_label, alignment=Qt.AlignHCenter)
-        question_layout.addWidget(self._create_range_button, alignment=Qt.AlignHCenter)
-
-        self._layout.addLayout(question_layout)
-        self._layout.addStretch()
-        self._layout.addWidget(self._plot_widget)
+        self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
+        self._layout.addSpacing(10)
+        self._layout.addLayout(self._plot_widget_layout)
+        self._layout.addSpacing(20)
+        self._layout.addLayout(self._domain_expression_edit_layout)
         self._layout.addStretch()
 
     def _on_click_validation_button(self):

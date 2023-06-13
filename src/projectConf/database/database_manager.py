@@ -94,35 +94,10 @@ class DatabaseManager:
 
             # Inverse exercise
             {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 2
-            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1}  # 3
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 3
 
             # # Domain functions exercises
-            # ('ConceptDomainExercise', 0, None, 2),  # 2
-            # ('ConceptDomainExercise', 0, None, 2),  # 3
-            # ('ConceptDomainExercise', 0, None, 2),  # 4
-            # ('ConceptDomainExercise', 0, None, 2),  # 5
-            # ('ConceptDomainExercise', 0, None, 2),  # 6
-            # ('ConceptDomainExercise', 0, None, 2),  # 7
-
-            # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 1
-            # ('ConceptInverseExercise', 0, '-3, 3', 1),  # 2
-            # ('ConceptInverseExercise', 0, None, 1),  # 3
-            # ('ConceptInverseExercise', 0, None, 1),  # 4
-            # ('ConceptInverseExercise', 0, None, 1),  # 5
-            # ('ConceptInverseExercise', 0, None, 1),  # 6
-            #
-            # # Domain exercise
-            # ('ConceptDomainExercise', 0, None, 2),
-            # ('ConceptDomainExercise', 1, None, 2),
-            # ('ConceptDomainExercise', 2, None, 2),
-            # ('ConceptDomainExercise', 3, None, 2),
-
-            # # Maximum functions
-            # ('MaximumPointsExercise', 0, None, 4),
-            # ('MinimumPointsExercise', 1, None, 4),
-            # ('MaximumPointsExercise', 2, None, 4),
-            # ('MinimumPointsExercise', 3, None, 4),
-
+            {'exercise_type': 'ConceptDomainExercise', 'domain': None, 'topic_id': 2},  # 4
         ]
         sql_query.prepare(
             """
@@ -171,16 +146,7 @@ class DatabaseManager:
             {'expression': '-(x)**3 * (-x**2)'},  # 11
 
             # Domain graphs
-            # ('(x)**4 / 4 - 2 * (x)**3 / 3  - (x)**2 / 2 + 2 * (x) - 5 / 12', 0, None),  # 17
-            # ('(x + 4) ** 2 - 1', 0, None),  # 18
-            # ('- x', 0, None),  # 19
-            # ('((x + 3) * (2 - x))**(1 / 2) - 1', 0, None),  # 20
-            # ('- abs(x - 2) + 3', 0, None),  # 21
-            # ('math.log(3 - x)', 0, None),  # 22
-            # ('math.cosh(x)', 0, None),  # 23
-
-            # Inverse graphs
-            # {'expression': 'x**(3)'},  # 17
+            {'expression': 'x'},  # 12
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -234,6 +200,8 @@ class DatabaseManager:
             {'exercise_id': 2, 'graph_id': 11, 'domain': None, 'is_main_graphic': False},  # 12
 
             {'exercise_id': 3, 'graph_id': 3, 'domain': None, 'is_main_graphic': True},  # 14
+
+            {'exercise_id': 4, 'graph_id': 12, 'domain': None, 'is_main_graphic': True},  # 15
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -247,7 +215,7 @@ class DatabaseManager:
             sql_query.addBindValue(exercise_graph['graph_id'])
             sql_query.addBindValue(exercise_graph['domain'])
             sql_query.addBindValue(exercise_graph['is_main_graphic'])
-            res = sql_query.exec()
+            sql_query.exec()
 
     def _setup_user_data(self):
         self._create_user_table()

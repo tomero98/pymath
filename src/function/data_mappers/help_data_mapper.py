@@ -12,29 +12,24 @@ class HelpDataMapper:
         help_data_list = []
         if step_type == StepType.inverse_concept_exercise:
             help_data_list = self._get_inverse_concept_help()
-        elif step_type == StepType.selection_inverse_exercise:
-            help_data_list = self._get_selection_inverse_help()
-        elif step_type == StepType.delimited_inverse_exercise:
-            help_data_list = self._get_delimited_inverse_help()
+        # elif step_type == StepType.selection_inverse_exercise:
+        #     help_data_list = self._get_selection_inverse_help()
+        # elif step_type == StepType.delimited_inverse_exercise:
+        #     help_data_list = self._get_delimited_inverse_help()
+        #
+        # elif step_type == StepType.maximum_relative_exercise:
+        #     help_data_list = self._get_maximum_relative_help()
+        # elif step_type == StepType.maximum_absolute_exercise:
+        #     help_data_list = self._get_maximum_absolute_help()
+        # elif step_type == StepType.minimum_relative_exercise:
+        #     help_data_list = self._get_minimum_relative_help()
+        # elif step_type == StepType.minimum_absolute_exercise:
+        #     help_data_list = self._get_minimum_absolute_help()
 
         elif step_type == StepType.indicate_domain_exercise:
             help_data_list = self._get_indicate_domain_help()
         elif step_type == StepType.indicate_range_exercise:
             help_data_list = self._get_indicate_range_help()
-        elif step_type == StepType.indicate_bounded_range_exercise:
-            help_data_list = self._get_indicate_bounded_range_help()
-        elif step_type == StepType.indicate_roots_exercise:
-            help_data_list = self._get_indicate_indicate_roots_help()
-
-        elif step_type == StepType.maximum_relative_exercise:
-            help_data_list = self._get_maximum_relative_help()
-        elif step_type == StepType.maximum_absolute_exercise:
-            help_data_list = self._get_maximum_absolute_help()
-        elif step_type == StepType.minimum_relative_exercise:
-            help_data_list = self._get_minimum_relative_help()
-        elif step_type == StepType.minimum_absolute_exercise:
-            help_data_list = self._get_minimum_absolute_help()
-
         elif step_type == StepType.indicate_elementary_shift_exercise:
             help_data_list = self._get_indicate_elementary_shift_exercise_help()
         return help_data_list
@@ -83,13 +78,26 @@ class HelpDataMapper:
     def _get_delimited_inverse_help(self):
         return None
 
-    ########################################
-
     def _get_indicate_domain_help(self):
-        pass
+        first_help_data = self._get_first_help_data_domain()
+        second_help_data = self._get_indicate_range_help()
+        return [first_help_data, second_help_data]
 
-    def _get_indicate_range_help(self):
-        pass
+    def _get_first_help_data_domain(self) -> HelpData:
+        function_one = Function(function_id=0, expression='(x)**3', x_values_range=(-5, 2), is_main_graphic=True,
+                                domain='(-inf, 2)')
+        function_one.setup_data((-5, 5))
+        function_two = Function(function_id=0, expression='x', x_values_range=(3, 4), is_main_graphic=True,
+                                domain='(3, 4]')
+        function_two.setup_data((-5, 5))
+        return HelpData(order=0, functions=[function_one, function_two], help_steps=[],
+                        text='El dominio de una función son todos los valores que toma x para la función. '
+                             'En este caso el dominio de la función es "(3, 4] U -inf, 2)"')
+
+    def _get_indicate_range_help(self) -> HelpData:
+        return None
+
+    ########################################
 
     def _get_indicate_bounded_range_help(self):
         pass

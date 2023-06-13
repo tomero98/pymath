@@ -10,7 +10,7 @@ class Window(QMainWindow):
 
     def __init__(self, title):
         super().__init__()
-        self.setFixedSize(1400, 875)
+        self.setFixedSize(1400, 1000)
         self.setWindowTitle(title)
         self.setObjectName('application')
         self.setStyleSheet('QWidget#application {background-color: #FBF4FF;}')

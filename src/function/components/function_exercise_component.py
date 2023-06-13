@@ -1,10 +1,9 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 
-from .domain_components import RootDomainComponent, BoundedRangeComponent, DomainIndicateComponent, \
-    DomainDefinitionComponent
+from .domain_components import DomainDefinitionComponent
 from .elementary_graph_components import ElementaryGraphComponent, ElementaryShiftGraphComponent
-from .inverse_components import InverseDelimitedComponent, InverseConceptComponent
+from .inverse_components import InverseDelimitedComponent, InverseConceptComponent, InverseSelectionComponent
 from .maximum_minimum_components import MaximumMinimumComponent
 from ..models import ExerciseResume, FunctionExercise, FunctionStep
 from ..models.enums import StepType
@@ -56,11 +55,7 @@ class FunctionExerciseComponent(QWidget):
         if step.type == StepType.inverse_concept_exercise:
             component = InverseConceptComponent(exercise=self._exercise, step=step, resume=resume, need_help_data=False)
         elif step.type == StepType.selection_inverse_exercise:
-            # component = InverseSelectionComponent(exercise=self._exercise, step=step, resume=resume,
-            #                                       need_help_data=False)
-            # component = MaximumMinimumComponent(exercise=self._exercise, step=step, resume=resume,
-            #                                     need_help_data=False)
-            component = DomainDefinitionComponent(exercise=self._exercise, step=step, resume=resume,
+            component = InverseSelectionComponent(exercise=self._exercise, step=step, resume=resume,
                                                   need_help_data=False)
 
         elif step.type == StepType.delimited_inverse_exercise:
@@ -68,11 +63,7 @@ class FunctionExerciseComponent(QWidget):
                                                   need_help_data=False)
 
         elif step.type in [StepType.indicate_domain_exercise, StepType.indicate_range_exercise]:
-            component = DomainIndicateComponent(exercise=self._exercise, step=step)
-        elif step.type == StepType.indicate_bounded_range_exercise:
-            component = BoundedRangeComponent(exercise=self._exercise, step=step)
-        elif step.type == StepType.indicate_roots_exercise:
-            component = RootDomainComponent(exercise=self._exercise, step=step)
+            component = DomainDefinitionComponent(exercise=self._exercise, step=step, resume=resume)
 
         elif step.type == StepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
@@ -80,12 +71,6 @@ class FunctionExerciseComponent(QWidget):
             component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume,
                                                       need_help_data=True)
         elif step.type == StepType.maximum_relative_exercise:
-            component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == StepType.maximum_absolute_exercise:
-            component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == StepType.minimum_relative_exercise:
-            component = MaximumMinimumComponent(exercise=self._exercise, step=step)
-        elif step.type == StepType.minimum_absolute_exercise:
             component = MaximumMinimumComponent(exercise=self._exercise, step=step)
 
         self._setup_signals(component=component)

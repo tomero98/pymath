@@ -44,8 +44,6 @@ class FunctionExercisePage(Window):
 
         self._header_layout = self._get_header_layout()
 
-        self._combobox_layout = self._get_combobox_layout()
-
         self._setup_first_exercise_component()
         self._set_layout()
 
@@ -57,45 +55,48 @@ class FunctionExercisePage(Window):
         header_layout = QHBoxLayout()
 
         back_button = self._get_back_button()
-        breadcrumb_layout = self._get_breadcrumb_layout()
+        self._combobox_layout = self._get_combobox_layout()
+        next_button = self._get_next_button()
 
+        header_layout.addSpacing(50)
         header_layout.addWidget(back_button)
         header_layout.addStretch()
-        header_layout.addLayout(breadcrumb_layout)
+        header_layout.addLayout(self._combobox_layout)
         header_layout.addStretch()
+        header_layout.addWidget(next_button)
+        header_layout.addSpacing(50)
         return header_layout
 
     def _get_back_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='back_button.png')
-        back_button = ButtonFactory.get_button_component(title='', function_to_connect=self._show_dialog, icon=icon,
-                                                         icon_size=30, tooltip='Atrás')
+        icon = IconFactory.get_icon_widget(image_name='left-arrow.png')
+        back_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_previous_exercise, icon=icon, icon_size=35,
+            tooltip='Ejercicio anterior', secondary_button=True
+        )
         return back_button
 
-    def _get_breadcrumb_layout(self) -> QHBoxLayout:
-        breadcrumb_layout = QHBoxLayout()
+    def _setup_previous_exercise(self):
+        print(1)
 
-        function_label = LabelFactory.get_label_component(text='Funciones', label_type=TextType.NORMAL_TEXT,
-                                                          set_underline=True, set_cursive=True)
-        arrow_label = LabelFactory.get_label_image_component(image_name='breadcrumb_arrow.png', width=10, height=10)
-        exercise_label = LabelFactory.get_label_component(text=self._topic.title, label_type=TextType.NORMAL_TEXT,
-                                                          set_underline=True, set_cursive=True)
+    def _get_next_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
+        back_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_next_exercise2, icon=icon, icon_size=35,
+            tooltip='Siguiente ejercicio', secondary_button=True)
+        return back_button
 
-        breadcrumb_layout.addWidget(function_label)
-        breadcrumb_layout.addSpacing(5)
-        breadcrumb_layout.addWidget(arrow_label)
-        breadcrumb_layout.addSpacing(5)
-        breadcrumb_layout.addWidget(exercise_label)
-        return breadcrumb_layout
+    def _setup_next_exercise2(self):
+        print(1)
 
     def _get_combobox_layout(self) -> QHBoxLayout:
         combobox_layout = QHBoxLayout()
         self._steps_done_widget = QComboBox()
+        self._steps_done_widget.setStyleSheet('background-color: #CBC5F8;')
         self._steps_done_widget.setDisabled(True)
-        combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.NORMAL_TEXT,
-                                                          set_underline=True)
+        combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.SUBTITLE)
         combobox_layout.addStretch()
-        combobox_layout.addWidget(combobox_label)
-        combobox_layout.addSpacing(10)
+        combobox_layout.addWidget(combobox_label, alignment=Qt.AlignVCenter)
+        combobox_layout.addSpacing(15)
         combobox_layout.addWidget(self._steps_done_widget)
         combobox_layout.addStretch()
 
@@ -123,12 +124,11 @@ class FunctionExercisePage(Window):
         component.resume_signal.connect(self._setup_resume)
 
     def _set_layout(self):
-        self._layout.setContentsMargins(10, 5, 0, 0)
+        self._layout.setContentsMargins(10, 35, 10, 0)
         self._layout.setSpacing(0)
         self._layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self._layout.addLayout(self._header_layout)
         self._layout.addSpacing(10)
-        self._layout.addLayout(self._combobox_layout)
         self._layout.addWidget(self._current_exercise_component)
 
     def keyPressEvent(self, e):

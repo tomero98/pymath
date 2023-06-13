@@ -58,37 +58,21 @@ class StepDataMapper:
     def _get_domain_concept_exercise_steps(self) -> List[FunctionStep]:
         first_step = self._get_first_domain_concept_step()
         second_step = self._get_second_domain_concept_step()
-        third_step = self._get_third_domain_concept_step()
-        four_step = self._get_four_domain_concept_step()
-        return [first_step, second_step, third_step, four_step]
+        return [first_step, second_step]
 
     def _get_first_domain_concept_step(self) -> FunctionStep:
         step_type = StepType.indicate_domain_exercise
-        question = 'Con la ayuda del ratón, indicar mediante intervalos el dominio de la función representada.'
+        question = 'Con la ayuda del ratón, indica el dominio de la función representada.'
         order = 0
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
+        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list)
 
     def _get_second_domain_concept_step(self) -> FunctionStep:
         step_type = StepType.indicate_range_exercise
-        question = 'Con la ayuda del ratón, indicar mediante intervalos el recorrido de la función representada'
+        question = 'Con la ayuda del ratón, indica el recorrido de la función representada.'
         order = 1
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
-
-    def _get_third_domain_concept_step(self) -> FunctionStep:
-        step_type = StepType.indicate_bounded_range_exercise
-        question = 'Indica si la siguiente gráfica está acotada para el dominio dado.'
-        order = 2
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
-
-    def _get_four_domain_concept_step(self) -> FunctionStep:
-        step_type = StepType.indicate_roots_exercise
-        question = 'Indica, si tiene, las raíces de la siguiente gráfica:'
-        order = 3
-        help_data = self._help_data_mapper.get_help_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data=help_data)
+        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
+        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list)
 
     def _get_elementary_graph_exercise_steps(self):
         first_step = self._get_first_elementary_graph_step()

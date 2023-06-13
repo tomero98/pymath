@@ -1,24 +1,27 @@
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt, QRegExp
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QLineEdit, QSizePolicy
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QLineEdit, QSizePolicy
 from pyqt5_plugins.examplebuttonplugin import QtGui
 
-from src.function.factories import PlotFactory
-from src.function.models.enums.step_type import StepType
-from src.function.models.function_exercise import FunctionExercise
-from src.function.models.function_step import FunctionStep
 from src.projectConf.factories import LabelFactory, ButtonFactory
 from src.projectConf.factories.icon_factory import IconFactory
 from src.projectConf.factories.line_edit_factory import LineEditFactory
 from src.projectConf.models.enums.text_type import TextType
+from ...components.graph_interaction_validation_component import GraphInteractionValidationComponent
+from ...factories import PlotFactory
+from ...models import ExerciseResume
+from ...models.enums.step_type import StepType
+from ...models.function_exercise import FunctionExercise
+from ...models.function_step import FunctionStep
 
 
-class DomainIndicateComponent(QWidget):
+class DomainIndicateComponent(GraphInteractionValidationComponent):
     continue_signal = pyqtSignal()
     validate_signal = pyqtSignal()
 
-    def __init__(self, exercise: FunctionExercise, step: FunctionStep, need_help_data: bool = True):
-        super(DomainIndicateComponent, self).__init__()
+    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
+                 need_help_data: bool = True):
+        super(DomainIndicateComponent, self).__init__(exercise=exercise, step=step, resume=resume)
         self._exercise = exercise
         self._step = step
         self._is_answer_correct = True

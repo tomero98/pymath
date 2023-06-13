@@ -33,6 +33,7 @@ class GraphInteractionValidationComponent(Component):
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._plot_widget_layout: QHBoxLayout = None  # noqa
         self._info_button_layout: QVBoxLayout = None  # noqa
+        self._button_layout: QVBoxLayout = None  # noqa
 
     @abstractmethod
     def _get_correct_expression(self):
@@ -63,18 +64,24 @@ class GraphInteractionValidationComponent(Component):
 
     def _get_help_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='question.png')
-        return ButtonFactory.get_button_component(title='', function_to_connect=self._setup_help_data,
-                                                  icon=icon, icon_size=45, tooltip='Ayuda sobre el ejercicio')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
+            tooltip='Ayuda sobre el ejercicio'
+        )
 
     def _get_info_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='lessons.png')
-        return ButtonFactory.get_button_component(title='', function_to_connect=self._setup_help_data,
-                                                  icon=icon, icon_size=45, tooltip='Ayuda sobre el concepto')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
+            tooltip='Ayuda sobre el concepto'
+        )
 
     def _get_validate_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='check_exercise.png')
-        return ButtonFactory.get_button_component(title='', function_to_connect=self._setup_help_data,
-                                                  icon=icon, icon_size=45, tooltip='Comprobar ejercicio')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_help_data, primary_button=True, icon=icon, icon_size=45,
+            tooltip='Comprobar ejercicio'
+        )
 
     @abstractmethod
     def _on_click_validation_button(self):
@@ -103,12 +110,11 @@ class GraphInteractionValidationComponent(Component):
         layout = QHBoxLayout()
 
         self._plot_widget = self._get_plot_widget()
-        self._info_button_layout = self._get_info_button_layout()
+        self._button_layout = self._get_button_layout()
 
         layout.addStretch()
-        layout.addWidget(self._plot_widget, alignment=Qt.AlignTop)
-        layout.addLayout(self._info_button_layout)
-        layout.addStretch()
+        layout.addWidget(self._plot_widget, alignment=Qt.AlignTop | Qt.AlignHCenter)
+        layout.addLayout(self._button_layout)
         return layout
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
@@ -117,8 +123,16 @@ class GraphInteractionValidationComponent(Component):
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
         return plot_widget
 
-    def _get_info_button_layout(self) -> QVBoxLayout:
+    def _get_button_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
+
+        self._info_button_layout = self._get_info_button_layout()
+
+        layout.addLayout(self._info_button_layout)
+        return layout
+
+    def _get_info_button_layout(self) -> QHBoxLayout:
+        layout = QHBoxLayout()
 
         self._help_button = self._get_help_button()
         self._info_button = self._get_info_button()

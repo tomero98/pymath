@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, QRegExp, Qt
 from PyQt5.QtWidgets import QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QLabel
 from pyqtgraph import LinearRegionItem
 
-from src.projectConf.factories import ButtonFactory, LineEditFactory, LabelFactory
+from src.projectConf.factories import ButtonFactory, LineEditFactory, LabelFactory, IconFactory
 from src.projectConf.models.enums import TextType
 from .graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...factories import PlotFactory2
@@ -25,9 +25,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
         self._proxy = None
         self._linear_region_items: List[LinearRegionItem] = []
+        self._domain_expression_label: QLabel = None  # noqa
         self._domain_expression_edit_label: QLineEdit = None  # noqa
         self._create_range_button: QPushButton = None  # noqa
-        self._domain_expression_label: QLabel = None  # noqa
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
@@ -43,7 +43,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         layout.addStretch()
         layout.addWidget(self._domain_expression_label, alignment=Qt.AlignVCenter)
         layout.addWidget(self._domain_expression_edit_label)
-        layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
+        layout.addSpacing(15)
+        layout.addWidget(self._validate_button, alignment=Qt.AlignTop)
         layout.addStretch()
         return layout
 
@@ -56,6 +57,22 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         validator = QtGui.QRegExpValidator(regex)
         domain_edit.setValidator(validator)
         return domain_edit
+
+    def _get_button_layout(self) -> QVBoxLayout:
+        layout = super(DomainDefinitionComponent, self)._get_button_layout()
+
+        self._create_range_button = self._get_create_range_button()
+        layout.addStretch()
+        layout.addWidget(self._create_range_button, alignment=Qt.AlignRight | Qt.AlignVCenter)
+        layout.addStretch()
+        return layout
+
+    def _get_create_range_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='plus.png')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._on_click_create_range_button, secondary_button=True, icon=icon,
+            icon_size=60, tooltip='Añadir rango', primary_button=True
+        )
 
     def _on_click_create_range_button(self):
         linear_region_item = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort',

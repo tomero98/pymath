@@ -9,7 +9,7 @@ class ButtonFactory:
                              size_policy=(QSizePolicy.Fixed, QSizePolicy.Fixed), icon: QIcon = None,
                              icon_size: int = None, tooltip: str = '', minimum_width: int = None,
                              minimum_height: int = None, text_size: int = None,
-                             secondary_button: bool = False) -> QPushButton:
+                             secondary_button: bool = False, primary_button: bool = False) -> QPushButton:
         button = QPushButton(title)
         button.setSizePolicy(*size_policy)
         button.pressed.connect(function_to_connect)
@@ -44,6 +44,25 @@ class ButtonFactory:
             
             #secondary:hover {
                 border: 3px solid #4831FF; 
+            }
+            """)
+            effect = QGraphicsDropShadowEffect()
+            effect.setOffset(0, 0)
+            effect.setBlurRadius(5)
+            button.setGraphicsEffect(effect)
+
+        if primary_button:
+            button.setObjectName('primary')
+            button.setStyleSheet("""
+            #primary {
+                background-color: #DEC0F1;
+                border: 1px solid #957FEF; 
+                border-radius: 10px;
+                padding: 3px;
+            }
+            
+            #primary:hover {
+                border: 3px solid #957FEF; 
             }
             """)
             effect = QGraphicsDropShadowEffect()

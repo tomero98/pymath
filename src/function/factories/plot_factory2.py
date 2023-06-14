@@ -17,8 +17,8 @@ class PlotFactory2:
         graph.showGrid(x=show_grid, y=show_grid)
         graph.getAxis('left').setTextPen('yellow')
         graph.getAxis('bottom').setTextPen('yellow')
-        graph.plotItem.setLimits(xMin=function_range[0] - 0.1, xMax=function_range[1] + 0.1)
-        graph.plotItem.setLimits(yMin=function_range[0] - 0.1, yMax=function_range[1] + 0.1)
+        graph.plotItem.setLimits(xMin=function_range[0], xMax=function_range[1])
+        graph.plotItem.setLimits(yMin=function_range[0], yMax=function_range[1])
         return graph
 
     @classmethod

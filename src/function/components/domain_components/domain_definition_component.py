@@ -27,6 +27,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         )
 
         self._proxy = None
+        self._selected_linear_range_item: LinearRegionItem = None  # noqa
         self._range_selection_dialog: RangeSelectionDialog = None  # noqa
         self._linear_region_items: List[LinearRegionItem] = []
         self._domain_expression_label: QLabel = None  # noqa
@@ -36,6 +37,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
+        self._validate_button.setDisabled(True)
         self._domain_expression_edit_layout = self._get_domain_expression_edit_layout()
 
     def _get_domain_expression_edit_layout(self) -> QHBoxLayout:
@@ -70,6 +72,27 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         layout.addStretch()
         return layout
 
+    def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
+        plot = super(DomainDefinitionComponent, self)._get_plot_widget()
+        self._proxy = pyqtgraph.SignalProxy(plot.scene().sigMouseClicked, rateLimit=60, slot=self._plot_clicked)
+        return plot
+
+    def _plot_clicked(self, event):
+        pos = event[0].scenePos()
+        if not self._range_selection_dialog and self._plot_widget.sceneBoundingRect().contains(pos):
+            pos = self._plot_widget.getPlotItem().vb.mapSceneToView(pos)
+            linear_ranges_clicked = [
+                linear_range for linear_range in self._linear_region_items if linear_range.contains(pos)
+            ]
+            if linear_ranges_clicked:
+                linear_ranges_clicked_order = sorted(
+                    linear_ranges_clicked, key=lambda x: abs(x.getRegion()[1] - x.getRegion()[0])
+                )
+                domain_expression = self._get_domain_expression_from_linear_region_item(linear_ranges_clicked_order[0])
+                self._setup_range_selection_dialog(domain_expression=domain_expression)
+                self._selected_linear_range_item = linear_ranges_clicked_order[0]
+                self._create_range_button.setDisabled(True)
+
     def _get_button_option_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
         self._create_range_button = self._get_create_range_button()
@@ -91,6 +114,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _on_click_create_range_button(self):
         if not self._range_selection_dialog:
             self._setup_range_selection_dialog()
+            self._create_range_button.setDisabled(True)
 
     def _get_delete_range_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='minus.png')
@@ -105,17 +129,18 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             self._plot_widget.removeItem(linear_region_item)
             self._update_domain_expression_edit_label()
 
-    def _setup_range_selection_dialog(self):
+    def _setup_range_selection_dialog(self, domain_expression: str = ''):
         self._range_selection_dialog = RangeSelectionDialog(
-            plot_range=[self._exercise.plot_range[0], self._exercise.plot_range[1]], ranges_added=[]
+            plot_range=[self._exercise.plot_range[0], self._exercise.plot_range[1]], ranges_added=[],
+            range_item=domain_expression
         )
         self._range_selection_dialog.continue_signal.connect(self._add_range_selection_dialog)
         self._range_selection_dialog.draw()
         self._range_selection_dialog.delete_signal.connect(self._destroy_range_selection_dialog)
 
     def _add_range_selection_dialog(self, range_added: str):
-        min_value = self._exercise.plot_range[0] - 0.1
-        max_value = self._exercise.plot_range[1] + 0.1
+        min_value = self._exercise.plot_range[0]
+        max_value = self._exercise.plot_range[1]
 
         range_parts = range_added[1:-1].split(',')
         lower_limit = range_parts[0]
@@ -136,47 +161,99 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
         self._setup_new_linear_region_item(lower_bound=lower_bound, upper_bound=upper_bound, min_value=min_value,
                                            max_value=max_value, lower_limit_type=lower_limit_type,
-                                           upper_limit_type=upper_limit_type)
+                                           upper_limit_type=upper_limit_type,
+                                           linear_region_item=self._selected_linear_range_item)
         self._update_domain_expression_edit_label()
+        self._create_range_button.setDisabled(False)
+        self._selected_linear_range_item = None
 
     def _setup_new_linear_region_item(self, lower_bound: float, upper_bound: float, min_value: float, max_value: float,
-                                      lower_limit_type: str, upper_limit_type: str):
-        linear_region_item = pyqtgraph.LinearRegionItem(values=(lower_bound, upper_bound), orientation='vertical',
-                                                        swapMode='sort', bounds=(min_value, max_value))
+                                      lower_limit_type: str, upper_limit_type: str,
+                                      linear_region_item: LinearRegionItem = None):
+        if not linear_region_item:
+            linear_region_item = pyqtgraph.LinearRegionItem(values=(lower_bound, upper_bound), orientation='vertical',
+                                                            swapMode='block', bounds=(min_value, max_value))
+            linear_region_item.sigRegionChangeFinished.connect(self._update_domain_expression_edit_label)
+            self._linear_region_items.append(linear_region_item)
+            self._plot_widget.addItem(linear_region_item)
+        else:
+            linear_region_item.setRegion([lower_bound, upper_bound])
 
-        linear_region_item.sigRegionChangeFinished.connect(self._update_domain_expression_edit_label)
+        hover_color = QPen(QColor('green'))
+        hover_color.setWidth(0.2)
+
         first_border_color = QPen(QColor(self._BORDER_COLOR_BY_BORDER_TYPE[lower_limit_type]))
         first_border_color.setWidth(0.2)
         linear_region_item.lines[0].setPen(first_border_color)
+        linear_region_item.lines[0].setHoverPen(hover_color)
         second_border_color = QPen(QColor(self._BORDER_COLOR_BY_BORDER_TYPE[upper_limit_type]))
         second_border_color.setWidth(0.2)
         linear_region_item.lines[1].setPen(second_border_color)
+        linear_region_item.lines[1].setHoverPen(hover_color)
 
-        self._linear_region_items.append(linear_region_item)
-        self._plot_widget.addItem(linear_region_item)
+        self._range_selection_dialog.close()
         self._range_selection_dialog = None
 
     def _update_domain_expression_edit_label(self):
         limits = []
         for region_item in self._linear_region_items:
-            bounds = region_item.getRegion()
-            lower_limit = '('
-            lower_value = round(float(bounds[0]), 2)
-            upper_limit = ')'
-            upper_value = round(float(bounds[1]), 2)
-            domain = f'{lower_limit}{lower_value}, {upper_value}{upper_limit}'
-            limits.append(domain)
+            expression = self._get_domain_expression_from_linear_region_item(region_item)
+            limits.append(expression)
 
         text = ' U '.join(limits)
         self._domain_expression_edit_label.setText(text)
 
         if not self._linear_region_items:
             self._delete_range_button.setDisabled(True)
+            self._validate_button.setDisabled(True)
         else:
             self._delete_range_button.setDisabled(False)
+            self._validate_button.setDisabled(False)
+
+    def _get_domain_expression_from_linear_region_item(self, region_item: LinearRegionItem) -> str:
+        bounds = region_item.getRegion()
+
+        lower_bound_color = region_item.lines[0].pen.color()
+        lower_value = round(float(bounds[0]), 2)
+
+        if not lower_bound_color.red() and not lower_bound_color.blue() and lower_value != self._exercise.plot_range[0]:
+            not_included_bound_color = QPen(QColor(self._BORDER_COLOR_BY_BORDER_TYPE['not_included']))
+            not_included_bound_color.setWidth(0.2)
+            region_item.lines[0].setPen(not_included_bound_color)
+            lower_bound_color = region_item.lines[0].pen.color()
+
+        if lower_bound_color.red():
+            lower_limit = '('
+        elif lower_bound_color.blue():
+            lower_limit = '['
+        else:
+            lower_limit = '('
+            lower_value = '-inf'
+
+        upper_bound_color = region_item.lines[1].pen.color()
+        upper_value = round(float(bounds[1]), 2)
+
+        if not upper_bound_color.red() and not upper_bound_color.blue() and upper_value != self._exercise.plot_range[1]:
+            not_included_bound_color = QPen(QColor(self._BORDER_COLOR_BY_BORDER_TYPE['not_included']))
+            not_included_bound_color.setWidth(0.2)
+            region_item.lines[1].setPen(not_included_bound_color)
+            upper_bound_color = region_item.lines[1].pen.color()
+
+        if upper_bound_color.red():
+            upper_limit = ')'
+        elif upper_bound_color.blue():
+            upper_limit = ']'
+        else:
+            upper_limit = ')'
+            upper_value = '+inf'
+
+        return f'{lower_limit}{lower_value}, {upper_value}{upper_limit}'
 
     def _destroy_range_selection_dialog(self):
+        self._range_selection_dialog.close()
         self._range_selection_dialog = None
+        self._create_range_button.setDisabled(False)
+        self._selected_linear_range_item = None
 
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)

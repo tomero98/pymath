@@ -155,12 +155,12 @@ class HelpDataDialog(QWidget):
 
     def _setup_buttons_state(self):
         is_first_step = self._current_help_data.order == 0 and self._current_step is None
-        is_last_help_data = (self._current_help_data.order + 1) == len(self._help_data_list)
-        if len(self._help_data_list[-1].help_steps) and self._current_step:
-            is_last_step = len(self._help_data_list[-1].help_steps) == 0 \
-                           or len(self._help_data_list[-1].help_steps) == (self._current_step.order + 1)
-        else:
-            is_last_step = False
-        is_last_step = is_last_help_data and is_last_step
-        self._continue_button.setDisabled(is_last_step)
         self._back_button.setDisabled(is_first_step)
+
+        is_last_help_data = self._current_help_data == self._help_data_list[-1]
+        if self._help_data_list[-1].help_steps:
+            is_last_step_data = self._current_step == self._help_data_list[-1].help_steps[-1]
+        else:
+            is_last_step_data = True
+        is_last_step = is_last_help_data and is_last_step_data
+        self._continue_button.setDisabled(is_last_step)

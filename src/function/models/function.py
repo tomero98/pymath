@@ -8,7 +8,7 @@ from sympy.core.numbers import Rational
 
 class Function:
     def __init__(self, function_id: int, expression: str, x_values_range: Tuple[int, int], is_main_graphic: bool,
-                 domain: str = ''):
+                 domain: str = '', is_invert_function: bool = False):
         self.function_id = function_id
         self.expression = expression
         self.x_values_range = x_values_range
@@ -18,12 +18,16 @@ class Function:
         self.x_values, self.y_values = [], []
         self.domain = domain
         self.real_range = ''
+        self.is_invert_function = is_invert_function
 
     def setup_data(self, plot_range: Tuple[int, int]):
         self.x_values, self.y_values = self.get_points()
         self.domain = self.get_domain(domain=self.domain)
         self.horizontal_asymptotes = self.get_horizontal_asymptotes()
         self.real_range = self.get_range_expression(plot_range=plot_range)
+
+        if self.is_invert_function:
+            self.x_values, self.y_values = self.y_values, self.x_values
 
     @lru_cache(maxsize=2)
     def get_points(self) -> (List[int], List[int]):
@@ -60,7 +64,6 @@ class Function:
 
     @lru_cache(maxsize=1)
     def get_range_expression(self, plot_range: Tuple[int, int]) -> str:
-        # TODO cast to float user input in validation of range because 1 != 1.0 and user not gonna write 1.0
         range_parts = []
         all_y_values = [item for y_list in self.y_values for item in y_list]
         min_y, max_y = min(all_y_values), max(all_y_values)

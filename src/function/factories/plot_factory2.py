@@ -17,6 +17,10 @@ class PlotFactory2:
         graph.showGrid(x=show_grid, y=show_grid)
         graph.getAxis('left').setTextPen('yellow')
         graph.getAxis('bottom').setTextPen('yellow')
+
+        graph_range = (function_range[0] + 0.4, function_range[1] - 0.4)
+        graph.setRange(xRange=graph_range, yRange=graph_range)
+
         graph.plotItem.setLimits(xMin=function_range[0], xMax=function_range[1])
         graph.plotItem.setLimits(yMin=function_range[0], yMax=function_range[1])
         return graph
@@ -36,18 +40,21 @@ class PlotFactory2:
                     function_name=function.expression, click_function=click_function
                 )
 
-            # if show_limits:
-            #     PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
+            if show_limits:
+                PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
 
     @classmethod
     def _setup_limits(cls, graph: pyqtgraph.PlotWidget, function: Function, x_values: List[int], y_values: List[int]):
-        is_first_point_included = function.domain[0] == '['
-        first_point_filling = 'w' if is_first_point_included else 'black'
-        graph.plot([x_values[0]], [y_values[0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
+        if '-inf' not in function.domain:
+            is_first_point_included = function.domain[0] == '['
+            first_point_filling = 'w' if is_first_point_included else 'black'
+            graph.plot([x_values[0][0]], [y_values[0][0]], symbol='o', symbolBrush=first_point_filling, symbolSize='12')
 
-        is_last_point_included = function.domain[-1] == ']'
-        last_point_filling = 'w' if is_last_point_included else 'black'
-        graph.plot([x_values[-1]], [y_values[-1]], symbol='o', symbolBrush=last_point_filling, symbolSize='12')
+        if '+inf' not in function.domain:
+            is_last_point_included = function.domain[-1] == ']'
+            last_point_filling = 'w' if is_last_point_included else 'black'
+            graph.plot([x_values[-1][-1]], [y_values[-1][-1]], symbol='o', symbolBrush=last_point_filling,
+                       symbolSize='12')
 
     @classmethod
     def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: [str, tuple] = '') -> None:

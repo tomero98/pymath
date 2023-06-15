@@ -27,8 +27,6 @@ class GraphInteractionValidationComponent(Component):
         self._question_label: QLabel = None  # noqa
         self._help_button: QPushButton = None  # noqa
         self._info_button: QPushButton = None  # noqa
-        self._continue_button: QPushButton = None  # noqa
-        self._back_button: QPushButton = None  # noqa
         self._validate_button: QPushButton = None  # noqa
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._plot_widget_layout: QHBoxLayout = None  # noqa
@@ -50,8 +48,6 @@ class GraphInteractionValidationComponent(Component):
 
     def _setup_components(self):
         self._question_label = self._get_question_label()
-        self._continue_button = self._get_continue_button()
-        self._back_button = self._get_back_button()
         self._validate_button = self._get_validate_button()
         self._plot_widget_layout = self._get_plot_widget_layout()
 
@@ -86,25 +82,6 @@ class GraphInteractionValidationComponent(Component):
     @abstractmethod
     def _on_click_validation_button(self):
         pass
-
-    def _get_continue_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='continue_button.png')
-        return ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._send_continue_signal(), icon=icon, icon_size=85,
-            tooltip='Continuar', is_disable=True
-        )
-
-    def _get_back_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='back_2_button.png')
-        back_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._send_back_signal(), icon=icon, icon_size=85,
-            tooltip='Ir al ejercicio anterior', is_disable=True
-        )
-
-        if self._exercise.exercise_order != 0 or self._step.order != 0:
-            back_button.setDisabled(False)
-
-        return back_button
 
     def _get_plot_widget_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()

@@ -80,24 +80,60 @@ class HelpDataMapper:
 
     def _get_indicate_domain_help(self):
         first_help_data = self._get_first_help_data_domain()
-        second_help_data = self._get_indicate_range_help()
-        return [first_help_data, second_help_data]
+        return [first_help_data]
 
     def _get_first_help_data_domain(self) -> HelpData:
-        function_one = Function(function_id=0, expression='(x)**3', x_values_range=(-5, 2), is_main_graphic=True,
-                                domain='(-inf, 2)')
+        function_one = Function(function_id=0, expression='(x)**2', x_values_range=(0, 2), is_main_graphic=True,
+                                domain='[0, 2)')
         function_one.setup_data((-5, 5))
-        function_two = Function(function_id=0, expression='x', x_values_range=(3, 4), is_main_graphic=True,
-                                domain='(3, 4]')
+        function_two = Function(function_id=0, expression='x', x_values_range=(3, 5), is_main_graphic=True,
+                                domain='(3, +inf)')
         function_two.setup_data((-5, 5))
-        return HelpData(order=0, functions=[function_one, function_two], help_steps=[],
+        help_step_one = self._get_first_help_step_domain()
+        help_step_two = self._get_second_help_step_domain()
+        return HelpData(order=0, title='Apuntes sobre el dominio de una función',
+                        functions=[function_one, function_two], help_steps=[help_step_one, help_step_two],
                         text='El dominio de una función son todos los valores que toma x para la función. '
-                             'En este caso el dominio de la función es "(3, 4] U -inf, 2)"')
+                             'En este caso el dominio de la función es "[0, 2) U (3, +inf)"')
+
+    def _get_first_help_step_domain(self) -> HelpStep:
+        function_one = Function(function_id=0, expression='0', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)', is_invert_function=True)
+        function_one.setup_data((-5, 5))
+
+        function_two = Function(function_id=0, expression='1', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)', is_invert_function=True)
+        function_two.setup_data((-5, 5))
+
+        function_three = Function(function_id=0, expression='4', x_values_range=(-5, 5), is_main_graphic=False,
+                                  domain='(-inf, +inf)', is_invert_function=True)
+        function_three.setup_data((-5, 5))
+
+        text = 'Para la función dada, los puntos siguientes sí están definidos en el dominio porque las cotas son. '
+        return HelpStep(order=0, functions=[function_one, function_two, function_three], text=text,
+                        function_color='blue')
+
+    def _get_second_help_step_domain(self) -> HelpStep:
+        function_one = Function(function_id=0, expression='2', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)', is_invert_function=True)
+        function_one.setup_data((-5, 5))
+
+        function_two = Function(function_id=0, expression='3', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)', is_invert_function=True)
+        function_two.setup_data((-5, 5))
+
+        function_three = Function(function_id=0, expression='2.5', x_values_range=(-5, 5), is_main_graphic=False,
+                                  domain='(-inf, +inf)', is_invert_function=True)
+        function_three.setup_data((-5, 5))
+
+        text = 'Para la función dada los puntos siguientes no están definidos en el dominio porque las cotas son. '
+        return HelpStep(order=0, functions=[function_one, function_two, function_three], text=text,
+                        function_color='red')
 
     def _get_indicate_range_help(self) -> HelpData:
         return None
 
-    ########################################
+        ########################################
 
     def _get_indicate_bounded_range_help(self):
         pass

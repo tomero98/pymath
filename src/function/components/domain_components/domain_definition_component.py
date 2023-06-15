@@ -23,7 +23,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False):
         super(DomainDefinitionComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_main_function_limits=True
         )
 
         self._proxy = None

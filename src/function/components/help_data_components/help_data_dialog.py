@@ -11,6 +11,8 @@ from src.projectConf.models.enums import TextType
 
 
 class HelpDataDialog(QWidget):
+    _PLOT_RANGE = (-5, 5)
+
     def __init__(self, help_data_list: List[HelpData], show_main_function_limits: bool = False,
                  show_function_labels: bool = False):
         super(HelpDataDialog, self).__init__()
@@ -21,6 +23,7 @@ class HelpDataDialog(QWidget):
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._continue_button: QPushButton = None  # noqa
         self._back_button: QPushButton = None  # noqa
+        self._title_label: QLabel = None  # noqa
         self._text_label: QLabel = None  # noqa
         self._current_help_data: HelpData = None  # noqa
         self._current_step: HelpStep = None  # noqa
@@ -29,22 +32,25 @@ class HelpDataDialog(QWidget):
         self.setWindowTitle('Ayuda')
 
         help_layout = QVBoxLayout()
-
-        self._plot_widget = PlotFactory2.get_plot(function_range=self._help_data_list[0].function.domain)
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._help_data_list[0].function],
-                                   function_width=5, color='white', show_limits=self._show_main_function_limits)
-        if self._show_function_labels:
-            PlotFactory2.set_labels(graph=self._plot_widget, functions=[(self._help_data_list[0].function, 'white')])
-        help_layout.addWidget(self._plot_widget)
-
-        self._text_label = LabelFactory.get_label_component(
-            text=self._help_data_list[0].text, label_type=TextType.SUBTITLE, align=Qt.AlignHCenter, need_word_wrap=True,
-            set_visible=True
-        )
-        help_layout.addWidget(self._text_label)
+        help_layout.setContentsMargins(20, 5, 20, 20)
 
         buttons_layout = self._get_buttons_layout()
         help_layout.addLayout(buttons_layout)
+
+        self._plot_widget = PlotFactory2.get_plot(function_range=self._PLOT_RANGE)
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=self._help_data_list[0].functions,
+                                   function_width=5, color='white', show_limits=self._show_main_function_limits)
+        if self._show_function_labels:
+            custom_functions = [(function, 'white') for function in self._help_data_list[0].functions]
+            PlotFactory2.set_labels(graph=self._plot_widget, functions=custom_functions)
+        help_layout.addWidget(self._plot_widget, alignment=Qt.AlignHCenter)
+
+        self._text_label = LabelFactory.get_label_component(
+            text=self._help_data_list[0].text, label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
+            need_word_wrap=False, set_visible=True
+        )
+        help_layout.addSpacing(10)
+        help_layout.addWidget(self._text_label)
 
         self.setLayout(help_layout)
         self.show()
@@ -55,26 +61,29 @@ class HelpDataDialog(QWidget):
 
     def _get_buttons_layout(self):
         buttons_layout = QHBoxLayout()
+        buttons_layout.setContentsMargins(50, 5, 50, 0)
 
-        icon = IconFactory.get_icon_widget(image_name='continue_button.png')
         continue_button_is_active = (len(self._help_data_list) > 1) or (len(self._help_data_list[0].help_steps) > 1)
+        icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
         self._continue_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._execute_continue(), icon=icon, icon_size=85,
-            tooltip='Continuar', is_disable=not continue_button_is_active
+            title='', function_to_connect=lambda: self._execute_continue(), icon=icon, icon_size=35,
+            tooltip='Continuar', is_disable=not continue_button_is_active, secondary_button=True
         )
 
-        icon = IconFactory.get_icon_widget(image_name='back_2_button.png')
+        self._title_label = LabelFactory.get_label_component(
+            text=self._help_data_list[0].title, label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
+            need_word_wrap=False, set_visible=True, set_bold=True
+        )
+
+        icon = IconFactory.get_icon_widget(image_name='left-arrow.png')
         self._back_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._execute_back(), icon=icon, icon_size=85,
-            tooltip='Ir al ejercicio anterior', is_disable=True
+            title='', function_to_connect=lambda: self._execute_back(), icon=icon, icon_size=35,
+            tooltip='Volver atrás', is_disable=True, secondary_button=True
         )
 
-        buttons_layout.addStretch()
         buttons_layout.addWidget(self._back_button)
-        buttons_layout.addStretch()
-        buttons_layout.addStretch()
+        buttons_layout.addWidget(self._title_label)
         buttons_layout.addWidget(self._continue_button)
-        buttons_layout.addStretch()
         return buttons_layout
 
     def _execute_back(self):
@@ -92,10 +101,11 @@ class HelpDataDialog(QWidget):
 
         text = self._current_step.text if self._current_step else self._current_help_data.text
         self._text_label.setText(text)
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._current_help_data.function],
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=self._current_help_data.functions,
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
         if self._show_function_labels:
-            PlotFactory2.set_labels(graph=self._plot_widget, functions=[(self._current_help_data.function, 'white')])
+            custom_functions = [(function, 'white') for function in self._help_data_list[0].functions]
+            PlotFactory2.set_labels(graph=self._plot_widget, functions=custom_functions)
         if self._current_step:
             steps = [step for step in self._current_help_data.help_steps if step.order <= self._current_step.order]
             for step in steps:
@@ -135,10 +145,11 @@ class HelpDataDialog(QWidget):
 
     def _setup_help_data(self):
         PlotFactory2.reset_graph(graph=self._plot_widget)
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._current_help_data.function],
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=self._current_help_data.functions,
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
         if self._show_function_labels:
-            PlotFactory2.set_labels(graph=self._plot_widget, functions=[(self._current_help_data.function, 'white')])
+            custom_functions = [(function, 'white') for function in self._help_data_list[0].functions]
+            PlotFactory2.set_labels(graph=self._plot_widget, functions=custom_functions)
 
         self._text_label.setText(self._current_help_data.text)
 

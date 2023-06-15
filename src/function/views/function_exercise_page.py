@@ -80,10 +80,10 @@ class FunctionExercisePage(Window):
 
     def _get_next_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
-        back_button = ButtonFactory.get_button_component(
+        next_button = ButtonFactory.get_button_component(
             title='', function_to_connect=self._setup_next_exercise2, icon=icon, icon_size=35,
             tooltip='Siguiente ejercicio', secondary_button=True)
-        return back_button
+        return next_button
 
     def _setup_next_exercise2(self):
         print(1)

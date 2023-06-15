@@ -56,7 +56,7 @@ class PlotFactory2:
 
     @classmethod
     def set_graph_using_points(cls, graph: pyqtgraph.PlotWidget, x_values: List[int], y_values: List[int],
-                               color: [str, Tuple] = 'yellow', function_width: int = 3, function_name: str = '',
+                               color: [str, Tuple] = 'yellow', function_width: float = 3, function_name: str = '',
                                click_function=None):
         pen = pyqtgraph.mkPen(color=color, width=function_width)
         plot_data_item = graph.plot(x_values, y_values, pen=pen, name=function_name)

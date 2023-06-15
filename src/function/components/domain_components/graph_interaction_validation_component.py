@@ -79,8 +79,8 @@ class GraphInteractionValidationComponent(Component):
     def _get_validate_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='check_exercise.png')
         return ButtonFactory.get_button_component(
-            title='', function_to_connect=self._setup_help_data, primary_button=True, icon=icon, icon_size=45,
-            tooltip='Comprobar ejercicio'
+            title='', function_to_connect=self._on_click_validation_button, primary_button=True, icon=icon,
+            icon_size=45, tooltip='Comprobar ejercicio'
         )
 
     @abstractmethod

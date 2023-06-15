@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import List
 
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
@@ -11,7 +11,7 @@ from src.projectConf.models.enums import TextType
 from .graph_interaction_validation_component import GraphInteractionValidationComponent
 from .range_selection_dialog import RangeSelectionDialog
 from ...factories import PlotFactory2
-from ...models import FunctionExercise, FunctionStep, ExerciseResume, Point
+from ...models import FunctionExercise, FunctionStep, ExerciseResume
 
 
 class DomainDefinitionComponent(GraphInteractionValidationComponent):
@@ -34,11 +34,15 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._domain_expression_edit_label: QLineEdit = None  # noqa
         self._create_range_button: QPushButton = None  # noqa
         self._delete_range_button: QPushButton = None  # noqa
+        self._result_label: QLabel = None  # noqa
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
         self._validate_button.setDisabled(True)
         self._domain_expression_edit_layout = self._get_domain_expression_edit_layout()
+        self._result_label = LabelFactory.get_label_component(
+            text='', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False, set_bold=True
+        )
 
     def _get_domain_expression_edit_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
@@ -261,69 +265,80 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._layout.addLayout(self._plot_widget_layout)
         self._layout.addSpacing(20)
         self._layout.addLayout(self._domain_expression_edit_layout)
+        self._layout.addWidget(self._result_label, alignment=Qt.AlignHCenter)
         self._layout.addStretch()
 
     def _on_click_validation_button(self):
-        self._validate_exercise(expression_selected=self._answers_by_point_type)
+        self._validate_exercise(expression_selected=self._domain_expression_edit_label.text())
 
     def _get_correct_expression(self):
-        return self._exercise._get_maximum_minimum_points()
+        return self._exercise.get_domain_expression()
 
     def _get_function_to_draw(self):
         return self._exercise.get_main_function()
 
-    def _is_exercise_correct(self, expression_selected):
-        correct_expression = self._get_correct_expression()
-        return expression_selected == correct_expression
-
-    def _validate_exercise(self, expression_selected: Union[dict, str], is_resume: bool = False):
-        super()._validate_exercise(expression_selected=str(dict(expression_selected)), is_resume=is_resume)
-        expression_selected = dict(expression_selected)
-        correct_expression = self._get_correct_expression()
-
-        for point_type, points in expression_selected:
-            for point in points:
-                if point not in correct_expression[point_type]:
-                    self._set_point_on_validating(point=point, point_type=point_type, validation_type='wrong')
-
-        for point_type, points in correct_expression:
-            for point in points:
-                if point not in expression_selected[point_type]:
-                    self._set_point_on_validating(point=point, point_type=point_type, validation_type='missing')
-                if point not in expression_selected[point_type]:
-                    self._set_point_on_validating(point=point, point_type=point_type, validation_type='correct')
-
-        self._post_exercise_validation(expression_selected=expression_selected)
-
-    def _set_point_on_validating(self, point: Point, point_type: str, validation_type: str):
-        point_color_text_by_validation_type = {
-            'wrong': ('red', 'Incorrecto. '),
-            'missing': ('orange', 'No seleccionado. '),
-            'correct': ('green', 'Correcto. '),
-        }
-        color_point, text_point = point_color_text_by_validation_type[validation_type]
-
-        PlotFactory2.set_points(graph=self._plot_widget, points=[point], color=color_point)
-
-        point.y = point.y - 0.15
-        PlotFactory2.set_labels2(
-            graph=self._plot_widget, points=[(point, (color_point, f'{text_point}  {point_type}'))]
-        )
-
-    def _post_exercise_validation(self, expression_selected: dict):
-        is_answer_correct = self._is_exercise_correct(expression_selected=expression_selected)
-        if not is_answer_correct:
-            self._help_text.setText('Incorrecto.')
-            border_color = 'red'
+    def _validate_exercise(self, expression_selected: str, is_resume: bool = False):
+        super()._validate_exercise(expression_selected=expression_selected, is_resume=is_resume)
+        is_correct, user_wrong_domain_num_set, user_missed_domain_num_set = \
+            self._exercise.validate_domain_expression(user_domain_input=expression_selected)
+        if is_correct:
+            self._setup_correct_response()
         else:
-            self._help_text.setText('Correcto.')
-            border_color = '#2F8C53'
+            self._setup_wrong_response(
+                correct_response=self._exercise.get_domain_expression(),
+                user_wrong_domain_num_set=user_wrong_domain_num_set,
+                user_missed_domain_num_set=user_missed_domain_num_set
+            )
+        self._setup_finished_exercise()
 
-        self._help_text.setVisible(True)
-        self._help_text.setStyleSheet(f'color: {border_color}')
+    def _setup_correct_response(self):
+        self._result_label.setText('Correcto.')
+        self._result_label.setStyleSheet('color: green')
+        self._result_label.setVisible(True)
 
-        self._continue_button.setStyleSheet(f'background: {border_color}')
-        self._continue_button.setDisabled(False)
+    def _setup_wrong_response(self, correct_response: str, user_wrong_domain_num_set: set,
+                              user_missed_domain_num_set: set):
+        self._result_label.setText(f'Incorrecto. El dominio de la función es el siguiente: {correct_response}')
+        self._result_label.setStyleSheet('color: red')
+        self._result_label.setVisible(True)
 
-        if self._exercise.exercise_order != 0 or self._step.order != 0:
-            self._back_button.setDisabled(False)
+        if user_wrong_domain_num_set:
+            slice_num = max(len(user_wrong_domain_num_set) // 3, 1)
+            sorted_wrong_num_set = sorted(user_wrong_domain_num_set)
+            x_points = set(sorted_wrong_num_set[::slice_num])
+            self._setup_constant_points(x_points=x_points, color='red')
+
+        if user_missed_domain_num_set:
+            slice_num = max(len(user_missed_domain_num_set) // 3, 1)
+            sorted_missed_num_set = sorted(user_missed_domain_num_set)
+            x_points = set(sorted_missed_num_set[::slice_num])
+            self._setup_constant_points(x_points=x_points, color='red')
+
+    def _setup_constant_points(self, x_points: set, color: str):
+        if self._ORIENTATION == 'vertical':
+            points_list = [
+                ([x_point, x_point], [self._exercise.plot_range[0], self._exercise.plot_range[1]])
+                for x_point in x_points
+            ]
+        else:
+            points_list = [
+                ([self._exercise.plot_range[0], self._exercise.plot_range[1]], [x_point, x_point])
+                for x_point in x_points
+            ]
+        for point_list in points_list:
+            PlotFactory2.set_graph_using_points(
+                graph=self._plot_widget, x_values=point_list[0], y_values=point_list[1], color=color, function_width=1.5
+            )
+
+    def _setup_finished_exercise(self):
+        self._help_button.setDisabled(True)
+        self._validate_button.setDisabled(True)
+        self._create_range_button.setDisabled(True)
+        self._delete_range_button.setDisabled(True)
+
+    def _is_exercise_correct(self, expression_selected: str) -> bool:
+        is_correct, _, _ = self._exercise.validate_domain_expression(user_domain_input=expression_selected)
+        return is_correct
+
+    def _on_function_to_draw_click(self, plot_curve_item_selected, point_selected):
+        return None

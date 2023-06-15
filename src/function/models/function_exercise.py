@@ -43,6 +43,55 @@ class FunctionExercise:
     def _get_maximum_minimum_points(self):
         pass
 
+    def validate_domain_expression(self, user_domain_input: str) -> [bool, set]:
+        exercise_domain = self.get_domain_expression()
+        if user_domain_input == exercise_domain:
+            return True, set(), set()
+
+        user_domain_expression_set = set(user_domain_input.replace(' ', '').split('U'))
+        exercise_domain_expression_set = set(exercise_domain.replace(' ', '').split('U'))
+        if user_domain_expression_set == exercise_domain_expression_set:
+            return True, set(), set()
+
+        exercise_domain_set = set()
+        for function in self.functions:
+            function_domain = self.get_num_set_from_domain_expression(domain_expression=function.domain)
+            exercise_domain_set.update(function_domain)
+
+        user_domain_set = self.get_num_set_from_domain_expression(domain_expression=user_domain_input)
+        return exercise_domain_set == user_domain_set, \
+               user_domain_set - exercise_domain_set, \
+               exercise_domain_set - user_domain_set
+
+    def get_domain_expression(self) -> str:
+        return ' U '.join(function.domain for function in self.functions)
+
+    def get_num_set_from_domain_expression(self, domain_expression: str) -> set:
+        domain_num_set = set()
+        domain_parts = domain_expression.split(' U ')
+        for domain_part in domain_parts:
+            limits = domain_part[1:-1].replace(',', '').split()
+            if '-inf' not in limits[0]:
+                lower_limit = round(float(limits[0]), 2)
+            else:
+                lower_limit = self.plot_range[0]
+
+            if 'inf' not in limits[1]:
+                upper_limit = round(float(limits[1]), 2)
+            else:
+                upper_limit = self.plot_range[1]
+
+            values = [num / 10 for num in range(int(lower_limit * 10), int(upper_limit * 10) + 1, 1)]
+
+            if domain_part[0] == '(' and '-inf' not in limits[0]:
+                values = values[1:]
+
+            if domain_part[-1] == ')' and 'inf' not in limits[1]:
+                values = values[:-1]
+
+            domain_num_set.update(values)
+        return domain_num_set
+
     ####################################################################################################################
     ####################################################################################################################
     ####################################################################################################################
@@ -53,36 +102,12 @@ class FunctionExercise:
         function = next(function for function in self.functions if function.expression == expression)
         return function
 
-    def get_domain_range_values(self, small_sample: bool = False) -> (list, list):
-        # Domain exercise
-        functions = [function for function in self.functions if function.is_main_graphic]
-        all_x_values = []
-        all_y_values = []
-        for function in functions:
-            x_values, y_values = function.get_points()
-            all_x_values.extend(x_values)
-            all_y_values.extend(y_values)
-        return all_x_values, all_y_values
-
-    def validate_domain_expression(self, domain_expression: str):
-        domain = self.get_domain_expression().replace(' ', '')
-        domain_expression = domain_expression.replace(' ', '')
-        domain_expression_list = domain_expression.split('U')
-        return all(expression and expression in domain for expression in domain_expression_list)
-
     def validate_range_expression(self, range_expression: str):
         function_range = self.get_range_expression()
         return function_range.replace(' ', '') == range_expression.replace(' ', '')
-
-    def get_domain_expression(self):
-        domain = ' U '.join(function.get_domain_function() for function in self.functions)
-        return domain
 
     def get_range_expression(self):
         function_range = ' U '.join(
             function.get_range_function(plot_range=self.plot_range) for function in self.functions
         )
         return function_range
-
-    def has_bounded_range(self):
-        return 'inf' not in self.get_range_expression()

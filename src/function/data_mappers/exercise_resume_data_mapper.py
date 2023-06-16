@@ -14,7 +14,7 @@ class ExerciseResumeDataMapper:
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO exercise_resumes (is_correct, step_type, exercise_id, graph_id) VALUES (?, ?, ?, ?)
+            INSERT INTO exercise_resumes (is_correct, step_type, exercise_id, graph_id, response) VALUES (?, ?, ?, ?, ?)
             """
         )
 
@@ -23,4 +23,5 @@ class ExerciseResumeDataMapper:
         sql_query.addBindValue(resume.step_type.value)
         sql_query.addBindValue(resume.exercise_id)
         sql_query.addBindValue(resume.function_id)
+        sql_query.addBindValue(resume.response)
         sql_query.exec()

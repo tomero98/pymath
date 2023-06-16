@@ -228,6 +228,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 is_correct INT NOT NULL,
                 step_type VARCHAR(64) NOT NULL,
+                response VARCHAR(64) NOT NULL,
                 exercise_id INT NOT NULL,
                 graph_id INT NOT NULL,
                 FOREIGN KEY (exercise_id) REFERENCES exercises(id),

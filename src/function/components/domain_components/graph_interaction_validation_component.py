@@ -13,8 +13,6 @@ from ...models.enums import ResumeState
 
 
 class GraphInteractionValidationComponent(Component):
-    resume_signal = pyqtSignal(ExerciseResume)
-
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False, show_main_function_limits: bool = False,
                  show_function_labels: bool = False):
@@ -25,8 +23,6 @@ class GraphInteractionValidationComponent(Component):
 
         self._layout: QVBoxLayout = None  # noqa
         self._question_label: QLabel = None  # noqa
-        self._help_button: QPushButton = None  # noqa
-        self._info_button: QPushButton = None  # noqa
         self._validate_button: QPushButton = None  # noqa
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._plot_widget_layout: QHBoxLayout = None  # noqa
@@ -47,6 +43,7 @@ class GraphInteractionValidationComponent(Component):
         self.setLayout(self._layout)
 
     def _setup_components(self):
+        super(GraphInteractionValidationComponent, self)._setup_components()
         self._question_label = self._get_question_label()
         self._validate_button = self._get_validate_button()
         self._plot_widget_layout = self._get_plot_widget_layout()
@@ -57,20 +54,6 @@ class GraphInteractionValidationComponent(Component):
     def _get_question_label(self) -> QLabel:
         return LabelFactory.get_label_component(text=self._step.question, label_type=TextType.SUBTITLE,
                                                 align=Qt.AlignHCenter)
-
-    def _get_help_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='question.png')
-        return ButtonFactory.get_button_component(
-            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
-            tooltip='Ayuda sobre el ejercicio'
-        )
-
-    def _get_info_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='lessons.png')
-        return ButtonFactory.get_button_component(
-            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
-            tooltip='Ayuda sobre el concepto'
-        )
 
     def _get_validate_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='check_exercise.png')
@@ -111,9 +94,6 @@ class GraphInteractionValidationComponent(Component):
     def _get_info_button_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
 
-        self._help_button = self._get_help_button()
-        self._info_button = self._get_info_button()
-
         layout.addWidget(self._info_button, alignment=Qt.AlignTop)
         layout.addWidget(self._help_button, alignment=Qt.AlignTop)
         layout.addStretch()
@@ -130,8 +110,11 @@ class GraphInteractionValidationComponent(Component):
 
     def _validate_exercise(self, expression_selected, is_resume: bool = False):
         is_answer_correct = self._is_exercise_correct(expression_selected=expression_selected)
+
         if not is_resume:
             self._update_resume(expression_selected=expression_selected, is_answer_correct=is_answer_correct)
+
+        self.resume_signal.emit(self._resume)
 
     @abstractmethod
     def _is_exercise_correct(self, expression_selected):
@@ -141,4 +124,3 @@ class GraphInteractionValidationComponent(Component):
         resume_state = ResumeState.success if is_answer_correct else ResumeState.error
         self._resume.resume_state = resume_state
         self._resume.response = expression_selected
-        self.resume_signal.emit(self._resume)

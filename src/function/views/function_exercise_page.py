@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QCom
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
 from src.function.data_mappers.function_exercise_data_mapper import FunctionExerciseDataMapper
+from src.function.models.enums import ResumeState
 from src.function.models.exercise_resume import ExerciseResume
 from src.function.models.function_exercise import FunctionExercise
 from src.function.models.function_step import FunctionStep
@@ -22,15 +23,16 @@ class FunctionExercisePage(Window):
     def __init__(self, topic: Topic):
         super(FunctionExercisePage, self).__init__(title=topic.title)
 
-        self._topic = topic
+        self._topic: Topic = topic
         self._exercises: List[FunctionExercise] = []  # noqa
-        self._steps_done = []
-        self._resume_by_exercise_id_step_id = {}
+        self._resume_by_exercise_id_step_id: dict = {}
 
         self._layout: QVBoxLayout = None  # noqa
         self._steps_done_widget: QComboBox = None  # noqa
-        self._header_layout = None
-        self._current_exercise_component = None
+        self._header_layout: QHBoxLayout = None  # noqa
+        self._current_exercise_component: FunctionExerciseComponent = None  # noqa
+        self._next_button: QPushButton = None  # noqa
+        self._back_button: QPushButton = None  # noqa
 
         self._get_exercise_data(topic_id=topic.id)
 
@@ -54,16 +56,16 @@ class FunctionExercisePage(Window):
     def _get_header_layout(self) -> QHBoxLayout:
         header_layout = QHBoxLayout()
 
-        back_button = self._get_back_button()
+        self._back_button = self._get_back_button()
         self._combobox_layout = self._get_combobox_layout()
-        next_button = self._get_next_button()
+        self._next_button = self._get_next_button()
 
         header_layout.addSpacing(50)
-        header_layout.addWidget(back_button)
+        header_layout.addWidget(self._back_button)
         header_layout.addStretch()
         header_layout.addLayout(self._combobox_layout)
         header_layout.addStretch()
-        header_layout.addWidget(next_button)
+        header_layout.addWidget(self._next_button)
         header_layout.addSpacing(50)
         return header_layout
 
@@ -71,22 +73,22 @@ class FunctionExercisePage(Window):
         icon = IconFactory.get_icon_widget(image_name='left-arrow.png')
         back_button = ButtonFactory.get_button_component(
             title='', function_to_connect=self._setup_previous_exercise, icon=icon, icon_size=35,
-            tooltip='Ejercicio anterior', secondary_button=True
+            tooltip='Ejercicio anterior', secondary_button=True, is_disable=True
         )
         return back_button
 
     def _setup_previous_exercise(self):
-        print(1)
+        self._current_exercise_component.setup_back_step_component()
 
     def _get_next_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
         next_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=self._setup_next_exercise2, icon=icon, icon_size=35,
-            tooltip='Siguiente ejercicio', secondary_button=True)
+            title='', function_to_connect=self._setup_next_step, icon=icon, icon_size=35,
+            tooltip='Siguiente ejercicio', secondary_button=True, is_disable=True)
         return next_button
 
-    def _setup_next_exercise2(self):
-        print(1)
+    def _setup_next_step(self):
+        self._current_exercise_component.setup_next_step_component()
 
     def _get_combobox_layout(self) -> QHBoxLayout:
         combobox_layout = QHBoxLayout()
@@ -106,10 +108,8 @@ class FunctionExercisePage(Window):
     def _setup_first_exercise_component(self):
         try:
             first_exercise = self._exercises[0]
-            need_help_data = True
             self._current_exercise_component = FunctionExerciseComponent(
-                exercise=first_exercise, need_help_data=need_help_data,
-                resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
+                exercise=first_exercise, resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
             )
 
             self._setup_signals(component=self._current_exercise_component)
@@ -199,12 +199,16 @@ class FunctionExercisePage(Window):
 
     def _setup_resume(self, resume: ExerciseResume):
         key = (resume.exercise_id, resume.step_type)
+
         if key not in self._resume_by_exercise_id_step_id:
             self._save_step_in_steps_done_widget(resume=resume)
+
         self._resume_by_exercise_id_step_id[key] = resume
         self._current_exercise_component.update_resume_dict(
             resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
         )
+
+        self._set_state_next_back_button(resume=resume)
 
     def _save_step_in_steps_done_widget(self, resume: ExerciseResume):
         current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)
@@ -215,3 +219,34 @@ class FunctionExercisePage(Window):
         self._steps_done_widget.adjustSize()
         self._steps_done_widget.setCurrentIndex(self._steps_done_widget.count() - 1)
         self._steps_done_widget.setDisabled(self._steps_done_widget.count() < 2)
+
+    def _set_state_next_back_button(self, resume: ExerciseResume):
+        current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)
+        self._set_state_next_button(resume=resume, current_exercise=current_exercise)
+        self._set_state_back_button(resume=resume, current_exercise=current_exercise)
+
+    def _set_state_next_button(self, resume: ExerciseResume, current_exercise: FunctionExercise):
+        if resume.resume_state == ResumeState.pending:
+            self._next_button.setDisabled(True)
+        else:
+            self._next_button.setDisabled(False)
+
+        is_last_exercise = self._exercises[-1] == current_exercise
+        is_last_step = self._exercises[-1].steps[-1].type == resume.step_type
+        is_last = is_last_exercise and is_last_step
+        if not is_last:
+            icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
+            self._next_button.setIcon(icon)
+        else:
+            icon = IconFactory.get_icon_widget(image_name='double-check.png')
+            self._next_button.setIcon(icon)
+
+    def _set_state_back_button(self, resume: ExerciseResume, current_exercise: FunctionExercise):
+        is_first_exercise = self._exercises[0] == current_exercise
+        is_first_step = self._exercises[0].steps[0].type == resume.step_type
+
+        is_first = is_first_exercise and is_first_step
+        if is_first:
+            self._back_button.setDisabled(True)
+        else:
+            self._back_button.setDisabled(False)

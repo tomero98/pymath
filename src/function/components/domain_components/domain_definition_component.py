@@ -12,10 +12,12 @@ from .graph_interaction_validation_component import GraphInteractionValidationCo
 from .range_selection_dialog import RangeSelectionDialog
 from ...factories import PlotFactory2
 from ...models import FunctionExercise, FunctionStep, ExerciseResume
+from ...models.enums import ResumeState
 
 
 class DomainDefinitionComponent(GraphInteractionValidationComponent):
     continue_signal = pyqtSignal(bool)
+
     label = 'Indicar el dominio de la función'
     _ORIENTATION = 'vertical'
     _BORDER_COLOR_BY_BORDER_TYPE = {'inf': 'transparent', 'included': 'blue', 'not_included': 'red'}
@@ -82,6 +84,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         return plot
 
     def _plot_clicked(self, event):
+        if self._resume.resume_state != ResumeState.pending:
+            return None
+
         pos = event[0].scenePos()
         if not self._range_selection_dialog and self._plot_widget.sceneBoundingRect().contains(pos):
             pos = self._plot_widget.getPlotItem().vb.mapSceneToView(pos)
@@ -195,8 +200,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         linear_region_item.lines[1].setPen(second_border_color)
         linear_region_item.lines[1].setHoverPen(hover_color)
 
-        self._range_selection_dialog.close()
-        self._range_selection_dialog = None
+        if self._range_selection_dialog:
+            self._range_selection_dialog.close()
+            self._range_selection_dialog = None
 
     def _update_domain_expression_edit_label(self):
         limits = []
@@ -279,6 +285,13 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _validate_exercise(self, expression_selected: str, is_resume: bool = False):
         super()._validate_exercise(expression_selected=expression_selected, is_resume=is_resume)
+
+        if is_resume:
+            self._setup_user_range(range_expression=expression_selected)
+
+        for region_item in self._linear_region_items:
+            region_item.setMovable(False)
+
         is_correct, user_wrong_domain_num_set, user_missed_domain_num_set = \
             self._exercise.validate_domain_expression(user_domain_input=expression_selected)
         if is_correct:
@@ -290,6 +303,11 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
                 user_missed_domain_num_set=user_missed_domain_num_set
             )
         self._setup_finished_exercise()
+
+    def _setup_user_range(self, range_expression: str):
+        range_expression_list = range_expression.split(' U ')
+        for expression in range_expression_list:
+            self._add_range_selection_dialog(range_added=expression)
 
     def _setup_correct_response(self):
         self._result_label.setText('Correcto.')

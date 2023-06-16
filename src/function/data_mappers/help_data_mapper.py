@@ -130,8 +130,53 @@ class HelpDataMapper:
         return HelpStep(order=0, functions=[function_one, function_two, function_three], text=text,
                         function_color='red')
 
-    def _get_indicate_range_help(self) -> HelpData:
-        return None
+    def _get_indicate_range_help(self):
+        first_help_data = self._get_first_help_data_range()
+        return [first_help_data]
+
+    def _get_first_help_data_range(self) -> HelpData:
+        function_one = Function(function_id=0, expression='(x)**2', x_values_range=(0, 2), is_main_graphic=True,
+                                domain='[0, 2)')
+        function_one.setup_data((-5, 5))
+        function_two = Function(function_id=0, expression='x + 0.5', x_values_range=(4, 5), is_main_graphic=True,
+                                domain='[4, +inf)')
+        function_two.setup_data((-5, 5))
+        help_step_one = self._get_first_help_step_range()
+        help_step_two = self._get_second_help_step_range()
+        return HelpData(order=0, title='Apuntes sobre el rango de una función',
+                        functions=[function_one, function_two], help_steps=[help_step_one, help_step_two],
+                        text='El rango de una función son todos los valores que toma y para la función. '
+                             'En este caso el rango de la función es "[0, 4) U [4.5, +inf)"')
+
+    def _get_first_help_step_range(self) -> HelpStep:
+        function_one = Function(function_id=0, expression='0', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)')
+        function_one.setup_data((-5, 5))
+
+        function_two = Function(function_id=0, expression='4.5', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)')
+        function_two.setup_data((-5, 5))
+
+        function_three = Function(function_id=0, expression='5', x_values_range=(-5, 5), is_main_graphic=False,
+                                  domain='(-inf, +inf)')
+        function_three.setup_data((-5, 5))
+
+        text = 'Para la función dada, los puntos siguientes sí están definidos en el rango porque las cotas son. '
+        return HelpStep(order=0, functions=[function_one, function_two, function_three], text=text,
+                        function_color='blue')
+
+    def _get_second_help_step_range(self) -> HelpStep:
+        function_one = Function(function_id=0, expression='4', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)')
+        function_one.setup_data((-5, 5))
+
+        function_two = Function(function_id=0, expression='4.25', x_values_range=(-5, 5), is_main_graphic=False,
+                                domain='(-inf, +inf)')
+        function_two.setup_data((-5, 5))
+
+        text = 'Para la función dada los puntos siguientes no están definidos en el rango porque las cotas son. '
+        return HelpStep(order=0, functions=[function_one, function_two], text=text,
+                        function_color='red')
 
         ########################################
 

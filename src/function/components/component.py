@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QPushButton
 
 from .help_data_components.help_data_dialog import HelpDataDialog
 from ..models.enums.resume_state import ResumeState
@@ -31,6 +31,9 @@ class Component(QWidget):
         self._show_main_function_limits = show_main_function_limits
         self._show_function_labels = show_function_labels
 
+        self._help_button: QPushButton = None  # noqa
+        self._info_button: QPushButton = None  # noqa
+
     def draw(self):
         self._setup_data()
         self._draw()
@@ -43,6 +46,10 @@ class Component(QWidget):
     @abstractmethod
     def _draw(self):
         pass
+
+    def _setup_components(self):
+        self._help_button = self._get_help_button()
+        self._info_button = self._get_info_button()
 
     @abstractmethod
     def _apply_resume(self):
@@ -58,6 +65,8 @@ class Component(QWidget):
         elif self._resume.resume_state != ResumeState.pending:
             self._apply_resume()
 
+        self.resume_signal.emit(self._resume)
+
     def _send_continue_signal(self):
         self.continue_signal.emit(self._step.type)
 
@@ -69,19 +78,20 @@ class Component(QWidget):
             resume_state=ResumeState.pending, show_help=False, exercise_id=self._exercise.id,
             step_type=self._step.type, graph_expression=self._get_function_to_draw().expression, response=None
         )
-        self.resume_signal.emit(self._resume)
 
-    def _get_help_button_layout(self) -> QVBoxLayout:
-        help_button_layout = QVBoxLayout()
-        icon = IconFactory.get_icon_widget(image_name='help_button.png')
-        self._help_button = ButtonFactory.get_button_component(title='', function_to_connect=self._setup_help_data,
-                                                               icon=icon, icon_size=45, tooltip='Ayuda')
-        help_button_text = LabelFactory.get_label_component(text='Ayuda', label_type=TextType.NORMAL_TEXT,
-                                                            size_policy=(QSizePolicy.Fixed, QSizePolicy.Fixed))
+    def _get_help_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='question.png')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
+            tooltip='Ayuda sobre el ejercicio'
+        )
 
-        help_button_layout.addWidget(self._help_button, alignment=Qt.AlignHCenter)
-        help_button_layout.addWidget(help_button_text, alignment=Qt.AlignHCenter)
-        return help_button_layout
+    def _get_info_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='lessons.png')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
+            tooltip='Ayuda sobre el concepto'
+        )
 
     def _setup_help_data(self):
         help_data_dialog = HelpDataDialog(

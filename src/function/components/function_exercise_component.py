@@ -2,6 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 
 from .domain_components import DomainDefinitionComponent
+from .domain_components.range_definition_component import RangeDefinitionComponent
 from .elementary_graph_components import ElementaryGraphComponent, ElementaryShiftGraphComponent
 from .inverse_components import InverseDelimitedComponent, InverseConceptComponent, InverseSelectionComponent
 from .maximum_minimum_components import MaximumMinimumComponent
@@ -22,7 +23,6 @@ class FunctionExerciseComponent(QWidget):
         self._current_step_component = None
         self._step_component_layout: QHBoxLayout = None
         self._title = None
-        self._help_button = None
         self._resume_by_exercise_id_step_id = resume_by_exercise_id_step_id
         self._start_step = start_step if start_step else self._exercise.steps[0]
         self._need_help_data = need_help_data
@@ -43,13 +43,13 @@ class FunctionExerciseComponent(QWidget):
 
     def _get_first_step_component(self, need_help_data: bool):
         try:
-            first_step_component = self._get_step_component(step=self._start_step, need_help_data=need_help_data)
+            first_step_component = self._get_step_component(step=self._start_step)
             return first_step_component
         except IndexError:
             print('No hay más ejercicios jeje 2')
             exit(0)
 
-    def _get_step_component(self, step: FunctionStep, need_help_data: bool = False):
+    def _get_step_component(self, step: FunctionStep):
         resume = self._get_step_resume(step=step)
 
         if step.type == StepType.inverse_concept_exercise:
@@ -62,8 +62,10 @@ class FunctionExerciseComponent(QWidget):
             component = InverseDelimitedComponent(exercise=self._exercise, step=step, resume=resume,
                                                   need_help_data=False)
 
-        elif step.type in [StepType.indicate_domain_exercise, StepType.indicate_range_exercise]:
+        elif step.type == StepType.indicate_domain_exercise:
             component = DomainDefinitionComponent(exercise=self._exercise, step=step, resume=resume)
+        elif step.type == StepType.indicate_range_exercise:
+            component = RangeDefinitionComponent(exercise=self._exercise, step=step, resume=resume)
 
         elif step.type == StepType.indicate_elementary_exercise:
             component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
@@ -71,7 +73,7 @@ class FunctionExerciseComponent(QWidget):
             component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume,
                                                       need_help_data=True)
         elif step.type == StepType.maximum_relative_exercise:
-            component = MaximumMinimumComponent(exercise=self._exercise, step=step)
+            component = MaximumMinimumComponent(exercise=self._exercise, step=step, resume=resume)
 
         self._setup_signals(component=component)
 
@@ -81,23 +83,19 @@ class FunctionExerciseComponent(QWidget):
         return self._resume_by_exercise_id_step_id.get((self._exercise.id, step.type))
 
     def _setup_signals(self, component):
-        component.continue_signal.connect(self._setup_next_step_component)
-        component.back_signal.connect(self._setup_back_step_component)
         component.resume_signal.connect(self._setup_resume)
 
-    def _setup_help_data(self):
-        self._current_step_component.setup_help_data()
-        self._help_button.setDisabled(True)
-
-    def _setup_next_step_component(self, step_type: StepType):
+    def setup_next_step_component(self):
         try:
+            step_type = self._current_step_component._step.type  # noqa
             current_step_order = next(step.order for step in self._exercise.steps if step.type == step_type)
             next_step = self._exercise.steps[current_step_order + 1]
             self._setup_step_component(next_step=next_step)
         except IndexError:
             self._send_continue_signal()
 
-    def _setup_back_step_component(self, step_type: StepType):
+    def setup_back_step_component(self):
+        step_type = self._current_step_component._step.type  # noqa
         current_step_order = next(step.order for step in self._exercise.steps if step.type == step_type)
         if current_step_order == 0:
             self._send_back_exercise_signal()

@@ -1,2 +1,1 @@
 from .domain_definition_component import DomainDefinitionComponent
-from .domain_indicate_component import DomainIndicateComponent

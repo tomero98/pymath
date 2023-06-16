@@ -24,8 +24,7 @@ class DatabaseManager:
         self._setup_exercise_data()
         self._setup_graph_data()
         self._setup_exercise_graph_data()
-        # self._setup_user_data()
-        # self._setup_exercise_resume()
+        self._setup_exercise_resume()
 
     def _setup_topic_data(self):
         self._create_topic_table()
@@ -217,39 +216,6 @@ class DatabaseManager:
             sql_query.addBindValue(exercise_graph['is_main_graphic'])
             sql_query.exec()
 
-    def _setup_user_data(self):
-        self._create_user_table()
-        self._populate_user_data()
-
-    @staticmethod
-    def _create_user_table():
-        sql_query = QSqlQuery()
-        sql_query.exec(
-            """
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-                nickname VARCHAR(64) NOT NULL
-                )
-            """
-        )
-
-    @staticmethod
-    def _populate_user_data():
-        user_seed = [
-            {'nickname': 'Anonymous'},  # 1
-        ]
-
-        sql_query = QSqlQuery()
-        sql_query.prepare(
-            """
-            INSERT INTO users (nickname) VALUES (?)
-            """
-        )
-
-        for user in user_seed:
-            sql_query.addBindValue(user['nickname'])
-            sql_query.exec()
-
     def _setup_exercise_resume(self):
         self._create_exercise_resume()
 
@@ -261,11 +227,9 @@ class DatabaseManager:
             CREATE TABLE exercise_resumes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 is_correct INT NOT NULL,
-                user_id INT NOT NULL,
                 step_type VARCHAR(64) NOT NULL,
                 exercise_id INT NOT NULL,
                 graph_id INT NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(id),
                 FOREIGN KEY (exercise_id) REFERENCES exercises(id),
                 FOREIGN KEY (graph_id) REFERENCES graphs(id)
                 )

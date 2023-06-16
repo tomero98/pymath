@@ -11,7 +11,7 @@ from src.projectConf.models.enums import TextType
 from .graph_interaction_validation_component import GraphInteractionValidationComponent
 from .range_selection_dialog import RangeSelectionDialog
 from ...factories import PlotFactory2
-from ...models import FunctionExercise, FunctionStep, ExerciseResume
+from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
 from ...models.enums import ResumeState
 
 
@@ -280,7 +280,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _get_correct_expression(self):
         return self._exercise.get_domain_expression()
 
-    def _get_function_to_draw(self):
+    def _get_function_to_draw(self) -> Function:
         return self._exercise.get_main_function()
 
     def _validate_exercise(self, expression_selected: str, is_resume: bool = False):

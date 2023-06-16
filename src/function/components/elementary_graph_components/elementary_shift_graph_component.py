@@ -54,7 +54,7 @@ class ElementaryShiftGraphComponent(OptionSelectionComponent):
 
     def _select_main_function_using_resume(self, functions: List[Function]):
         self._main_function = next(
-            function for function in functions if function.expression == self._resume.graph_expression
+            function for function in functions if function.function_id == self._resume.function_id
         )
         self._main_function.is_main_graphic = True
 

@@ -1,9 +1,11 @@
 import sys
+from copy import deepcopy
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QComboBox
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
+from src.function.data_mappers import ExerciseResumeDataMapper
 from src.function.data_mappers.function_exercise_data_mapper import FunctionExerciseDataMapper
 from src.function.models.enums import ResumeState
 from src.function.models.exercise_resume import ExerciseResume
@@ -26,6 +28,7 @@ class FunctionExercisePage(Window):
         self._topic: Topic = topic
         self._exercises: List[FunctionExercise] = []  # noqa
         self._resume_by_exercise_id_step_id: dict = {}
+        self._exercise_step_type_by_label: dict = {}
 
         self._layout: QVBoxLayout = None  # noqa
         self._steps_done_widget: QComboBox = None  # noqa
@@ -192,18 +195,22 @@ class FunctionExercisePage(Window):
     def _no_exit_dialog(self):
         self._exit_dialog_widget.close()
 
-    def _update_step_component(self, *args, **kwargs):
+    def _update_step_component(self):
         current_text_label = self._steps_done_widget.currentText()
-        # TODO: create a dict key (exercise_id, step) by label and update method set_step_component
-        # self._current_exercise_component.set_step_component_by_combobox(step_component)
+        exercise, step = self._exercise_step_type_by_label[current_text_label]
+        self._set_exercise_component(next_exercise=exercise, start_step=step)
 
     def _setup_resume(self, resume: ExerciseResume):
         key = (resume.exercise_id, resume.step_type)
 
         if key not in self._resume_by_exercise_id_step_id:
             self._save_step_in_steps_done_widget(resume=resume)
+        else:
+            previous_resume = self._resume_by_exercise_id_step_id[key]
+            if previous_resume.resume_state == ResumeState.pending and resume.resume_state != ResumeState.pending:
+                self._save_resume_in_db(resume=resume)
 
-        self._resume_by_exercise_id_step_id[key] = resume
+        self._resume_by_exercise_id_step_id[key] = deepcopy(resume)
         self._current_exercise_component.update_resume_dict(
             resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
         )
@@ -212,13 +219,18 @@ class FunctionExercisePage(Window):
 
     def _save_step_in_steps_done_widget(self, resume: ExerciseResume):
         current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)
-        step = self._current_exercise_component._current_step_component
+        step = self._current_exercise_component._current_step_component  # noqa
         step_label = f'Ejercicio {current_exercise.exercise_order + 1}: {step.label}'
+
+        self._exercise_step_type_by_label[step_label] = (current_exercise, step._step)  # noqa
 
         self._steps_done_widget.addItem(step_label)
         self._steps_done_widget.adjustSize()
         self._steps_done_widget.setCurrentIndex(self._steps_done_widget.count() - 1)
         self._steps_done_widget.setDisabled(self._steps_done_widget.count() < 2)
+
+    def _save_resume_in_db(self, resume: ExerciseResume):
+        ExerciseResumeDataMapper.save_resume_state(resume=resume)
 
     def _set_state_next_back_button(self, resume: ExerciseResume):
         current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)

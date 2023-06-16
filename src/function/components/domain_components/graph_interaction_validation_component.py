@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
 import pyqtgraph
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton
 
 from src.projectConf.factories import LabelFactory, ButtonFactory, IconFactory
 from src.projectConf.models.enums import TextType

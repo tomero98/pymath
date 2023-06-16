@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout
 
@@ -23,7 +25,7 @@ class FunctionExerciseComponent(QWidget):
         self._current_step_component = None
         self._step_component_layout: QHBoxLayout = None
         self._title = None
-        self._resume_by_exercise_id_step_id = resume_by_exercise_id_step_id
+        self._resume_by_exercise_id_step_id = deepcopy(resume_by_exercise_id_step_id)
         self._start_step = start_step if start_step else self._exercise.steps[0]
         self._need_help_data = need_help_data
 
@@ -123,4 +125,4 @@ class FunctionExerciseComponent(QWidget):
         self.resume_signal.emit(resume)
 
     def update_resume_dict(self, resume_by_exercise_id_step_id: dict):
-        self._resume_by_exercise_id_step_id = resume_by_exercise_id_step_id
+        self._resume_by_exercise_id_step_id = deepcopy(resume_by_exercise_id_step_id)

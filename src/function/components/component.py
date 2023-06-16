@@ -1,17 +1,17 @@
 from abc import abstractmethod
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QPushButton
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget, QPushButton
 
 from .help_data_components.help_data_dialog import HelpDataDialog
+from ..models import Function
 from ..models.enums.resume_state import ResumeState
 from ..models.enums.step_type import StepType
 from ..models.exercise_resume import ExerciseResume
 from ..models.function_exercise import FunctionExercise
 from ..models.function_step import FunctionStep
-from ...projectConf.factories import ButtonFactory, LabelFactory
+from ...projectConf.factories import ButtonFactory
 from ...projectConf.factories.icon_factory import IconFactory
-from ...projectConf.models.enums.text_type import TextType
 
 
 class Component(QWidget):
@@ -56,7 +56,7 @@ class Component(QWidget):
         pass
 
     @abstractmethod
-    def _get_function_to_draw(self):
+    def _get_function_to_draw(self) -> Function:
         pass
 
     def _setup_resume(self):
@@ -76,7 +76,7 @@ class Component(QWidget):
     def _initialize_resume(self):
         self._resume = ExerciseResume(
             resume_state=ResumeState.pending, show_help=False, exercise_id=self._exercise.id,
-            step_type=self._step.type, graph_expression=self._get_function_to_draw().expression, response=None
+            step_type=self._step.type, function_id=self._get_function_to_draw().function_id, response=None
         )
 
     def _get_help_button(self) -> QPushButton:

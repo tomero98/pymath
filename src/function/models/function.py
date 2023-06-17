@@ -21,13 +21,16 @@ class Function:
         self.is_invert_function = is_invert_function
 
     def setup_data(self, plot_range: Tuple[int, int]):
+        print(self.expression)
         self.x_values, self.y_values = self.get_points()
+        if self.is_invert_function:
+            self.x_values, self.y_values = self.y_values, self.x_values
+
+    def setup_domain_data(self, plot_range: Tuple[int, int]):
+        self.setup_data(plot_range=plot_range)
         self.domain = self.get_domain(domain=self.domain)
         self.horizontal_asymptotes = self.get_horizontal_asymptotes()
         self.real_range = self.get_range_expression(plot_range=plot_range)
-
-        if self.is_invert_function:
-            self.x_values, self.y_values = self.y_values, self.x_values
 
     @lru_cache(maxsize=2)
     def get_points(self) -> (List[int], List[int]):
@@ -216,4 +219,4 @@ class Function:
             .replace('math.tan', 'tan').replace('math.asin', 'asin')
 
     def get_sympy_expression(self) -> str:
-        return self.expression.replace('math.e', 'E')
+        return self.expression.replace('math.e', 'E').replace('math.tan', 'tan').replace('math.log', 'log')

@@ -101,29 +101,34 @@ class FunctionExerciseDataMapper:
         is_main_graphic = bool(query_result.value('is_main_graphic'))
         function = Function(function_id=function_id, expression=function_expression, x_values_range=x_values_range,
                             is_main_graphic=is_main_graphic, domain=domain)
-        function.setup_data(plot_range=exercise.plot_range)
+        if exercise.type == FunctionExerciseType.domain_concept_exercise.value:
+            function.setup_domain_data(plot_range=exercise.plot_range)
+        else:
+            function.setup_data(plot_range=exercise.plot_range)
         exercise.functions.append(function)
 
     @staticmethod
     def _setup_elementary_graph(main_exercise: FunctionExercise, topic: Topic) -> List[FunctionExercise]:
         setting = next(
             setting for setting in topic.exercise_settings
-            if setting.exercise_type== FunctionExerciseType.elementary_graph_exercise.value
+            if setting.exercise_type == FunctionExerciseType.elementary_graph_exercise.value
         )
 
-        list_functions = list(
-            itertools.combinations([function for function in main_exercise.functions], setting.exercise_num)
+        num_function_per_exercise = 4
+
+        function_combination_group = list(
+            itertools.combinations([function for function in main_exercise.functions], num_function_per_exercise)
         )
 
         exercises = []
         for i in range(setting.exercise_num):
-            index = random.randint(0, len(list_functions))
-            functions = list_functions[index]
+            index_function_combination_group = random.randint(0, len(function_combination_group))
+            functions = function_combination_group[index_function_combination_group]
             exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
                                         plot_range=main_exercise.plot_range, functions=[*functions],
                                         steps=main_exercise.steps, exercise_order=i)
             exercises.append(exercise)
-            index = random.randint(0, 3)
+            index = random.randint(0, num_function_per_exercise - 1)
             exercise.functions[index].is_main_graphic = True
         return exercises
 

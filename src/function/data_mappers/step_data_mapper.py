@@ -20,8 +20,6 @@ class StepDataMapper:
             steps = self._get_elementary_graph_exercise_steps()
         elif self._exercise.type == FunctionExerciseType.maximum_points_exercise.value:
             steps = self._get_maximum_points_exercise_steps()
-        elif self._exercise.type == FunctionExerciseType.minimum_points_exercise.value:
-            steps = self._get_minimum_points_exercise_steps()
         return steps
 
     def _get_inverse_graph_exercise_steps(self) -> List[FunctionStep]:

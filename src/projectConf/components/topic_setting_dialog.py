@@ -1,0 +1,170 @@
+from collections import defaultdict
+from copy import deepcopy
+from typing import List
+
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSlider, QCheckBox
+
+from ..data_mappers import TopicDataMapper
+from ..factories import ButtonFactory, LabelFactory, IconFactory
+from ..models import Topic, ExerciseSetting, StepSetting
+from ..models.enums import TextType
+
+
+class TopicSettingDialog(QWidget):
+    close_signal = pyqtSignal()
+
+    def __init__(self, topic: Topic):
+        super(TopicSettingDialog, self).__init__()
+
+        self._topic: Topic = topic
+        self._topic_edited: Topic = deepcopy(self._topic)
+        self._checkbox_step_list_by_exercise_id: defaultdict = defaultdict(list)
+        self._checkbox_exercise_list: List[QCheckBox] = []
+
+        self._save_label: QLabel = None  # noqa
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.close_signal.emit()
+
+    def draw(self):
+        self.setWindowTitle('Configuración del ejercicio')
+
+        layout = QVBoxLayout()
+
+        text_label = LabelFactory.get_label_component(
+            text=f'Configuración de "{self._topic.title}"', label_type=TextType.TITLE, align=Qt.AlignLeft,
+            set_visible=True
+        )
+        layout.addWidget(text_label, alignment=Qt.AlignLeft)
+
+        settings_layout = QVBoxLayout()
+        for exercise_setting in self._topic_edited.exercise_settings:
+            exercise_setting_layout = self._get_exercise_setting_layout(exercise_setting=exercise_setting)
+            settings_layout.addLayout(exercise_setting_layout)
+
+        layout.addLayout(settings_layout)
+
+        icon = IconFactory.get_icon_widget(image_name='save.png')
+        self._save_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=lambda: self._send_signal(save=True), icon=icon, icon_size=25,
+            tooltip='Guardar',
+            primary_button=True
+        )
+        layout.addWidget(self._save_button, alignment=Qt.AlignHCenter)
+
+        self._save_label = LabelFactory.get_label_component(
+            text=f'Guardado', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False
+        )
+        self._save_label.setStyleSheet('color: green;')
+        layout.addWidget(text_label, alignment=Qt.AlignHCenter)
+
+        self._setup_exercise_checkbox_layout()
+
+        self.setLayout(layout)
+        self.show()
+        self.setFixedSize(self.width(), self.height())
+
+    def _send_signal(self, save: bool = False):
+        if save:
+            self._topic = self._topic_edited
+            TopicDataMapper.save_topic_configuration(self._topic_edited)
+
+        self.close_signal.emit()
+
+    def _get_exercise_setting_layout(self, exercise_setting: ExerciseSetting) -> QVBoxLayout:
+        layout = QVBoxLayout()
+
+        text_label = LabelFactory.get_label_component(
+            text=f'Configuración de "{self._topic.title}"', label_type=TextType.TITLE, align=Qt.AlignLeft,
+            set_visible=True
+        )
+        layout.addWidget(text_label, alignment=Qt.AlignLeft)
+
+        slider = self._get_slider(exercise_setting=exercise_setting)
+        layout.addWidget(slider)
+
+        checkbox = self._get_exercise_checkbox(exercise_setting=exercise_setting)
+        self._checkbox_exercise_list.append(checkbox)
+        layout.addWidget(checkbox)
+
+        step_setting_layout = self._get_step_settings_layout(exercise_id=exercise_setting.id,
+                                                             exercise_setting=exercise_setting)
+        layout.addLayout(step_setting_layout)
+        return layout
+
+    def _get_slider(self, exercise_setting: ExerciseSetting) -> QSlider:
+        slider = QSlider(Qt.Horizontal)
+        slider.setValue(exercise_setting.exercise_num)
+        slider.setMinimum(1)
+        slider.setMaximum(exercise_setting.max_exercise_num)
+        slider.setSingleStep(1)
+        slider.valueChanged.connect(lambda value: self._on_slider_change(value, exercise_setting))
+        return slider
+
+    def _on_slider_change(self, value: int, exercise_setting: ExerciseSetting):
+        exercise_setting.exercise_num = value
+        self._save_label.setVisible(False)
+
+    def _get_exercise_checkbox(self, exercise_setting: ExerciseSetting) -> QCheckBox:
+        checkbox = self._get_checkbox(initial_value=exercise_setting.is_active, text=exercise_setting.description)
+        checkbox.clicked.connect(
+            lambda value: self._set_exercise_checkbox(value=value, exercise_setting=exercise_setting)
+        )
+        return checkbox
+
+    def _set_exercise_checkbox(self, value: int, exercise_setting: ExerciseSetting):
+        exercise_setting.is_active = value
+        if value:
+            for checkbox in self._checkbox_exercise_list:
+                checkbox.setDisabled(False)
+        else:
+            self._setup_exercise_checkbox_layout()
+
+        self._save_label.setVisible(False)
+
+    def _get_checkbox(self, initial_value: bool, text: str) -> QCheckBox:
+        checkbox = QCheckBox()
+        checkbox.setText(text)
+        checkbox.setTristate(False)
+        checkbox.setChecked(initial_value)
+        return checkbox
+
+    def _get_step_settings_layout(self, exercise_id: int, exercise_setting: ExerciseSetting) -> QVBoxLayout:
+        layout = QVBoxLayout()
+
+        text_label = LabelFactory.get_label_component(
+            text=f'Pasos', label_type=TextType.NORMAL_TEXT, align=Qt.AlignLeft,
+            set_visible=True
+        )
+        layout.addWidget(text_label, alignment=Qt.AlignLeft)
+
+        for step_setting in exercise_setting.step_settings:
+            checkbox = self._get_checkbox(initial_value=step_setting.is_active, text=step_setting.description)
+            checkbox.clicked.connect(
+                lambda value: self._set_step_setting_active(value=value, step_setting=step_setting,
+                                                            exercise_id=exercise_id)
+            )
+            layout.addWidget(checkbox)
+            self._checkbox_step_list_by_exercise_id[exercise_id].append(checkbox)
+        return layout
+
+    def _set_step_setting_active(self, value: bool, exercise_id: int, step_setting: StepSetting):
+        step_setting.is_active = value
+
+        checkbox_list = self._checkbox_step_list_by_exercise_id[exercise_id]
+        if value:
+            for checkbox in checkbox_list:
+                checkbox.setDisabled(False)
+        else:
+            checkbox_activated = [checkbox for checkbox in checkbox_list if checkbox.isChecked()]
+            if len(checkbox_activated) == 1:
+                checkbox_activated[0].setDisabled(True)
+
+        self._save_label.setVisible(False)
+
+    def _setup_exercise_checkbox_layout(self):
+        checkbox_activated = [checkbox for checkbox in self._checkbox_exercise_list if checkbox.isChecked()]
+        if len(checkbox_activated) == 1:
+            checkbox_activated[0].setDisabled(True)

@@ -25,6 +25,8 @@ class DatabaseManager:
         self._setup_graph_data()
         self._setup_exercise_graph_data()
         self._setup_exercise_resume()
+        self._setup_exercise_settings_data()
+        self._setup_step_settings_data()
 
     def _setup_topic_data(self):
         self._create_topic_table()
@@ -38,7 +40,8 @@ class DatabaseManager:
             CREATE TABLE topics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 title VARCHAR(64) NOT NULL,
-                description VARCHAR(128)
+                description VARCHAR(128), 
+                first_time INT
                 )
             """
         )
@@ -46,22 +49,26 @@ class DatabaseManager:
     @staticmethod
     def _populate_topic_data():
         topic_seed = [
-            {'title': 'Funciones inversas', 'description': 'Ejercicios sobre inversas'},  # 1
-            {'title': 'Dominio y recorrido', 'description': 'Ejercicios sobre dominio y recorrido'},  # 2
-            {'title': 'Gráficas elementales', 'description': 'Ejercicios para reconocer gráficas elementales'},  # 3
-            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para detectar máximos y mínimos'},  # 4
+            {'title': 'Funciones inversas', 'description': 'Ejercicios sobre inversas', 'first_time': 1},  # 1
+            {'title': 'Dominio y recorrido', 'description': 'Ejercicios sobre dominio y recorrido', 'first_time': 1},
+            # 2
+            {'title': 'Gráficas elementales', 'description': 'Ejercicios para reconocer gráficas elementales',
+             'first_time': 1},  # 3
+            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para detectar máximos y mínimos',
+             'first_time': 1},  # 4
         ]
 
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO topics (title, description) VALUES (?, ?)
+            INSERT INTO topics (title, description, first_time) VALUES (?, ?, ?)
             """
         )
 
         for topic in topic_seed:
             sql_query.addBindValue(topic['title'])
             sql_query.addBindValue(topic['description'])
+            sql_query.addBindValue(topic['first_time'])
             sql_query.exec()
 
     def _setup_exercise_data(self):
@@ -236,3 +243,188 @@ class DatabaseManager:
                 )
             """
         )
+
+    def _setup_exercise_settings_data(self):
+        self._create_exercise_settings_table()
+        self._populate_exercise_settings_data()
+
+    @staticmethod
+    def _create_exercise_settings_table():
+        sql_query = QSqlQuery()
+        sql_query.exec(
+            """
+            CREATE TABLE exercise_settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+                exercise_type VARCHAR(64) NOT NULL,
+                description VARCHAR(128), 
+                exercise_num INT NOT NULL,
+                is_active INT NOT NULL,
+                topic_id INT NOT NULL,
+                FOREIGN KEY (topic_id) REFERENCES topics(id)
+                )
+            """
+        )
+
+    @staticmethod
+    def _populate_exercise_settings_data():
+        exercise_settings_seed = [
+            {
+                'exercise_type': 'InverseGraphExercise',
+                'description': 'Estudio de la función inversa.',
+                'exercise_num': 5,
+                'is_active': 1,
+                'topic_id': 1,
+            },
+            {
+                'exercise_type': 'ConceptDomainExercise',
+                'description': 'Estudio del dominio y recorrido de la función.',
+                'exercise_num': 5,
+                'is_active': 1,
+                'topic_id': 2,
+            },
+            {
+                'exercise_type': 'ElementaryGraphExercise',
+                'description': 'Estudio de las gráficas elementales.',
+                'exercise_num': 5,
+                'is_active': 1,
+                'topic_id': 3,
+            },
+            {
+                'exercise_type': 'MaximumPointsExercise',
+                'description': 'Estudio de puntos máximos en la función.',
+                'exercise_num': 5,
+                'is_active': 1,
+                'topic_id': 4,
+            },
+            {
+                'exercise_type': 'MinimumPointsExercise',
+                'description': 'Estudio de puntos mínimos en la función',
+                'exercise_num': 5,
+                'is_active': 1,
+                'topic_id': 4,
+            },
+        ]
+
+        sql_query = QSqlQuery()
+        sql_query.prepare(
+            """
+            INSERT INTO exercise_settings (exercise_type, description, exercise_num, is_active, topic_id) VALUES (?, ?, ?, ?, ?)
+            """
+        )
+
+        for topic in exercise_settings_seed:
+            sql_query.addBindValue(topic['exercise_type'])
+            sql_query.addBindValue(topic['description'])
+            sql_query.addBindValue(topic['exercise_num'])
+            sql_query.addBindValue(topic['is_active'])
+            sql_query.addBindValue(topic['topic_id'])
+            sql_query.exec()
+
+
+    def _setup_step_settings_data(self):
+        self._create_step_settings_table()
+        self._populate_step_settings_data()
+
+    @staticmethod
+    def _create_step_settings_table():
+        sql_query = QSqlQuery()
+        sql_query.exec(
+            """
+            CREATE TABLE step_settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+                step_type VARCHAR(64) NOT NULL,
+                description VARCHAR(128), 
+                is_active INT NOT NULL,
+                exercise_setting_id INT NOT NULL,
+                FOREIGN KEY (exercise_setting_id) REFERENCES exercise_settings(id)
+                )
+            """
+        )
+
+    @staticmethod
+    def _populate_step_settings_data():
+        step_settings_seed = [
+            {
+                'step_type': 'ConceptInverseExercise',
+                'description': 'Indicar si la siguiente función tiene inversa.',
+                'is_active': 1,
+                'exercise_setting_id': 1,
+            },
+            {
+                'step_type': 'SelectionInverseExercise',
+                'description': 'Seleccionar la función inversa.',
+                'is_active': 1,
+                'exercise_setting_id': 1,
+            },
+            {
+                'step_type': 'DelimitedInverseExercise',
+                'description': 'Definir el dominio de la función para la cual hay inversa.',
+                'is_active': 1,
+                'exercise_setting_id': 1,
+            },
+
+            {
+                'step_type': 'IndicateDomainExercise',
+                'description': 'Indicar el dominio de la función.',
+                'is_active': 1,
+                'exercise_setting_id': 2,
+            },
+            {
+                'step_type': 'IndicateRangeExercise',
+                'description': 'Indicar el recorrido de la función.',
+                'is_active': 1,
+                'exercise_setting_id': 2,
+            },
+
+            {
+                'step_type': 'IndicateElementaryExercise',
+                'description': 'Seleccionar la función elemental correcta.',
+                'is_active': 1,
+                'exercise_setting_id': 3,
+            },
+            {
+                'step_type': 'IndicateElementaryShiftExercise',
+                'description': 'Seleccionar el desplazamiento correcto.',
+                'is_active': 1,
+                'exercise_setting_id': 3,
+            },
+
+            {
+                'step_type': 'MaximumRelativeExercise',
+                'description': 'Seleccionar máximos relativos.',
+                'is_active': 1,
+                'exercise_setting_id': 4,
+            },
+            {
+                'step_type': 'MaximumAbsoluteExercise',
+                'description': 'Seleccionar máximos absolutos.',
+                'is_active': 1,
+                'exercise_setting_id': 4,
+            },
+            {
+                'step_type': 'MinimumRelativeExercise',
+                'description': 'Seleccionar mínimos relativos.',
+                'is_active': 1,
+                'exercise_setting_id': 5,
+            },
+            {
+                'step_type': 'MinimumAbsoluteExercise',
+                'description': 'Seleccionar mínimos absolutos.',
+                'is_active': 1,
+                'exercise_setting_id': 5,
+            },
+        ]
+
+        sql_query = QSqlQuery()
+        sql_query.prepare(
+            """
+            INSERT INTO step_settings (step_type, description, is_active, exercise_setting_id) VALUES (?, ?, ?, ?)
+            """
+        )
+
+        for step_setting in step_settings_seed:
+            sql_query.addBindValue(step_setting['step_type'])
+            sql_query.addBindValue(step_setting['description'])
+            sql_query.addBindValue(step_setting['is_active'])
+            sql_query.addBindValue(step_setting['exercise_setting_id'])
+            sql_query.exec()

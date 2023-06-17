@@ -5,6 +5,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayout, QFrame, QGraphicsDropShadowEffect
 
 from ..components import Window
+from ..components.topic_setting_dialog import TopicSettingDialog
 from ..data_mappers import TopicDataMapper
 from ..factories import ButtonFactory, LabelFactory
 from ..factories.icon_factory import IconFactory
@@ -22,6 +23,8 @@ class TopicPage(Window):
         super(TopicPage, self).__init__(title=self._title)
 
         self._topics: List[Topic] = TopicDataMapper.get_topics()
+        self._setting_buttons: List[QPushButton] = []
+        self._topic_setting_dialog: TopicSettingDialog = None  # noqa
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()
@@ -59,6 +62,7 @@ class TopicPage(Window):
             title='', function_to_connect=lambda val=topic: self._show_settings(topic=val), icon=icon,
             icon_size=45, tooltip=f'Configuración del ejercicio', secondary_button=True
         )
+        self._setting_buttons.append(setting_button)
 
         description_layout = QVBoxLayout()
         title = LabelFactory.get_label_component(text=topic.title, label_type=TextType.SUBTITLE)
@@ -101,7 +105,21 @@ class TopicPage(Window):
         self.continue_signal.emit(topic)
 
     def _show_settings(self, topic: Topic):
-        print(1)
+        if not self._topic_setting_dialog:
+            self._topic_setting_dialog = TopicSettingDialog(topic=topic)
+            self._topic_setting_dialog.close_signal.connect(self._set_topic_setting_dialog_close)
+            self._topic_setting_dialog.draw()
+
+            for button in self._setting_buttons:
+                button.setDisabled(True)
+
+    def _set_topic_setting_dialog_close(self):
+        if self._topic_setting_dialog:
+            self._topic_setting_dialog.close()
+            self._topic_setting_dialog = None
+
+        for button in self._setting_buttons:
+            button.setDisabled(False)
 
     @staticmethod
     def _setup_layout(layout: QVBoxLayout, title_label: QLabel, topic_buttons_layout: List[QPushButton]):

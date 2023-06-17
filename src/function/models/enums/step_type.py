@@ -8,8 +8,6 @@ class StepType(Enum):
 
     indicate_domain_exercise = 'IndicateDomainExercise'
     indicate_range_exercise = 'IndicateRangeExercise'
-    indicate_bounded_range_exercise = 'IndicateBoundedRangeExercise'
-    indicate_roots_exercise = 'IndicateRootsExercise'
 
     indicate_elementary_exercise = 'IndicateElementaryExercise'
     indicate_elementary_shift_exercise = 'IndicateElementaryShiftExercise'

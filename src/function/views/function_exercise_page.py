@@ -37,11 +37,10 @@ class FunctionExercisePage(Window):
         self._next_button: QPushButton = None  # noqa
         self._back_button: QPushButton = None  # noqa
 
-        self._get_exercise_data(topic_id=topic.id)
+        self._get_exercise_data()
 
-    def _get_exercise_data(self, topic_id: int):
-        # TODO CUSTOM NUM EXERCISES
-        self._exercises = FunctionExerciseDataMapper.get_function_exercise(topic_id=topic_id)
+    def _get_exercise_data(self):
+        self._exercises = FunctionExerciseDataMapper.get_function_exercise(topic=self._topic)
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()

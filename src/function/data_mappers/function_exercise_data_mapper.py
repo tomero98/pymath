@@ -1,3 +1,4 @@
+import itertools
 import random
 from typing import List
 
@@ -6,13 +7,15 @@ from PyQt5.QtSql import QSqlQuery
 from .step_data_mapper import StepDataMapper
 from ..models import Function, FunctionExercise
 from ..models.enums import FunctionExerciseType
+from ...projectConf.models import Topic
 
 
 class FunctionExerciseDataMapper:
     @classmethod
-    def get_function_exercise(cls, topic_id: int) -> List[FunctionExercise]:
+    def get_function_exercise(cls, topic: Topic) -> List[FunctionExercise]:
         # TODO CODE IMPROVE: mover a una clase el acceso a bd
-        query = cls._get_function_exercise_query(topic_id=topic_id)
+        exercise_ids = cls._get_exercise_ids(topic=topic)
+        query = cls._get_function_exercise_query(exercise_ids=exercise_ids)
         result = QSqlQuery()
         result.exec(query)
 
@@ -29,14 +32,37 @@ class FunctionExerciseDataMapper:
 
         exercises = list(exercises_by_id.values())
         if exercises[0].type == FunctionExerciseType.elementary_graph_exercise.value:
-            exercises = cls._setup_elementary_graph(main_exercise=exercises[0])
+            exercises = cls._setup_elementary_graph(main_exercise=exercises[0], topic=topic)
 
-        cls._setup_steps(exercises=exercises)
+        cls._setup_steps(exercises=exercises, topic=topic)
         return exercises
 
+    @classmethod
+    def _get_exercise_ids(cls, topic: Topic) -> List[int]:
+        exercise_ids = []
+        where_clause = f'WHERE topic_id = {topic.id}'
+
+        for exercise_setting in topic.exercise_settings:
+            result = QSqlQuery()
+
+            if exercise_setting.is_active:
+                where_clause = f"{where_clause} AND exercise_type = '{exercise_setting.exercise_type}'"
+                query = f"""
+                    SELECT id
+                    FROM exercises
+                    {where_clause}
+                    ORDER BY RANDOM()
+                    LIMIT {exercise_setting.max_exercise_num}
+                """
+                result.exec(query)
+
+                while result.next():
+                    exercise_ids.append(result.value('id'))
+
+        return exercise_ids
+
     @staticmethod
-    def _get_function_exercise_query(topic_id: int):
-        # TODO CUSTOM NUM EXERCISES
+    def _get_function_exercise_query(exercise_ids: List[int]):
         return f'''
             SELECT exercises.id                    AS exercise_id,
                    exercises.exercise_type         AS exercise_type,
@@ -48,7 +74,7 @@ class FunctionExerciseDataMapper:
             FROM exercises
             INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
             INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id
-            WHERE exercises.topic_id == {topic_id}
+            WHERE exercises.id IN ({' '.join(list(map(str, exercise_ids)))})
             ORDER BY RANDOM()
         '''
 
@@ -79,12 +105,18 @@ class FunctionExerciseDataMapper:
         exercise.functions.append(function)
 
     @staticmethod
-    def _setup_elementary_graph(main_exercise: FunctionExercise) -> List[FunctionExercise]:
-        # TODO CUSTOM NUM EXERCISES
-        import itertools
-        list_functions = list(itertools.combinations([function for function in main_exercise.functions], 4))
+    def _setup_elementary_graph(main_exercise: FunctionExercise, topic: Topic) -> List[FunctionExercise]:
+        setting = next(
+            setting for setting in topic.exercise_settings
+            if setting.exercise_type== FunctionExerciseType.elementary_graph_exercise.value
+        )
+
+        list_functions = list(
+            itertools.combinations([function for function in main_exercise.functions], setting.exercise_num)
+        )
+
         exercises = []
-        for i in range(4):
+        for i in range(setting.exercise_num):
             index = random.randint(0, len(list_functions))
             functions = list_functions[index]
             exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
@@ -96,8 +128,11 @@ class FunctionExerciseDataMapper:
         return exercises
 
     @staticmethod
-    def _setup_steps(exercises: List[FunctionExercise]) -> None:
+    def _setup_steps(exercises: List[FunctionExercise], topic: Topic) -> None:
+        exercise_setting_by_exercise_type = {
+            setting.exercise_type: setting for setting in topic.exercise_settings
+        }
         for exercise in exercises:
-            step_mapper = StepDataMapper(exercise=exercise)
-            steps = step_mapper.get_steps()
-            exercise.steps = steps
+            setting = exercise_setting_by_exercise_type[exercise.type]
+            step_mapper = StepDataMapper(exercise=exercise, exercise_setting=setting)
+            step_mapper.get_steps()

@@ -10,6 +10,7 @@ from ..data_mappers import TopicDataMapper
 from ..factories import ButtonFactory, LabelFactory, IconFactory
 from ..models import Topic, ExerciseSetting, StepSetting
 from ..models.enums import TextType
+from ...function.models.enums import FunctionExerciseType
 
 
 class TopicSettingDialog(QWidget):
@@ -68,6 +69,15 @@ class TopicSettingDialog(QWidget):
 
     def _send_signal(self, save: bool = False):
         if save:
+            for exercise_setting, exercise_setting_edited in zip(self._topic.exercise_settings,
+                                                                 self._topic_edited.exercise_settings):
+                exercise_setting.exercise_num = exercise_setting_edited.exercise_num
+                exercise_setting.is_active = exercise_setting_edited.is_active
+
+                for step_setting, step_setting_edited in zip(exercise_setting.step_settings,
+                                                             exercise_setting_edited.step_settings):
+                    step_setting.is_active = step_setting_edited.is_active
+
             self._topic = self._topic_edited
             TopicDataMapper.save_topic_configuration(self._topic_edited)
 
@@ -98,7 +108,11 @@ class TopicSettingDialog(QWidget):
         slider = QSlider(Qt.Horizontal)
         slider.setValue(exercise_setting.exercise_num)
         slider.setMinimum(1)
-        slider.setMaximum(exercise_setting.max_exercise_num)
+        max_num = 20 if exercise_setting.exercise_type == FunctionExerciseType.elementary_graph_exercise.value \
+            else exercise_setting.max_exercise_num
+        slider.setMaximum(max_num)
+        slider.setTickInterval(1)
+        slider.setTickPosition(QSlider.TicksBothSides)
         slider.setSingleStep(1)
         slider.valueChanged.connect(lambda value: self._on_slider_change(value, exercise_setting))
         return slider
@@ -135,16 +149,15 @@ class TopicSettingDialog(QWidget):
         layout = QVBoxLayout()
 
         text_label = LabelFactory.get_label_component(
-            text=f'Pasos', label_type=TextType.NORMAL_TEXT, align=Qt.AlignLeft,
-            set_visible=True
+            text=f'Pasos', label_type=TextType.NORMAL_TEXT, align=Qt.AlignLeft, set_visible=True
         )
         layout.addWidget(text_label, alignment=Qt.AlignLeft)
 
         for step_setting in exercise_setting.step_settings:
             checkbox = self._get_checkbox(initial_value=step_setting.is_active, text=step_setting.description)
             checkbox.clicked.connect(
-                lambda value: self._set_step_setting_active(value=value, step_setting=step_setting,
-                                                            exercise_id=exercise_id)
+                lambda value, step=step_setting: self._set_step_setting_active(value=value, step_setting=step,
+                                                                               exercise_id=exercise_id)
             )
             layout.addWidget(checkbox)
             self._checkbox_step_list_by_exercise_id[exercise_id].append(checkbox)

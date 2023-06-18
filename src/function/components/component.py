@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QPushButton
 
 from .help_data_components.help_data_dialog import HelpDataDialog
+from .video_component import VideoDialog
 from ..models import Function
 from ..models.enums.resume_state import ResumeState
 from ..models.enums.step_type import StepType
@@ -33,6 +34,8 @@ class Component(QWidget):
 
         self._help_button: QPushButton = None  # noqa
         self._info_button: QPushButton = None  # noqa
+
+        self._video_dialog: VideoDialog = None  # noqa
 
     def draw(self):
         self._setup_data()
@@ -84,9 +87,23 @@ class Component(QWidget):
     def _get_help_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='question.png')
         return ButtonFactory.get_button_component(
-            title='', function_to_connect=self._setup_help_data, secondary_button=True, icon=icon, icon_size=45,
+            title='', function_to_connect=self._setup_question_data, secondary_button=True, icon=icon, icon_size=45,
             tooltip='Ayuda sobre el ejercicio'
         )
+
+    def _setup_question_data(self):
+        if not self._video_dialog:
+            self._video_dialog = VideoDialog(step_info_data=self._step.step_info_data)
+            self._video_dialog.close_signal.connect(self._set_video_dialog_close)
+            self._video_dialog.draw()
+            self._help_button.setDisabled(True)
+
+    def _set_video_dialog_close(self):
+        if self._video_dialog:
+            self._video_dialog.close()
+            self._video_dialog = None
+        if self._help_button:
+            self._help_button.setDisabled(False)
 
     def _get_info_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='lessons.png')

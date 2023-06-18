@@ -223,6 +223,7 @@ class FunctionExercisePage(Window):
             resume_by_exercise_id_step_id=self._resume_by_exercise_id_step_id
         )
 
+        self._setup_save_widget_status(resume=resume)
         self._set_state_next_back_button(resume=resume)
 
     def _save_step_in_steps_done_widget(self, resume: ExerciseResume):
@@ -239,6 +240,17 @@ class FunctionExercisePage(Window):
 
     def _save_resume_in_db(self, resume: ExerciseResume):
         ExerciseResumeDataMapper.save_resume_state(resume=resume)
+
+    def _setup_save_widget_status(self, resume: ExerciseResume):
+        current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)
+        step = self._current_exercise_component._current_step_component  # noqa
+        step_label = f'Ejercicio {current_exercise.exercise_order + 1}: {step.label}'
+        for index in range(self._steps_done_widget.count()):
+            text = self._steps_done_widget.itemText(index)
+            if text == step_label:
+                self._steps_done_widget.setCurrentIndex(index)
+                break
+
 
     def _set_state_next_back_button(self, resume: ExerciseResume):
         current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)

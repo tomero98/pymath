@@ -2,6 +2,7 @@ import itertools
 import random
 from typing import List
 
+from copy import deepcopy
 from PyQt5.QtSql import QSqlQuery
 
 from .step_data_mapper import StepDataMapper
@@ -125,8 +126,8 @@ class FunctionExerciseDataMapper:
             index_function_combination_group = random.randint(0, len(function_combination_group) - 1)
             functions = function_combination_group[index_function_combination_group]
             exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
-                                        plot_range=main_exercise.plot_range, functions=[*functions],
-                                        steps=main_exercise.steps, exercise_order=i)
+                                        plot_range=main_exercise.plot_range, functions=deepcopy(functions),
+                                        steps=[], exercise_order=i)
             exercises.append(exercise)
             index = random.randint(0, num_function_per_exercise - 1)
             exercise.functions[index].is_main_graphic = True

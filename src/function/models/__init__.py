@@ -5,3 +5,4 @@ from .function_step import FunctionStep
 from .help_data import HelpData
 from .help_step import HelpStep
 from .point import Point
+from .step_info_data import StepInfoData

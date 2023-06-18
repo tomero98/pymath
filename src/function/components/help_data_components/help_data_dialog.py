@@ -1,7 +1,7 @@
 from typing import List
 
 import pyqtgraph
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 
 from src.function.factories.plot_factory2 import PlotFactory2
@@ -34,8 +34,8 @@ class HelpDataDialog(QWidget):
         help_layout = QVBoxLayout()
         help_layout.setContentsMargins(20, 5, 20, 20)
 
-        buttons_layout = self._get_buttons_layout()
-        help_layout.addLayout(buttons_layout)
+        buttons_widget = self._get_buttons_widget()
+        help_layout.addWidget(buttons_widget, alignment=Qt.AlignHCenter)
 
         self._plot_widget = PlotFactory2.get_plot(function_range=self._PLOT_RANGE)
         PlotFactory2.set_functions(graph=self._plot_widget, functions=self._help_data_list[0].functions,
@@ -59,7 +59,16 @@ class HelpDataDialog(QWidget):
         self._current_help_data = self._help_data_list[0]
         self._current_step = None
 
-    def _get_buttons_layout(self):
+    def _get_buttons_widget(self) -> QWidget:
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+        widget.setStyleSheet("""
+            #topic-container {
+                border: 4px solid #897B6D;
+                border-radius: 20px;
+                background: #F5EBE0;
+            }
+        """)
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(50, 5, 50, 0)
 
@@ -81,10 +90,16 @@ class HelpDataDialog(QWidget):
             tooltip='Volver atrás', is_disable=True, secondary_button=True
         )
 
-        buttons_layout.addWidget(self._back_button)
-        buttons_layout.addWidget(self._title_label)
-        buttons_layout.addWidget(self._continue_button)
-        return buttons_layout
+        buttons_layout.addSpacing(50)
+        buttons_layout.addWidget(self._back_button, alignment=Qt.AlignLeft)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(self._title_label, alignment=Qt.AlignVCenter)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(self._continue_button, alignment=Qt.AlignRight)
+        buttons_layout.addSpacing(50)
+        widget.setLayout(buttons_layout)
+        widget.setMinimumSize(QSize(widget.minimumSizeHint().width() * 1.2, widget.minimumSizeHint().height() * 1.4))
+        return widget
 
     def _execute_back(self):
         if not self._current_step:

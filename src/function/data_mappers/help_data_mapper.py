@@ -42,18 +42,20 @@ class HelpDataMapper:
     def _get_first_help_data_elementary_shift(self) -> HelpData:
         first_step = self._get_first_step_elementary_shift()
         second_step = self._get_second_step_elementary_shift()
-        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 3), is_main_graphic=True)
+        function = Function(function_id=0, expression='(x)**2', x_values_range=(-4, 4), is_main_graphic=True)
         function.setup_data(plot_range=(-5, 5))
         return HelpData(order=0, functions=[function], help_steps=[first_step, second_step],
                         title='Apuntes sobre desplazamientos en funciones', text='Super cool text')
 
     def _get_first_step_elementary_shift(self) -> HelpStep:
-        function = Function(function_id=0, expression='(x + 1)**2', x_values_range=(-3, 3), is_main_graphic=False)
+        function = Function(function_id=0, expression='(x + 1)**2', x_values_range=(-4, 4), is_main_graphic=False)
+        function.setup_data(plot_range=(-5, 5))
         return HelpStep(order=0, functions=[function], text='El desplazamiento hacía la izquierda',
                         function_color='blue')
 
     def _get_second_step_elementary_shift(self) -> HelpStep:
-        function = Function(function_id=0, expression='(x - 1)**2', x_values_range=(-3, 3), is_main_graphic=False)
+        function = Function(function_id=0, expression='(x - 1)**2', x_values_range=(-4, 4), is_main_graphic=False)
+        function.setup_data(plot_range=(-5, 5))
         return HelpStep(order=1, functions=[function], text='El desplazamiento hacía la derecha',
                         function_color='purple')
 
@@ -61,15 +63,18 @@ class HelpDataMapper:
         first_step = self._get_third_step_elementary_shift()
         second_step = self._get_fourth_step_elementary_shift()
         function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 3), is_main_graphic=True)
+        function.setup_data(plot_range=(-5, 5))
         return HelpData(order=1, functions=[function], help_steps=[first_step, second_step],
                         title='Apuntes sobre desplazamientos en funciones', text='Super cool text x2')
 
     def _get_third_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x)**2 + 1', x_values_range=(-3, 3), is_main_graphic=False)
+        function.setup_data(plot_range=(-5, 5))
         return HelpStep(order=0, functions=[function], text='El desplazamiento hacía arriba', function_color='blue')
 
     def _get_fourth_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x)**2 - 1', x_values_range=(-3, 3), is_main_graphic=False)
+        function.setup_data(plot_range=(-5, 5))
         return HelpStep(order=1, functions=[function], text='El desplazamiento hacía abajo', function_color='purple')
 
     def _get_inverse_concept_help(self):

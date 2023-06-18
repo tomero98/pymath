@@ -119,6 +119,7 @@ class VideoDialog(QWidget):
                                                     align=Qt.AlignLeft)
             layout.addWidget(text, alignment=Qt.AlignLeft)
         widget.setLayout(layout)
+        widget.setObjectName('topic-container')
         widget.setStyleSheet("""
             #topic-container {
                 border: 4px solid #897B6D;
@@ -126,6 +127,5 @@ class VideoDialog(QWidget):
                 background: #F5EBE0;
             }
         """)
-        widget.setObjectName('topic-container')
         widget.setMinimumSize(700, widget.minimumSizeHint().height() * 1.2)
         return widget

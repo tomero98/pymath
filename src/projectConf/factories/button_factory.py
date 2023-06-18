@@ -36,14 +36,15 @@ class ButtonFactory:
             button.setObjectName('secondary')
             button.setStyleSheet("""
             #secondary {
-                background-color: #CBC5F8;
-                border: 1px solid #4831FF; 
+                background-color: #F5D8B8;
+                border: 2px solid #A57A51; 
                 border-radius: 10px;
                 padding: 3px;
+                font-size: 20px;
             }
             
             #secondary:hover {
-                border: 3px solid #4831FF; 
+                border: 3px solid #A57A51; 
             }
             """)
             effect = QGraphicsDropShadowEffect()
@@ -55,15 +56,15 @@ class ButtonFactory:
             button.setObjectName('primary')
             button.setStyleSheet("""
             #primary {
-                background-color: #DEC0F1;
-                border: 1px solid #957FEF; 
+                background-color: #F5D8B8;
+                border: 2px solid #A57A51; 
                 border-radius: 10px;
                 padding: 3px;
                 font-size: 20px;
             }
             
             #primary:hover {
-                border: 3px solid #957FEF; 
+                border: 3px solid #A57A51; 
             }
             """)
             effect = QGraphicsDropShadowEffect()

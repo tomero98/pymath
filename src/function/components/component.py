@@ -50,6 +50,8 @@ class Component(QWidget):
     def _setup_components(self):
         self._help_button = self._get_help_button()
         self._info_button = self._get_info_button()
+        if not self._need_help_data:
+            self._info_button.setVisible(False)
 
     @abstractmethod
     def _apply_resume(self):

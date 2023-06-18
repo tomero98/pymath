@@ -29,7 +29,8 @@ class StepDataMapper:
                 step = self._get_indicate_range_exercise_step()
             elif step_setting.step_type == StepType.indicate_elementary_exercise.value:
                 step = self._get_indicate_elementary_exercise_step()
-            elif step_setting.step_type == StepType.indicate_elementary_shift_exercise.value:
+            elif step_setting.step_type == StepType.indicate_elementary_shift_exercise.value \
+                    and not self._exercise.get_main_function().expression == 'math.tan(x)':
                 step = self._get_indicate_elementary_shift_exercise_step()
             elif step_setting.step_type == StepType.maximum_relative_exercise.value:
                 step = self._get_maximum_relative_exercise_step()

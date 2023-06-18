@@ -29,27 +29,27 @@ class ElementaryShiftGraphComponent(ElementaryGraphComponent):
         main_function_expression = main_function.expression
 
         expression = f'{main_function_expression} - 1'
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+        function = Function(function_id=1, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
         function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression = f'{main_function_expression} + 1'
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+        function = Function(function_id=2, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
         function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x - 1' if '(x)' in main_function_expression else '(x - 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+        function = Function(function_id=3, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
         function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x + 1' if '(x)' in main_function_expression else '(x + 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+        function = Function(function_id=4, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
         function.setup_data(plot_range=(-5, 5))
         functions.append(function)

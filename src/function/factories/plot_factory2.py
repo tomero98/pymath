@@ -13,7 +13,9 @@ class PlotFactory2:
     def get_plot(cls, parent=None, show_grid: bool = True,
                  function_range: Tuple[int, int] = (5, 5)) -> pyqtgraph.PlotWidget:
         graph = pyqtgraph.PlotWidget() if not parent else pyqtgraph.PlotWidget(parent)
-        graph.setFixedSize(700, 700)
+        graph.setFixedSize(650, 650)
+        graph.setMenuEnabled(False)
+        graph.customContextMenuRequested.connect(lambda: None)
         graph.setMouseEnabled(x=False, y=False)
         graph.showGrid(x=show_grid, y=show_grid)
         graph.getAxis('left').setTextPen('yellow')

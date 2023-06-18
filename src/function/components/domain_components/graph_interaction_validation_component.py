@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
 import pyqtgraph
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
 
 from src.projectConf.factories import LabelFactory, ButtonFactory, IconFactory
 from src.projectConf.models.enums import TextType
@@ -29,6 +29,7 @@ class GraphInteractionValidationComponent(Component):
         self._info_button_layout: QVBoxLayout = None  # noqa
         self._button_layout: QVBoxLayout = None  # noqa
         self._result_label: QLabel = None  # noqa
+        self._plot_widget_container: QWidget = None  # noqa
 
     def _setup_data(self):
         """ If component need to set up anything before _draw() """
@@ -77,7 +78,7 @@ class GraphInteractionValidationComponent(Component):
     def _setup_components(self):
         super(GraphInteractionValidationComponent, self)._setup_components()
         self._question_label = self._get_question_label()
-        self._plot_widget_layout = self._get_plot_widget_layout()
+        self._plot_widget_container = self._get_plot_widget_container()
         self._result_label = self._get_result_label()
 
     def _get_question_label(self) -> QLabel:
@@ -89,7 +90,10 @@ class GraphInteractionValidationComponent(Component):
             text='', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False, set_bold=True
         )
 
-    def _get_plot_widget_layout(self) -> QHBoxLayout:
+    def _get_plot_widget_container(self) -> QWidget:
+        window = QWidget()
+        window.setObjectName('container')
+
         layout = QHBoxLayout()
 
         self._plot_widget = self._get_plot_widget()
@@ -98,7 +102,11 @@ class GraphInteractionValidationComponent(Component):
         layout.addStretch()
         layout.addWidget(self._plot_widget, alignment=Qt.AlignTop | Qt.AlignHCenter)
         layout.addLayout(self._button_layout)
-        return layout
+
+        window.setLayout(layout)
+        window.setMinimumSize(QSize(window.minimumSizeHint().width() * 1.1, window.minimumSizeHint().height()))
+        window.setMaximumSize(QSize(window.minimumSizeHint().width() * 1.1, window.minimumSizeHint().height()))
+        return window
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)

@@ -1,8 +1,8 @@
 from typing import List
 
-from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QSize
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayout, QFrame, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayout, QGraphicsDropShadowEffect
 
 from ..components import Window
 from ..components.topic_setting_dialog import TopicSettingDialog
@@ -10,7 +10,6 @@ from ..data_mappers import TopicDataMapper
 from ..factories import ButtonFactory, LabelFactory
 from ..factories.icon_factory import IconFactory
 from ..models import Topic
-from ..models.enums import ColorType
 from ..models.enums.text_type import TextType
 
 
@@ -84,13 +83,13 @@ class TopicPage(Window):
         widget.setCursor(QCursor(Qt.PointingHandCursor))
         widget.setStyleSheet("""
             #topic-container {
-                border: 2px solid #957FEF;
+                border: 4px solid #897B6D;
                 border-radius: 20px;
-                background: #DEC0F1;
+                background: #F5EBE0;
             }
             
             #topic-container::hover {
-                border: 5px solid #957FEF;
+                border: 5px solid #897B6D;
             }
         """)
         effect = QGraphicsDropShadowEffect()
@@ -124,7 +123,7 @@ class TopicPage(Window):
     @staticmethod
     def _setup_layout(layout: QVBoxLayout, title_label: QLabel, topic_buttons_layout: List[QPushButton]):
         layout.addSpacing(20)
-        layout.addWidget(title_label)
+        layout.addWidget(title_label, alignment=Qt.AlignHCenter)
         layout.addSpacing(20)
         for topic_button_layout in topic_buttons_layout:
             layout.addWidget(topic_button_layout, alignment=Qt.AlignHCenter)

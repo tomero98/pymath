@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
 from src.projectConf.factories import ButtonFactory
 from ..domain_components.graph_interaction_validation_component import GraphInteractionValidationComponent
@@ -20,6 +20,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
 
         self._graph_buttons: List[QPushButton] = []  # noqa
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
+        self._bottom_buttons_widget: QWidget = None  # noqa
 
     def _setup_data(self):
         """ If component need to set up anything before _draw() """
@@ -27,9 +28,9 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
 
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
-        self._layout.addLayout(self._plot_widget_layout)
+        self._layout.addWidget(self._plot_widget_container, alignment=Qt.AlignHCenter)
         self._layout.addSpacing(20)
-        self._layout.addLayout(self._bottom_buttons_layout)
+        self._layout.addWidget(self._bottom_buttons_widget, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._result_label, alignment=Qt.AlignHCenter)
 
     def _is_exercise_correct(self, expression_selected) -> bool:
@@ -50,8 +51,8 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         pressed_button = self._graph_buttons[self._button_selected_index]
         pressed_button.setStyleSheet("""
             #primary {
-                background-color: #DEC0F1;
-                border: 1px solid #957FEF; 
+                background-color: #F5EBE0;
+                border: 1px solid #A57A51; 
                 border-radius: 10px;
                 padding: 3px;
                 font-size: 20px;
@@ -59,7 +60,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
             }
             
             #primary:hover {
-                border: 3px solid #957FEF; 
+                border: 3px solid #A57A51; 
             }
             """
                                      )
@@ -75,8 +76,8 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         pressed_button = self._graph_buttons[self._button_selected_index]
         pressed_button.setStyleSheet("""
             #primary {
-                background-color: #DEC0F1;
-                border: 1px solid #957FEF; 
+                background-color: #F5EBE0;
+                border: 1px solid #A57A51; 
                 border-radius: 10px;
                 padding: 3px;
                 font-size: 20px;
@@ -84,7 +85,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
             }
 
             #primary:hover {
-                border: 3px solid #957FEF; 
+                border: 3px solid #A57A51; 
             }
             """
                                      )
@@ -94,8 +95,8 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         )
         correct_button.setStyleSheet("""
             #primary {
-                background-color: #DEC0F1;
-                border: 1px solid #957FEF; 
+                background-color: #F5EBE0;
+                border: 1px solid #A57A51; 
                 border-radius: 10px;
                 padding: 3px;
                 font-size: 20px;
@@ -103,7 +104,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
             }
             
             #primary:hover {
-                border: 3px solid #957FEF; 
+                border: 3px solid #A57A51; 
             }
             """
                                      )
@@ -121,7 +122,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
 
     def _setup_components(self):
         super(ElementaryGraphComponent, self)._setup_components()
-        self._bottom_buttons_layout = self._get_function_expression_buttons_layout()
+        self._bottom_buttons_widget = self._get_function_expression_buttons_widget()
         self._result_label.setText('')
         self._result_label.setVisible(True)
 
@@ -134,20 +135,27 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         )
         super(ElementaryGraphComponent, self)._apply_resume()
 
-    def _get_function_expression_buttons_layout(self) -> QHBoxLayout:
+    def _get_function_expression_buttons_widget(self) -> QWidget:
+        window = QWidget()
+        window.setObjectName('container')
+
         layout = QHBoxLayout()
         layout.addStretch()
         options = self._get_options_to_display()
         for index, option in enumerate(options):
             graph_button = self._get_graph_button(index=index, option=option)
             layout.addWidget(graph_button)
+            graph_button.adjustSize()
             self._graph_buttons.append(graph_button)
             layout.addStretch()
-        return layout
+        window.setLayout(layout)
+        window.setMinimumSize(QSize(window.minimumSizeHint().width() * 2, window.minimumSizeHint().height() * 1.3))
+        window.setMaximumSize(QSize(window.minimumSizeHint().width() * 2, window.minimumSizeHint().height() * 1.3))
+        return window
 
     def _get_graph_button(self, index: int, option: str) -> QPushButton:
         return ButtonFactory.get_button_component(
-            title=option, minimum_width=90, minimum_height=90, text_size=40, primary_button=True,
+            title=option, minimum_width=120, minimum_height=45, text_size=40, primary_button=True,
             function_to_connect=lambda val=index: self._execute_validation(button_index=index),
         )
 

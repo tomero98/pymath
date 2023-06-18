@@ -13,7 +13,27 @@ class Window(QMainWindow):
         self.setFixedSize(1200, 1000)
         self.setWindowTitle(title)
         self.setObjectName('application')
-        self.setStyleSheet('QWidget#application {background-color: #FBF4FF;}')
+        self.setStyleSheet("""
+        QWidget#application {
+            background-color: #EDEDE9;
+        }
+        
+        #container {
+            border: 4px solid #897B6D;
+            border-radius: 20px;
+            background: #F5EBE0;
+        }
+        
+        #topic-container {
+            border: 4px solid #897B6D;
+            border-radius: 20px;
+            background: #F5EBE0;
+        }
+            
+        #topic-container::hover {
+            border: 5px solid #897B6D;
+        }
+        """)
         self.center()
 
     def _exit_app(self):

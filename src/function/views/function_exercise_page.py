@@ -1,8 +1,8 @@
 import sys
 from copy import deepcopy
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QComboBox
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QComboBox, QGraphicsDropShadowEffect
 
 from src.function.components.function_exercise_component import FunctionExerciseComponent
 from src.function.data_mappers import ExerciseResumeDataMapper
@@ -36,7 +36,7 @@ class FunctionExercisePage(Window):
         self._current_exercise_component: FunctionExerciseComponent = None  # noqa
         self._next_button: QPushButton = None  # noqa
         self._back_button: QPushButton = None  # noqa
-
+        self._header_widget: QWidget = None  # noqa
         self._get_exercise_data()
 
     def _get_exercise_data(self):
@@ -46,7 +46,7 @@ class FunctionExercisePage(Window):
         main_window = QWidget()
         self._layout = QVBoxLayout()
 
-        self._header_layout = self._get_header_layout()
+        self._header_widget = self._get_header_layout()
 
         self._setup_first_exercise_component()
         self._set_layout()
@@ -55,7 +55,8 @@ class FunctionExercisePage(Window):
         self.setCentralWidget(main_window)
         self.show()
 
-    def _get_header_layout(self) -> QHBoxLayout:
+    def _get_header_layout(self) -> QWidget:
+        header = QWidget()
         header_layout = QHBoxLayout()
 
         self._back_button = self._get_back_button()
@@ -69,7 +70,16 @@ class FunctionExercisePage(Window):
         header_layout.addStretch()
         header_layout.addWidget(self._next_button)
         header_layout.addSpacing(50)
-        return header_layout
+        header.setLayout(header_layout)
+        header.setObjectName('container')
+        effect = QGraphicsDropShadowEffect()
+        effect.setOffset(0, 0)
+        effect.setBlurRadius(15)
+        header.setGraphicsEffect(effect)
+        header.setFixedSize(550, 100)
+        header.setMinimumSize(QSize(header.minimumSizeHint().width() * 2.2, header.minimumSizeHint().height()*1.2))
+        header.setMaximumSize(QSize(header.minimumSizeHint().width() * 2.2, header.minimumSizeHint().height()*1.2))
+        return header
 
     def _get_back_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='left-arrow.png')
@@ -95,7 +105,7 @@ class FunctionExercisePage(Window):
     def _get_combobox_layout(self) -> QHBoxLayout:
         combobox_layout = QHBoxLayout()
         self._steps_done_widget = QComboBox()
-        self._steps_done_widget.setStyleSheet('background-color: #CBC5F8;')
+        self._steps_done_widget.setStyleSheet('background-color: #ECDAC6;')
         self._steps_done_widget.setDisabled(True)
         combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.SUBTITLE)
         combobox_layout.addStretch()
@@ -126,11 +136,10 @@ class FunctionExercisePage(Window):
         component.resume_signal.connect(self._setup_resume)
 
     def _set_layout(self):
-        self._layout.setContentsMargins(10, 35, 10, 0)
+        self._layout.setContentsMargins(0, 10, 0, 0)
         self._layout.setSpacing(0)
         self._layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self._layout.addLayout(self._header_layout)
-        self._layout.addSpacing(10)
+        self._layout.addWidget(self._header_widget, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._current_exercise_component)
 
     def keyPressEvent(self, e):

@@ -1,3 +1,4 @@
+import math
 from typing import List, Tuple
 
 import pyqtgraph
@@ -90,14 +91,27 @@ class PlotFactory2:
 
     @classmethod
     def set_labels(cls, graph: pyqtgraph.PlotWidget, functions: list) -> None:
+        points_added = set()
         for function, color in functions:
             font = QFont()
             font.setPixelSize(25)
-            x_value, y_value = function.get_label_point()
+            points = function.get_label_point()
+            point = (points[0][0], points[0][1])
+            for p in points:
+                can_use_point = False
+                for p1 in points_added:
+                    result = abs(p1[0] - p[0]) + abs(p1[1] - p[1]) > 0.5
+                    if result:
+                        can_use_point = True
+                if can_use_point or not points_added:
+                    point = p
+                    points_added.add(point)
+                    break
+            points_added.add(point)
             label = TextItem(anchor=(0.5, 0.5))
             text = function.get_math_expression()
             label.setText(text=text)
-            label.setPos(x_value - 0.2, y_value + 0.4)
+            label.setPos(point[0], point[1])
             label.setFont(font)
             label.setColor(color)
             graph.addItem(label)

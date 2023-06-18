@@ -59,6 +59,7 @@ class ButtonFactory:
                 border: 1px solid #957FEF; 
                 border-radius: 10px;
                 padding: 3px;
+                font-size: 20px;
             }
             
             #primary:hover {

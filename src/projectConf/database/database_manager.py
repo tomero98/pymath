@@ -142,7 +142,7 @@ class DatabaseManager:
             {'expression': '(x)**2'},  # 3
             {'expression': '(x)**(1/2)'},  # 4
             {'expression': 'math.e**x'},  # 5
-            {'expression': 'math.log(x)'},  # 6
+            {'expression': 'x'},  # 6
             {'expression': 'math.cos(x)'},  # 7
             {'expression': 'math.sin(x)'},  # 8
             {'expression': 'math.tan(x)'},  # 9
@@ -190,11 +190,11 @@ class DatabaseManager:
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
             # Elementary exercise
-            {'exercise_id': 1, 'graph_id': 1, 'domain': None, 'is_main_graphic': 0},  # 1
-            {'exercise_id': 1, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 2
-            {'exercise_id': 1, 'graph_id': 3, 'domain': None, 'is_main_graphic': 0},  # 3
-            {'exercise_id': 1, 'graph_id': 4, 'domain': None, 'is_main_graphic': 0},  # 4
-            {'exercise_id': 1, 'graph_id': 5, 'domain': None, 'is_main_graphic': 0},  # 5
+            # {'exercise_id': 1, 'graph_id': 1, 'domain': None, 'is_main_graphic': 0},  # 1
+            # {'exercise_id': 1, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 2
+            # {'exercise_id': 1, 'graph_id': 3, 'domain': None, 'is_main_graphic': 0},  # 3
+            # {'exercise_id': 1, 'graph_id': 4, 'domain': None, 'is_main_graphic': 0},  # 4
+            # {'exercise_id': 1, 'graph_id': 5, 'domain': None, 'is_main_graphic': 0},  # 5
             {'exercise_id': 1, 'graph_id': 6, 'domain': None, 'is_main_graphic': 0},  # 6
             {'exercise_id': 1, 'graph_id': 7, 'domain': None, 'is_main_graphic': 0},  # 7
             {'exercise_id': 1, 'graph_id': 8, 'domain': None, 'is_main_graphic': 0},  # 8

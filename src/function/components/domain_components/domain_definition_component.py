@@ -40,11 +40,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
+        self._validate_button = self._get_validate_button()
         self._validate_button.setDisabled(True)
         self._domain_expression_edit_layout = self._get_domain_expression_edit_layout()
-        self._result_label = LabelFactory.get_label_component(
-            text='', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False, set_bold=True
-        )
 
     def _get_domain_expression_edit_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
@@ -277,9 +275,6 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _on_click_validation_button(self):
         self._validate_exercise(expression_selected=self._domain_expression_edit_label.text())
 
-    def _get_correct_expression(self):
-        return self._exercise.get_domain_expression()
-
     def _get_function_to_draw(self) -> Function:
         return self._exercise.get_main_function()
 
@@ -348,15 +343,14 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
                 graph=self._plot_widget, x_values=point_list[0], y_values=point_list[1], color=color, function_width=1.5
             )
 
-    def _setup_finished_exercise(self):
-        self._help_button.setDisabled(True)
-        self._validate_button.setDisabled(True)
-        self._create_range_button.setDisabled(True)
-        self._delete_range_button.setDisabled(True)
-
     def _is_exercise_correct(self, expression_selected: str) -> bool:
         is_correct, _, _ = self._exercise.validate_domain_expression(user_domain_input=expression_selected)
         return is_correct
 
     def _on_function_to_draw_click(self, plot_curve_item_selected, point_selected):
         return None
+
+    def _setup_finished_exercise(self):
+        self._validate_button.setDisabled(True)
+        self._create_range_button.setDisabled(True)
+        self._delete_range_button.setDisabled(True)

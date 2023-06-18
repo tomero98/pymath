@@ -70,7 +70,8 @@ class FunctionExerciseComponent(QWidget):
             component = RangeDefinitionComponent(exercise=self._exercise, step=step, resume=resume)
 
         elif step.type == StepType.indicate_elementary_exercise:
-            component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume)
+            component = ElementaryGraphComponent(exercise=self._exercise, step=step, resume=resume,
+                                                 need_help_data=False)
         elif step.type == StepType.indicate_elementary_shift_exercise:
             component = ElementaryShiftGraphComponent(exercise=self._exercise, step=step, resume=resume,
                                                       need_help_data=True)

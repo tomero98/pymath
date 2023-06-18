@@ -28,13 +28,44 @@ class GraphInteractionValidationComponent(Component):
         self._plot_widget_layout: QHBoxLayout = None  # noqa
         self._info_button_layout: QVBoxLayout = None  # noqa
         self._button_layout: QVBoxLayout = None  # noqa
-
-    @abstractmethod
-    def _get_correct_expression(self):
-        pass
+        self._result_label: QLabel = None  # noqa
 
     def _setup_data(self):
+        """ If component need to set up anything before _draw() """
         pass
+
+    @abstractmethod
+    def _setup_layout(self):
+        """ Setup main window layout """
+        pass
+
+    @abstractmethod
+    def _is_exercise_correct(self, expression_selected) -> bool:
+        """ Return if exercise is correct """
+        pass
+
+    @abstractmethod
+    def _on_click_validation_button(self):
+        """ Method called when user clicks validation button """
+        pass
+
+    @abstractmethod
+    def _on_function_to_draw_click(self, plot_curve_item_selected, point_selected):
+        """" Function called if user clicks main graphic function"""
+        pass
+
+    @abstractmethod
+    def _setup_correct_response(self, *args, **kwargs):
+        """ Function called to set up a correct response state"""
+        pass
+
+    @abstractmethod
+    def _setup_wrong_response(self, *args, **kwargs):
+        """ Function called to set up a wrong response state"""
+        pass
+
+    def _setup_finished_exercise(self, *args, **kwargs):
+        self._help_button.setDisabled(True)
 
     def _draw(self):
         self._layout = QVBoxLayout()
@@ -42,29 +73,21 @@ class GraphInteractionValidationComponent(Component):
         self._setup_layout()
         self.setLayout(self._layout)
 
+    @abstractmethod
     def _setup_components(self):
         super(GraphInteractionValidationComponent, self)._setup_components()
         self._question_label = self._get_question_label()
-        self._validate_button = self._get_validate_button()
         self._plot_widget_layout = self._get_plot_widget_layout()
-
-    def _setup_layout(self):
-        pass
+        self._result_label = self._get_result_label()
 
     def _get_question_label(self) -> QLabel:
         return LabelFactory.get_label_component(text=self._step.question, label_type=TextType.SUBTITLE,
                                                 align=Qt.AlignHCenter)
 
-    def _get_validate_button(self) -> QPushButton:
-        icon = IconFactory.get_icon_widget(image_name='check_exercise.png')
-        return ButtonFactory.get_button_component(
-            title='', function_to_connect=self._on_click_validation_button, primary_button=True, icon=icon,
-            icon_size=45, tooltip='Comprobar ejercicio'
+    def _get_result_label(self) -> QLabel:
+        return LabelFactory.get_label_component(
+            text='', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False, set_bold=True
         )
-
-    @abstractmethod
-    def _on_click_validation_button(self):
-        pass
 
     def _get_plot_widget_layout(self) -> QHBoxLayout:
         layout = QHBoxLayout()
@@ -100,9 +123,12 @@ class GraphInteractionValidationComponent(Component):
 
         return layout
 
-    @abstractmethod
-    def _on_function_to_draw_click(self, plot_curve_item_selected, point_selected):
-        pass
+    def _get_validate_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='check_exercise.png')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._on_click_validation_button, primary_button=True, icon=icon,
+            icon_size=45, tooltip='Comprobar ejercicio'
+        )
 
     def _apply_resume(self):
         expression_selected = self._resume.response
@@ -115,10 +141,6 @@ class GraphInteractionValidationComponent(Component):
             self._update_resume(expression_selected=expression_selected, is_answer_correct=is_answer_correct)
 
         self.resume_signal.emit(self._resume)
-
-    @abstractmethod
-    def _is_exercise_correct(self, expression_selected):
-        pass
 
     def _update_resume(self, expression_selected: str, is_answer_correct: bool):
         resume_state = ResumeState.success if is_answer_correct else ResumeState.error

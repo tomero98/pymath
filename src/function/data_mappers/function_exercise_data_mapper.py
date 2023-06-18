@@ -122,7 +122,7 @@ class FunctionExerciseDataMapper:
 
         exercises = []
         for i in range(setting.exercise_num):
-            index_function_combination_group = random.randint(0, len(function_combination_group))
+            index_function_combination_group = random.randint(0, len(function_combination_group) - 1)
             functions = function_combination_group[index_function_combination_group]
             exercise = FunctionExercise(identifier=i, exercise_type=main_exercise.type, title=main_exercise.title,
                                         plot_range=main_exercise.plot_range, functions=[*functions],

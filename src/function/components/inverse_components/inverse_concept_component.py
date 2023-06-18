@@ -1,8 +1,8 @@
-from ..option_selection_component import OptionSelectionComponent
+from ..graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...models import ExerciseResume, FunctionExercise, FunctionStep
 
 
-class InverseConceptComponent(OptionSelectionComponent):
+class InverseConceptComponent(GraphInteractionValidationComponent):
     label = 'Indicar si existe inversa: '
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):

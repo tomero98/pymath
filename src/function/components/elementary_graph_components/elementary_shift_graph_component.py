@@ -1,19 +1,24 @@
 import random
 from typing import List
 
-from ..option_selection_component import OptionSelectionComponent
+import pyqtgraph
+
+from .elementary_graph_component import ElementaryGraphComponent
+from ...factories import PlotFactory2
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
 from ...models.enums import ResumeState
 
 
-class ElementaryShiftGraphComponent(OptionSelectionComponent):
+class ElementaryShiftGraphComponent(ElementaryGraphComponent):
     label = 'Seleccionar el desplazamiento.'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):
         self._main_function = None
 
+        self._functions: List[Function] = []
+
         super(ElementaryShiftGraphComponent, self).__init__(exercise=exercise, step=step, resume=resume,
-                                                            need_help_data=need_help_data, show_function_labels=True)
+                                                            need_help_data=need_help_data)
 
     def _setup_data(self):
         self._setup_functions()
@@ -24,21 +29,29 @@ class ElementaryShiftGraphComponent(OptionSelectionComponent):
         main_function_expression = main_function.expression
 
         expression = f'{main_function_expression} - 1'
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False)
+        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+                            x_values_range=(-5, 5))
+        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression = f'{main_function_expression} + 1'
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False)
+        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+                            x_values_range=(-5, 5))
+        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x - 1' if '(x)' in main_function_expression else '(x - 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False)
+        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+                            x_values_range=(-5, 5))
+        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x + 1' if '(x)' in main_function_expression else '(x + 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
-        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False)
+        function = Function(function_id=0, expression=expression, domain=main_function.domain, is_main_graphic=False,
+                            x_values_range=(-5, 5))
+        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         if not self._resume or self._resume.resume_state == ResumeState.pending:
@@ -57,6 +70,12 @@ class ElementaryShiftGraphComponent(OptionSelectionComponent):
             function for function in functions if function.function_id == self._resume.function_id
         )
         self._main_function.is_main_graphic = True
+
+    def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
+        plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
+        PlotFactory2.set_functions(graph=plot_widget, functions=[self._main_function], function_width=5, color='white',
+                                   show_limits=self._show_main_function_limits)
+        return plot_widget
 
     def _get_options_to_display(self):
         return [function.get_math_expression() for function in self._functions]

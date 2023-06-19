@@ -12,7 +12,4 @@ class StepType(Enum):
     indicate_elementary_exercise = 'IndicateElementaryExercise'
     indicate_elementary_shift_exercise = 'IndicateElementaryShiftExercise'
 
-    maximum_relative_exercise = 'MaximumRelativeExercise'
-    maximum_absolute_exercise = 'MaximumAbsoluteExercise'
-    minimum_relative_exercise = 'MinimumRelativeExercise'
-    minimum_absolute_exercise = 'MinimumAbsoluteExercise'
+    maximum_minimum_exercise = 'MaximumMinimumExercise'

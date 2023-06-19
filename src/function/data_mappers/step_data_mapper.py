@@ -35,14 +35,8 @@ class StepDataMapper:
             elif step_setting.step_type == StepType.indicate_elementary_shift_exercise.value \
                     and not self._exercise.get_main_function().expression == 'math.tan(x)':
                 step = self._get_indicate_elementary_shift_exercise_step()
-            elif step_setting.step_type == StepType.maximum_relative_exercise.value:
-                step = self._get_maximum_relative_exercise_step()
-            elif step_setting.step_type == StepType.maximum_absolute_exercise.value:
-                step = self._get_maximum_absolute_exercise_step()
-            elif step_setting.step_type == StepType.minimum_relative_exercise.value:
-                step = self._get_minimum_relative_exercise_step()
-            elif step_setting.step_type == StepType.minimum_absolute_exercise.value:
-                step = self._get_minimum_absolute_exercise_step()
+            elif step_setting.step_type == StepType.maximum_minimum_exercise.value:
+                step = self._get_maximum_minimum_exercise_step()
 
             if step:
                 self._exercise.steps.append(step)
@@ -109,37 +103,10 @@ class StepDataMapper:
         return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list,
                             step_info_data=step_info_data)
 
-    def _get_maximum_relative_exercise_step(self):
-        step_type = StepType.maximum_relative_exercise
-        question = 'Con ayuda del ratón, encuentra los máximos relativos de la función representada:'
-        order = 1
-        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
-        step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list,
-                            step_info_data=step_info_data)
-
-    def _get_maximum_absolute_exercise_step(self):
-        step_type = StepType.maximum_absolute_exercise
-        question = 'Con ayuda del ratón, encuentra los máximos absolutos de la función representada:'
-        order = 1
-        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
-        step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list,
-                            step_info_data=step_info_data)
-
-    def _get_minimum_relative_exercise_step(self):
-        step_type = StepType.minimum_relative_exercise
-        question = 'Con ayuda del ratón, encuentra los mínimos relativos de la función representada:'
-        order = 1
-        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
-        step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list,
-                            step_info_data=step_info_data)
-
-    def _get_minimum_absolute_exercise_step(self):
-        step_type = StepType.minimum_absolute_exercise
-        question = 'Con ayuda del ratón, encuentra los mínimos absolutos de la función representada:'
-        order = 1
+    def _get_maximum_minimum_exercise_step(self):
+        step_type = StepType.maximum_minimum_exercise
+        question = 'Con ayuda del ratón, encuentra los máximos y mínimos relativos y absolutos:'
+        order = 0
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=help_data_list,

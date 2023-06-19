@@ -2,23 +2,25 @@ from collections import defaultdict
 from typing import Union
 
 import pyqtgraph
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt, QSize
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
+from src.projectConf.factories import LabelFactory
+from src.projectConf.models.enums import TextType
 from .point_selection_dialog import PointSelectionDialog
-from ..graph_interaction_validation_component import GraphInteractionValidationComponent
+from ..inverse_components import InverseSelectionComponent
 from ...factories import PlotFactory2
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Point
 
 
-class MaximumMinimumComponent(GraphInteractionValidationComponent):
+class MaximumMinimumComponent(InverseSelectionComponent):
     continue_signal = pyqtSignal(bool)
     label = 'Seleccionar máximos y mínimos'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False):
         super(MaximumMinimumComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, need_validate_button=True,
-            add_interaction_to_main_graph=True
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_main_function_limits=True
         )
         self._point_info_by_point_type = {
             'máximo absoluto': (255, 0, 0), 'máximo relativo': (200, 0, 0), 'mínimo absoluto': (0, 0, 255),
@@ -28,6 +30,17 @@ class MaximumMinimumComponent(GraphInteractionValidationComponent):
         self._point_selection_dialog: PointSelectionDialog = None  # noqa
         self._answers_by_point_type: defaultdict = defaultdict(list)
         self._proxy = None
+        self._coordinates_label: QLabel = None  # noqa
+
+    def _setup_layout(self):
+        self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
+        self._layout.addSpacing(10)
+        self._layout.addWidget(self._plot_widget_container, alignment=Qt.AlignTop | Qt.AlignHCenter)
+        self._layout.addWidget(self._coordinates_label, alignment=Qt.AlignHCenter)
+        self._layout.addSpacing(20)
+        self._layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
+        self._layout.addWidget(self._result_label, alignment=Qt.AlignHCenter)
+        self._layout.addStretch()
 
     def _on_click_validation_button(self):
         self._validate_exercise(expression_selected=self._answers_by_point_type)
@@ -50,9 +63,33 @@ class MaximumMinimumComponent(GraphInteractionValidationComponent):
         if not self._point_selection_dialog:
             self._setup_point_selection_dialog(point_to_draw=point_to_draw)
 
-    def _set_plot_widget(self):
-        super(MaximumMinimumComponent, self)._set_plot_widget()
-        self._proxy = pyqtgraph.SignalProxy(self._plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
+    def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
+        plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
+        PlotFactory2.set_functions(
+            graph=plot_widget, functions=[self._exercise.get_main_function()], function_width=5, color='white',
+            show_limits=self._show_main_function_limits, click_function=self._on_function_to_draw_click
+        )
+        self._proxy = pyqtgraph.SignalProxy(plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
+        return plot_widget
+
+    def _setup_components(self):
+        super(MaximumMinimumComponent, self)._setup_components()
+        self._validate_button = self._get_validate_button()
+        self._coordinates_label = LabelFactory.get_label_component(
+            text='', label_type=TextType.SUBTITLE, align=Qt.AlignHCenter, need_word_wrap=True, set_visible=False
+        )
+
+    def _get_validate_button(self) -> QWidget:
+        validate_button = super(MaximumMinimumComponent, self)._get_validate_button()
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+
+        layout = QHBoxLayout()
+        layout.addWidget(validate_button, alignment=Qt.AlignTop | Qt.AlignHCenter)
+
+        widget.setLayout(layout)
+        widget.setMinimumSize(QSize(widget.minimumSizeHint().width() * 1.4, widget.minimumSizeHint().height() * 1.2))
+        return widget
 
     def mouse_moved(self, e):
         pos = e[0]

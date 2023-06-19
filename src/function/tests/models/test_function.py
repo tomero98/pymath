@@ -106,3 +106,4 @@ class TestFunction(TestCase):
                             domain='(-inf, 5]')
         maximum_values, maximum_absolute, minimum_values, minimum_absolute = function.get_maximum_minimum_points(
             plot_range=(-5, 5))
+        a=8

@@ -25,10 +25,8 @@ class FunctionExercise:
             title = 'Dominio y recorrido'
         elif exercise_type == FunctionExerciseType.elementary_graph_exercise.value:
             title = 'Gráficas elementales'
-        elif exercise_type == FunctionExerciseType.maximum_points_exercise.value:
-            title = 'Máximos'
-        elif exercise_type == FunctionExerciseType.minimum_points_exercise.value:
-            title = 'Mínimos'
+        elif exercise_type == FunctionExerciseType.maximum_minimum_exercise.value:
+            title = 'Máximos y Mínimos'
         return title
 
     @lru_cache(maxsize=1)
@@ -42,7 +40,10 @@ class FunctionExercise:
         return next(function for function in self.functions if function.is_main_graphic)
 
     def _get_maximum_minimum_points(self):
-        pass
+        return [
+            function.get_maximum_minimum_points(plot_range=self.plot_range)
+            for function in self.functions if function.is_main_graphic
+        ]
 
     def validate_domain_expression(self, user_domain_input: str) -> [bool, set]:
         exercise_domain = self.get_domain_expression()

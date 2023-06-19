@@ -73,7 +73,6 @@ class GraphInteractionValidationComponent(Component):
         self._setup_layout()
         self.setLayout(self._layout)
 
-    @abstractmethod
     def _setup_components(self):
         super(GraphInteractionValidationComponent, self)._setup_components()
         self._question_label = self._get_question_label()

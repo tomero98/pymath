@@ -92,18 +92,20 @@ class DatabaseManager:
 
     @staticmethod
     def _populate_exercise_data():
-        # Domain example: '5, 5'
         sql_query = QSqlQuery()
         exercise_seed = [
-            # Elementary functions exercises
+            # Elementary exercises
             {'exercise_type': 'ElementaryGraphExercise', 'domain': None, 'topic_id': 3},  # 1
 
-            # Inverse exercise
+            # Inverse exercises
             {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 2
             {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 3
 
-            # # Domain functions exercises
+            # Domain exercises
             {'exercise_type': 'ConceptDomainExercise', 'domain': None, 'topic_id': 2},  # 4
+
+            # Maximum minimum exercises
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': None, 'topic_id': 2},  # 5
         ]
         sql_query.prepare(
             """
@@ -208,6 +210,8 @@ class DatabaseManager:
             {'exercise_id': 3, 'graph_id': 3, 'domain': None, 'is_main_graphic': True},  # 14
 
             {'exercise_id': 4, 'graph_id': 12, 'domain': None, 'is_main_graphic': True},  # 15
+
+            {'exercise_id': 5, 'graph_id': 3, 'domain': '(3, 3)', 'is_main_graphic': True},  # 16
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -290,15 +294,8 @@ class DatabaseManager:
                 'topic_id': 3,
             },
             {
-                'exercise_type': 'MaximumPointsExercise',
+                'exercise_type': 'MaximumMinimumExercise',
                 'description': 'Estudio de puntos máximos en la función.',
-                'exercise_num': 5,
-                'is_active': 1,
-                'topic_id': 4,
-            },
-            {
-                'exercise_type': 'MinimumPointsExercise',
-                'description': 'Estudio de puntos mínimos en la función',
                 'exercise_num': 5,
                 'is_active': 1,
                 'topic_id': 4,
@@ -319,7 +316,6 @@ class DatabaseManager:
             sql_query.addBindValue(topic['is_active'])
             sql_query.addBindValue(topic['topic_id'])
             sql_query.exec()
-
 
     def _setup_step_settings_data(self):
         self._create_step_settings_table()
@@ -390,29 +386,11 @@ class DatabaseManager:
             },
 
             {
-                'step_type': 'MaximumRelativeExercise',
-                'description': 'Seleccionar máximos relativos.',
+                'step_type': 'MaximumMinimumExercise',
+                'description': 'Seleccionar máximos y mínimos absolutos y relativos.',
                 'is_active': 1,
                 'exercise_setting_id': 4,
-            },
-            {
-                'step_type': 'MaximumAbsoluteExercise',
-                'description': 'Seleccionar máximos absolutos.',
-                'is_active': 1,
-                'exercise_setting_id': 4,
-            },
-            {
-                'step_type': 'MinimumRelativeExercise',
-                'description': 'Seleccionar mínimos relativos.',
-                'is_active': 1,
-                'exercise_setting_id': 5,
-            },
-            {
-                'step_type': 'MinimumAbsoluteExercise',
-                'description': 'Seleccionar mínimos absolutos.',
-                'is_active': 1,
-                'exercise_setting_id': 5,
-            },
+            }
         ]
 
         sql_query = QSqlQuery()

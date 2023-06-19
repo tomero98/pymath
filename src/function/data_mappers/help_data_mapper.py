@@ -16,15 +16,9 @@ class HelpDataMapper:
             help_data_list = self._get_selection_inverse_help()
         elif step_type == StepType.delimited_inverse_exercise:
             help_data_list = self._get_delimited_inverse_help()
-        #
-        # elif step_type == StepType.maximum_relative_exercise:
-        #     help_data_list = self._get_maximum_relative_help()
-        # elif step_type == StepType.maximum_absolute_exercise:
-        #     help_data_list = self._get_maximum_absolute_help()
-        # elif step_type == StepType.minimum_relative_exercise:
-        #     help_data_list = self._get_minimum_relative_help()
-        # elif step_type == StepType.minimum_absolute_exercise:
-        #     help_data_list = self._get_minimum_absolute_help()
+
+        # elif step_type == StepType.maximum_minimum_exercise:
+        #     help_data_list = self._get_maximum_minimum_help()
 
         elif step_type == StepType.indicate_domain_exercise:
             help_data_list = self._get_indicate_domain_help()

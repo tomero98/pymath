@@ -10,10 +10,11 @@ from ...models import ExerciseResume, FunctionExercise, FunctionStep, Function
 class ElementaryGraphComponent(GraphInteractionValidationComponent):
     label = 'Seleccionar la función elemental.'
 
-    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool):
+    def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume, need_help_data: bool,
+                 show_function_labels: bool = True, show_main_function_limits: bool = False):
         super(ElementaryGraphComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_function_labels=True,
-            show_main_function_limits=False
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
+            show_function_labels=show_function_labels, show_main_function_limits=show_main_function_limits
         )
 
         self._button_selected_index: int = None  # noqa

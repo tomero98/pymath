@@ -3,7 +3,7 @@ from typing import List
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QPen, QColor
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QWidget
 from pyqtgraph import LinearRegionItem
 
 from src.projectConf.factories import ButtonFactory, LineEditFactory, LabelFactory, IconFactory
@@ -23,9 +23,11 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     _BORDER_COLOR_BY_BORDER_TYPE = {'inf': 'transparent', 'included': 'blue', 'not_included': 'red'}
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
-                 need_help_data: bool = False):
+                 need_help_data: bool = False, show_main_function_limits: bool = True,
+                 show_function_labels: bool = False):
         super(DomainDefinitionComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_main_function_limits=True
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
+            show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
         )
 
         self._proxy = None
@@ -37,14 +39,18 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._create_range_button: QPushButton = None  # noqa
         self._delete_range_button: QPushButton = None  # noqa
         self._result_label: QLabel = None  # noqa
+        self._validate_button: QPushButton = None  # noqa
 
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
         self._validate_button = self._get_validate_button()
         self._validate_button.setDisabled(True)
-        self._domain_expression_edit_layout = self._get_domain_expression_edit_layout()
+        self._domain_expression_edit_widget = self._get_domain_expression_edit_widget()
 
-    def _get_domain_expression_edit_layout(self) -> QHBoxLayout:
+    def _get_domain_expression_edit_widget(self) -> QWidget:
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+
         layout = QHBoxLayout()
 
         self._domain_expression_label = LabelFactory.get_label_component(
@@ -57,7 +63,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         layout.addSpacing(15)
         layout.addWidget(self._validate_button, alignment=Qt.AlignTop)
         layout.addStretch()
-        return layout
+
+        widget.setLayout(layout)
+        return widget
 
     def _get_domain_expression_edit_label(self) -> QLineEdit:
         domain_edit = LineEditFactory.get_line_edit_component(
@@ -266,9 +274,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
         self._layout.addSpacing(10)
-        self._layout.addLayout(self._plot_widget_layout)
+        self._layout.addWidget(self._plot_widget_container, alignment=Qt.AlignTop | Qt.AlignHCenter)
         self._layout.addSpacing(20)
-        self._layout.addLayout(self._domain_expression_edit_layout)
+        self._layout.addWidget(self._domain_expression_edit_widget, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._result_label, alignment=Qt.AlignHCenter)
         self._layout.addStretch()
 
@@ -352,5 +360,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _setup_finished_exercise(self):
         self._validate_button.setDisabled(True)
-        self._create_range_button.setDisabled(True)
-        self._delete_range_button.setDisabled(True)
+        if self._create_range_button:
+            self._create_range_button.setDisabled(True)
+        if self._delete_range_button:
+            self._delete_range_button.setDisabled(True)

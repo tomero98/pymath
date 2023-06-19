@@ -72,7 +72,7 @@ class HelpDataDialog(QWidget):
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(50, 5, 50, 0)
 
-        continue_button_is_active = (len(self._help_data_list) > 1) or (len(self._help_data_list[0].help_steps) > 1)
+        continue_button_is_active = (len(self._help_data_list) > 1) or (bool(self._help_data_list[0].help_steps))
         icon = IconFactory.get_icon_widget(image_name='arrow-right.png')
         self._continue_button = ButtonFactory.get_button_component(
             title='', function_to_connect=lambda: self._execute_continue(), icon=icon, icon_size=35,

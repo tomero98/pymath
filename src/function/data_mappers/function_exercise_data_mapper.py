@@ -36,7 +36,7 @@ class FunctionExerciseDataMapper:
             exercises = cls._setup_elementary_graph(main_exercise=exercises[0], topic=topic)
 
         cls._setup_steps(exercises=exercises, topic=topic)
-        return exercises
+        return [exercise for exercise in exercises if exercise.steps]
 
     @classmethod
     def _get_exercise_ids(cls, topic: Topic) -> List[int]:
@@ -75,7 +75,7 @@ class FunctionExerciseDataMapper:
             FROM exercises
             INNER JOIN exercise_graphs ON exercises.id = exercise_graphs.exercise_id
             INNER JOIN graphs ON exercise_graphs.graph_id = graphs.id
-            WHERE exercises.id IN ({' '.join(list(map(str, exercise_ids)))})
+            WHERE exercises.id IN ({', '.join(list(map(str, exercise_ids)))})
             ORDER BY RANDOM()
         '''
 

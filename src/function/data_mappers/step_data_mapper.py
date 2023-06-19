@@ -24,7 +24,7 @@ class StepDataMapper:
                     and self._exercise.has_main_function_inverse():
                 step = self._get_selection_inverse_exercise_step()
             elif step_setting.step_type == StepType.delimited_inverse_exercise.value \
-                    and self._exercise.has_main_function_inverse():
+                    and not self._exercise.has_main_function_inverse():
                 step = self._get_delimited_inverse_exercise_step()
             elif step_setting.step_type == StepType.indicate_domain_exercise.value:
                 step = self._get_indicate_domain_exercise_step()
@@ -69,8 +69,10 @@ class StepDataMapper:
         step_type = StepType.delimited_inverse_exercise
         question = 'Delimita el rango de la función para que tenga inversa'
         order = 1
+        help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
-        return FunctionStep(step_type=step_type, question=question, order=order, step_info_data=step_info_data)
+        return FunctionStep(step_type=step_type, question=question, order=order, step_info_data=step_info_data,
+                            help_data_list=help_data_list)
 
     def _get_indicate_domain_exercise_step(self) -> FunctionStep:
         step_type = StepType.indicate_domain_exercise

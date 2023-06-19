@@ -7,10 +7,10 @@ class StepInfoDataMapper:
         step_info_data = None
         if step_type == StepType.inverse_concept_exercise:
             step_info_data = self._get_inverse_concept_info_data()
-        # elif step_type == StepType.selection_inverse_exercise:
-        #     step_info_data = self._get_selection_inverse_info_data()
-        # elif step_type == StepType.delimited_inverse_exercise:
-        #     step_info_data = self._get_delimited_inverse_info_data()
+        elif step_type == StepType.selection_inverse_exercise:
+            step_info_data = self._get_selection_inverse_info_data()
+        elif step_type == StepType.delimited_inverse_exercise:
+            step_info_data = self._get_delimited_inverse_info_data()
         #
         # elif step_type == StepType.maximum_relative_exercise:
         #     step_info_data = self._get_maximum_relative_info_data()
@@ -32,6 +32,27 @@ class StepInfoDataMapper:
         if step_info_data:
             return step_info_data
 
+    def _get_inverse_concept_info_data(self) -> StepInfoData:
+        info_list = [
+            'Hola',
+            'Adios'
+        ]
+        return StepInfoData(video_name='inverse_concept_info_data.mp4', info_list=info_list)
+
+    def _get_selection_inverse_info_data(self) -> StepInfoData:
+        info_list = [
+            'Hola',
+            'Adios'
+        ]
+        return StepInfoData(video_name='selection_inverse_info_data.mp4', info_list=info_list)
+
+    def _get_delimited_inverse_info_data(self) -> StepInfoData:
+        info_list = [
+            'Hola',
+            'Adios'
+        ]
+        return StepInfoData(video_name='delimited_inverse_info_data.mp4', info_list=info_list)
+
     def _get_indicate_elementary_exercise_info_data(self) -> StepInfoData:
         info_list = [
             'Hola',
@@ -44,16 +65,7 @@ class StepInfoDataMapper:
             'Hola',
             'Adios'
         ]
-        return StepInfoData(video_name='indicate_elementary_shift_exercise_info_data.mp4', info_list=[])
-
-    def _get_inverse_concept_info_data(self) -> StepInfoData:
-        return None
-
-    def _get_selection_inverse_info_data(self) -> StepInfoData:
-        return None
-
-    def _get_delimited_inverse_info_data(self) -> StepInfoData:
-        return None
+        return StepInfoData(video_name='indicate_elementary_shift_exercise_info_data.mp4', info_list=info_list)
 
     def _get_indicate_domain_info_data(self) -> StepInfoData:
         info_list = [

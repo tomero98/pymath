@@ -35,6 +35,7 @@ class FunctionExercise:
     def has_main_function_inverse(self) -> bool:
         main_function = self.get_main_function()
         _, y_values = main_function.get_points()
+        y_values = [y for y_group in y_values for y in y_group]
         return len(set(y_values)) == len(y_values)
 
     def get_main_function(self) -> Function:

@@ -55,14 +55,13 @@ class FunctionExerciseComponent(QWidget):
         resume = self._get_step_resume(step=step)
 
         if step.type == StepType.inverse_concept_exercise:
-            component = InverseConceptComponent(exercise=self._exercise, step=step, resume=resume, need_help_data=False)
+            component = InverseConceptComponent(exercise=self._exercise, step=step, resume=resume, need_help_data=True)
         elif step.type == StepType.selection_inverse_exercise:
             component = InverseSelectionComponent(exercise=self._exercise, step=step, resume=resume,
-                                                  need_help_data=False)
-
+                                                  need_help_data=True)
         elif step.type == StepType.delimited_inverse_exercise:
             component = InverseDelimitedComponent(exercise=self._exercise, step=step, resume=resume,
-                                                  need_help_data=False)
+                                                  need_help_data=True)
 
         elif step.type == StepType.indicate_domain_exercise:
             component = DomainDefinitionComponent(exercise=self._exercise, step=step, resume=resume)

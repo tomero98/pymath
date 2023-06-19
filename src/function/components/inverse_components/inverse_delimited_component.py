@@ -1,40 +1,68 @@
 from typing import Tuple
 
 import pyqtgraph
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt, QSize
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
 
-from ..graph_interaction_component import GraphInteractionComponent
-from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
+from ..domain_components.domain_definition_component import DomainDefinitionComponent
+from ...factories import PlotFactory2
+from ...models import FunctionExercise, FunctionStep, ExerciseResume, Point
 
 
-class InverseDelimitedComponent(GraphInteractionComponent):
+class InverseDelimitedComponent(DomainDefinitionComponent):
     continue_signal = pyqtSignal(bool)
     label = 'Seleccionar la inversa'
 
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False):
         super(InverseDelimitedComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, need_validate_button=True
+            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_function_labels=False,
+            show_main_function_limits=False
         )
 
         self._region: pyqtgraph.LinearRegionItem = None  # noqa
 
-    def _get_correct_expression(self, *args, **kwargs):
-        return 'no-duplicates'
-
     def _get_function_to_draw(self):
         return self._exercise.get_main_function()
 
-    def _is_exercise_correct(self, expression_selected):
+    def _setup_layout(self):
+        super(InverseDelimitedComponent, self)._setup_layout()
+        self._validate_button.setDisabled(False)
+
+    def _get_button_layout(self) -> QVBoxLayout:
+        layout = QVBoxLayout()
+
+        self._info_button_layout = self._get_info_button_layout()
+
+        layout.addLayout(self._info_button_layout)
+        return layout
+
+    def _is_exercise_correct(self, expression_selected: tuple):
         main_function = self._exercise.get_main_function()
-        y_values_selected = [y for x, y in zip(main_function.x_values, main_function.y_values)
-                             if expression_selected[0] <= x <= expression_selected[1]]
+        y_values_selected = [
+            y for x_group, y_group in zip(main_function.x_values, main_function.y_values)
+            for x, y in zip(x_group, y_group) if expression_selected[0] <= x <= expression_selected[1]
+        ]
         return len(set(y_values_selected)) == len(y_values_selected)
 
-    def _set_plot_widget(self):
-        super(InverseDelimitedComponent, self)._set_plot_widget()
+    def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
+        plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
+        PlotFactory2.set_functions(graph=plot_widget, functions=[self._exercise.get_main_function()],
+                                   function_width=5, color='white', show_limits=self._show_main_function_limits)
         self._region = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort')
-        self._plot_widget.addItem(self._region)
+        plot_widget.addItem(self._region)
+        return plot_widget
+
+    def _get_domain_expression_edit_widget(self) -> QWidget:
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+
+        layout = QHBoxLayout()
+        layout.addWidget(self._validate_button, alignment=Qt.AlignTop | Qt.AlignHCenter)
+
+        widget.setLayout(layout)
+        widget.setMinimumSize(QSize(widget.minimumSizeHint().width() * 1.4, widget.minimumSizeHint().height() * 1.2))
+        return widget
 
     def _on_click_validation_button(self):
         response = self._region.getRegion()
@@ -42,29 +70,43 @@ class InverseDelimitedComponent(GraphInteractionComponent):
         self._validate_exercise(expression_selected=expression_selected)
 
     def _validate_exercise(self, expression_selected: str, is_resume: bool = False):
+        expression_selected_str = expression_selected
         expression_selected = tuple(map(float, expression_selected.split(',')))
-        super()._validate_exercise(expression_selected=expression_selected, is_resume=is_resume)
         is_answer_correct = self._is_exercise_correct(expression_selected=expression_selected)
-        self._set_exercise(expression_selected=expression_selected, is_answer_correct=is_answer_correct)
+        if not is_resume:
+            self._update_resume(expression_selected=expression_selected_str, is_answer_correct=is_answer_correct)
 
-    def _set_exercise(self, expression_selected: Tuple, is_answer_correct: bool):
-        border_color = '#2F8C53' if is_answer_correct else 'red'
-        if not is_answer_correct:
-            self._help_text.setText('Incorrecto.')
-            self._update_region_with_error(expression_selected=expression_selected)
-        else:
+        self.resume_signal.emit(self._resume)
+
+        if is_resume:
+            self._region.setRegion(expression_selected)
             self._region.setMovable(False)
-            self._help_text.setText('Correcto.')
-        self._help_text.setVisible(True)
-        self._help_text.setStyleSheet(f'color: {border_color}')
 
-        self._continue_button.setStyleSheet(f'background: {border_color}')
-        self._continue_button.setDisabled(False)
+        if is_answer_correct:
+            self._setup_correct_response()
+        else:
+            self._setup_wrong_response(expression_selected=expression_selected_str)
+        self._setup_finished_exercise()
 
-        if self._exercise.exercise_order != 0 or self._step.order != 0:
-            self._back_button.setDisabled(False)
+    def _setup_wrong_response(self, expression_selected: str):
+        main_function = self._exercise.get_main_function()
+        expression_selected = tuple(map(float, expression_selected.split(',')))
+        values_selected = [
+            (x, y) for x_group, y_group in zip(main_function.x_values, main_function.y_values)
+            for x, y in zip(x_group, y_group) if expression_selected[0] <= x <= expression_selected[1]
+        ]
+        y_values_set = set()
+        x_by_y = {}
+        points = None
+        for x, y in values_selected:
+            if y not in y_values_set:
+                y_values_set.add(y)
+                x_by_y[y] = x
+            else:
+                points = [Point(x, y), Point(x_by_y[y], y)]
 
-    def _update_region_with_error(self, expression_selected: Tuple[float, float]):
-        self._region.setRegion((expression_selected[0], expression_selected[1]))
-        self._region.setMovable(False)
-        self._region.setBrush((255, 0, 0))
+        PlotFactory2.set_points(self._plot_widget, points=points, color='red')
+
+        self._result_label.setText('Incorrecto. Los dos puntos indicados muestran porque la gráfica no tiene inversa.')
+        self._result_label.setStyleSheet('color: red')
+        self._result_label.setVisible(True)

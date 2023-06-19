@@ -23,7 +23,6 @@ class GraphInteractionValidationComponent(Component):
 
         self._layout: QVBoxLayout = None  # noqa
         self._question_label: QLabel = None  # noqa
-        self._validate_button: QPushButton = None  # noqa
         self._plot_widget: pyqtgraph.PlotWidget = None  # noqa
         self._plot_widget_layout: QHBoxLayout = None  # noqa
         self._info_button_layout: QVBoxLayout = None  # noqa

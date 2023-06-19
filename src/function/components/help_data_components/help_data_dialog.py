@@ -47,14 +47,14 @@ class HelpDataDialog(QWidget):
 
         self._text_label = LabelFactory.get_label_component(
             text=self._help_data_list[0].text, label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
-            need_word_wrap=False, set_visible=True
+            need_word_wrap=True, set_visible=True
         )
         help_layout.addSpacing(10)
         help_layout.addWidget(self._text_label)
 
         self.setLayout(help_layout)
         self.show()
-        self.setFixedSize(self.width(), self.height())
+        self.setFixedSize(800, 800)
 
         self._current_help_data = self._help_data_list[0]
         self._current_step = None

@@ -24,8 +24,8 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         self._bottom_buttons_widget: QWidget = None  # noqa
 
     def _setup_data(self):
-        """ If component need to set up anything before _draw() """
-        pass
+        main_function = self._exercise.get_main_function()
+        main_function.setup_data((-5, 5))
 
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
@@ -66,7 +66,10 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
             """
                                      )
 
-        label_functions = [(self._get_function_to_draw(), 'white')]
+
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._get_function_to_draw()], function_width=3,
+                                   color='green')
+        label_functions = [(self._get_function_to_draw(), 'green')]
         PlotFactory2.set_labels(graph=self._plot_widget, functions=label_functions)
 
     def _setup_wrong_response(self, expression_selected: str):
@@ -111,9 +114,12 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
                                      )
 
         error_function = self._get_error_function(expression=expression_selected)
+        error_function.setup_data(plot_range=(-5, 5))
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._get_function_to_draw()], function_width=3,
+                                   color='green')
         PlotFactory2.set_functions(graph=self._plot_widget, functions=[error_function], function_width=3,
                                    color='red')
-        label_functions = [(self._get_function_to_draw(), 'white'), (error_function, 'red')]
+        label_functions = [(self._get_function_to_draw(), 'green'), (error_function, 'red')]
         PlotFactory2.set_labels(graph=self._plot_widget, functions=label_functions)
 
     def _setup_finished_exercise(self):

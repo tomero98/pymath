@@ -30,28 +30,27 @@ class TopicSettingDialog(QWidget):
         self.close_signal.emit()
 
     def draw(self):
+        self.setObjectName('application')
+        self.setStyleSheet("""
+                    QWidget#application {
+                        background-color: #EDEDE9;
+                    }"""
+        )
         self.setWindowTitle('Configuración del ejercicio')
 
         layout = QVBoxLayout()
 
-        text_label = LabelFactory.get_label_component(
-            text=f'Configuración de "{self._topic.title}"', label_type=TextType.TITLE, align=Qt.AlignLeft,
-            set_visible=True
-        )
-        layout.addWidget(text_label, alignment=Qt.AlignLeft)
-
         settings_layout = QVBoxLayout()
         for exercise_setting in self._topic_edited.exercise_settings:
-            exercise_setting_layout = self._get_exercise_setting_layout(exercise_setting=exercise_setting)
-            settings_layout.addLayout(exercise_setting_layout)
+            exercise_setting_widget = self._get_exercise_setting_widget(exercise_setting=exercise_setting)
+            settings_layout.addWidget(exercise_setting_widget, alignment=Qt.AlignHCenter)
 
         layout.addLayout(settings_layout)
 
         icon = IconFactory.get_icon_widget(image_name='save.png')
         self._save_button = ButtonFactory.get_button_component(
             title='', function_to_connect=lambda: self._send_signal(save=True), icon=icon, icon_size=25,
-            tooltip='Guardar',
-            primary_button=True
+            tooltip='Guardar',primary_button=True
         )
         layout.addWidget(self._save_button, alignment=Qt.AlignHCenter)
 
@@ -59,7 +58,6 @@ class TopicSettingDialog(QWidget):
             text=f'Guardado', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False
         )
         self._save_label.setStyleSheet('color: green;')
-        layout.addWidget(text_label, alignment=Qt.AlignHCenter)
 
         self._setup_exercise_checkbox_layout()
 
@@ -83,7 +81,16 @@ class TopicSettingDialog(QWidget):
 
         self.close_signal.emit()
 
-    def _get_exercise_setting_layout(self, exercise_setting: ExerciseSetting) -> QVBoxLayout:
+    def _get_exercise_setting_widget(self, exercise_setting: ExerciseSetting) -> QWidget:
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+        widget.setStyleSheet("""
+            #topic-container {
+                border: 4px solid #897B6D;
+                border-radius: 20px;
+                background: #F5EBE0;
+            }
+        """)
         layout = QVBoxLayout()
 
         text_label = LabelFactory.get_label_component(
@@ -102,7 +109,8 @@ class TopicSettingDialog(QWidget):
         step_setting_layout = self._get_step_settings_layout(exercise_id=exercise_setting.id,
                                                              exercise_setting=exercise_setting)
         layout.addLayout(step_setting_layout)
-        return layout
+        widget.setLayout(layout)
+        return widget
 
     def _get_slider(self, exercise_setting: ExerciseSetting) -> QSlider:
         slider = QSlider(Qt.Horizontal)

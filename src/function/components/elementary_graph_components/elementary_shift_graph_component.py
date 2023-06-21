@@ -31,49 +31,46 @@ class ElementaryShiftGraphComponent(ElementaryGraphComponent):
         expression = f'{main_function_expression} - 1'
         function = Function(function_id=1, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
-        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression = f'{main_function_expression} + 1'
         function = Function(function_id=2, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
-        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x - 1' if '(x)' in main_function_expression else '(x - 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
         function = Function(function_id=3, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
-        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
         expression_to_replace = 'x + 1' if '(x)' in main_function_expression else '(x + 1)'
         expression = main_function_expression.replace('x', expression_to_replace)
         function = Function(function_id=4, expression=expression, domain=main_function.domain, is_main_graphic=False,
                             x_values_range=(-5, 5))
-        function.setup_data(plot_range=(-5, 5))
         functions.append(function)
 
-        if not self._resume or self._resume.resume_state == ResumeState.pending:
-            self._select_main_function_random(functions=functions)
+        if not self._resume:
+            main_function = self._select_main_function_random(functions=functions)
         else:
-            self._select_main_function_using_resume(functions=functions)
+            main_function = self._select_main_function_using_resume(functions=functions)
+        self._main_function = main_function
+        self._main_function.setup_data(plot_range=(-5, 5))
+        self._main_function.is_main_graphic = True
         self._functions = functions
 
-    def _select_main_function_random(self, functions: List[Function]):
+    def _select_main_function_random(self, functions: List[Function]) -> Function:
         index = random.randint(0, 3)
-        self._main_function = functions[index]
-        self._main_function.is_main_graphic = True
+        return functions[index]
 
-    def _select_main_function_using_resume(self, functions: List[Function]):
-        self._main_function = next(
+    def _select_main_function_using_resume(self, functions: List[Function]) -> Function:
+        return next(
             function for function in functions if function.function_id == self._resume.function_id
         )
-        self._main_function.is_main_graphic = True
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
-        PlotFactory2.set_functions(graph=plot_widget, functions=[self._main_function], function_width=5, color='white',
+        PlotFactory2.set_functions(graph=plot_widget, functions=[self._main_function], function_width=1, color='white',
                                    show_limits=self._show_main_function_limits)
         return plot_widget
 

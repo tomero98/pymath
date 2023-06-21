@@ -139,15 +139,25 @@ class DatabaseManager:
     def _populate_graph_data():
         graph_seed = [
             # Elementary graphs
-            {'expression': 'x**(1/3)'},  # 1
-            {'expression': 'x**3'},  # 2
-            {'expression': '(x)**2'},  # 3
-            {'expression': '(x)**(1/2)'},  # 4
-            {'expression': 'math.e**x'},  # 5
-            {'expression': 'x'},  # 6
-            {'expression': 'math.cos(x)'},  # 7
-            {'expression': 'math.sin(x)'},  # 8
-            {'expression': 'math.tan(x)'},  # 9
+            {'expression': '(x)**2'},  # 1
+            {'expression': '(x)**3'},  # 2
+            {'expression': '1 / (x)**3'},  # 3
+            {'expression': '1 / (x)**2'},  # 4
+            {'expression': 'math.sqrt(x)'},  # 5
+            {'expression': 'math.sqrt(x**3)'},  # 6
+            {'expression': '1 / math.sqrt(x)'},  # 7 need 100 points
+            {'expression': '1 / math.sqrt((x)**2)'},  # 8
+            {'expression': 'math.e**x'},  # 9
+            {'expression': '(1 / math.e) ** x'},  # 10
+            {'expression': 'math.cos(x)'},  # 11
+            {'expression': 'math.sin(x)'},  # 12
+            {'expression': 'math.tan(x)'},  # 13
+            {'expression': 'math.cos(x) / math.sin(x)'},  # 14 Revisar mismos problemas que con la tangente
+            {'expression': '1 / math.sin(x)'},  # 15 Revisar mismos problemas que con la tangente
+            {'expression': '1 / math.cos(x)'},  # 16 Revisar mismos problemas que con la tangente
+            {'expression': '(math.e**x - math.e**(-x)) / 2'},  # 17
+            {'expression': '(math.e**x + math.e**(-x)) / 2'},  # 18
+            {'expression': '(math.e**x - math.e**(-x)) / (math.e**x + math.e**(-x))'},  # 19
 
             # Inverse graphs
             {'expression': '-x**(1/3)'},  # 10
@@ -192,15 +202,25 @@ class DatabaseManager:
     def _populate_exercise_graph_data():
         exercise_graph_seed = [
             # Elementary exercise
-            # {'exercise_id': 1, 'graph_id': 1, 'domain': None, 'is_main_graphic': 0},  # 1
-            # {'exercise_id': 1, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 2
-            # {'exercise_id': 1, 'graph_id': 3, 'domain': None, 'is_main_graphic': 0},  # 3
-            # {'exercise_id': 1, 'graph_id': 4, 'domain': None, 'is_main_graphic': 0},  # 4
-            # {'exercise_id': 1, 'graph_id': 5, 'domain': None, 'is_main_graphic': 0},  # 5
-            {'exercise_id': 1, 'graph_id': 6, 'domain': None, 'is_main_graphic': 0},  # 6
-            {'exercise_id': 1, 'graph_id': 7, 'domain': None, 'is_main_graphic': 0},  # 7
+            {'exercise_id': 1, 'graph_id': 1, 'domain': '(-3, 3)', 'is_main_graphic': 0},  # 1
+            {'exercise_id': 1, 'graph_id': 2, 'domain': '(-2, 2)', 'is_main_graphic': 0},  # 2
+            {'exercise_id': 1, 'graph_id': 3, 'domain': None, 'is_main_graphic': 0},  # 3
+            {'exercise_id': 1, 'graph_id': 4, 'domain': None, 'is_main_graphic': 0},  # 4
+            {'exercise_id': 1, 'graph_id': 5, 'domain': '(0, +inf)', 'is_main_graphic': 0},  # 5
+            {'exercise_id': 1, 'graph_id': 6, 'domain': '(0, +inf)', 'is_main_graphic': 0},  # 6
+            {'exercise_id': 1, 'graph_id': 7, 'domain': '(0, +inf)', 'is_main_graphic': 0},  # 7
             {'exercise_id': 1, 'graph_id': 8, 'domain': None, 'is_main_graphic': 0},  # 8
-            {'exercise_id': 1, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 9
+            {'exercise_id': 1, 'graph_id': 9, 'domain': '(-inf, 2)', 'is_main_graphic': 0},  # 9
+            {'exercise_id': 1, 'graph_id': 10, 'domain': '(-2, +inf)', 'is_main_graphic': 0},  # 10
+            {'exercise_id': 1, 'graph_id': 11, 'domain': None, 'is_main_graphic': 0},  # 11
+            {'exercise_id': 1, 'graph_id': 12, 'domain': None, 'is_main_graphic': 0},  # 12
+            {'exercise_id': 1, 'graph_id': 13, 'domain': None, 'is_main_graphic': 0},  # 13
+            {'exercise_id': 1, 'graph_id': 14, 'domain': None, 'is_main_graphic': 0},  # 14
+            {'exercise_id': 1, 'graph_id': 15, 'domain': None, 'is_main_graphic': 0},  # 15
+            {'exercise_id': 1, 'graph_id': 16, 'domain': None, 'is_main_graphic': 0},  # 16
+            {'exercise_id': 1, 'graph_id': 17, 'domain': '(-3, 3)', 'is_main_graphic': 0},  # 17
+            {'exercise_id': 1, 'graph_id': 18, 'domain': '(-3, 3)', 'is_main_graphic': 0},  # 18
+            {'exercise_id': 1, 'graph_id': 19, 'domain': None, 'is_main_graphic': 0},  # 19
 
             # Inverse exercise
             {'exercise_id': 2, 'graph_id': 2, 'domain': None, 'is_main_graphic': True},  # 10

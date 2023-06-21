@@ -109,7 +109,7 @@ class GraphInteractionValidationComponent(Component):
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
         PlotFactory2.set_functions(graph=plot_widget, functions=[self._exercise.get_main_function()],
-                                   function_width=5, color='white', show_limits=self._show_main_function_limits)
+                                   function_width=1, color='white', show_limits=self._show_main_function_limits)
         return plot_widget
 
     def _get_button_layout(self) -> QVBoxLayout:

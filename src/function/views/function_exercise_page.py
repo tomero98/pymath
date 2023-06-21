@@ -77,8 +77,8 @@ class FunctionExercisePage(Window):
         effect.setBlurRadius(15)
         header.setGraphicsEffect(effect)
         header.setFixedSize(550, 100)
-        header.setMinimumSize(QSize(header.minimumSizeHint().width() * 2.2, header.minimumSizeHint().height()*1.2))
-        header.setMaximumSize(QSize(header.minimumSizeHint().width() * 2.2, header.minimumSizeHint().height()*1.2))
+        header.setMinimumSize(QSize(header.minimumSizeHint().width() * 2, header.minimumSizeHint().height() * 1.2))
+        header.setMaximumSize(QSize(header.minimumSizeHint().width() * 2, header.minimumSizeHint().height() * 1.2))
         return header
 
     def _get_back_button(self) -> QPushButton:
@@ -108,11 +108,13 @@ class FunctionExercisePage(Window):
         self._steps_done_widget.setStyleSheet('background-color: #ECDAC6;')
         self._steps_done_widget.setDisabled(True)
         combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.SUBTITLE)
-        combobox_layout.addStretch()
+        exercise_count_label = LabelFactory.get_label_component(text=f'/ {len(self._exercises)}',
+                                                                label_type=TextType.SUBTITLE)
         combobox_layout.addWidget(combobox_label, alignment=Qt.AlignVCenter)
         combobox_layout.addSpacing(15)
         combobox_layout.addWidget(self._steps_done_widget)
-        combobox_layout.addStretch()
+        combobox_layout.addSpacing(15)
+        combobox_layout.addWidget(exercise_count_label, alignment=Qt.AlignVCenter)
 
         self._steps_done_widget.activated.connect(self._update_step_component)
         return combobox_layout
@@ -250,7 +252,6 @@ class FunctionExercisePage(Window):
             if text == step_label:
                 self._steps_done_widget.setCurrentIndex(index)
                 break
-
 
     def _set_state_next_back_button(self, resume: ExerciseResume):
         current_exercise = next(exercise for exercise in self._exercises if exercise.id == resume.exercise_id)

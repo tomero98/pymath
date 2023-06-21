@@ -1,4 +1,3 @@
-import math
 from typing import List, Tuple
 
 import pyqtgraph
@@ -39,8 +38,7 @@ class PlotFactory2:
                 color_selected = color if color else colors.pop()
                 PlotFactory2.set_graph_using_points(
                     graph=graph, x_values=x_set, y_values=y_set, color=color_selected,
-                    function_width=function_width,
-                    function_name=function.expression, click_function=click_function
+                    function_width=function_width, function_name=function.expression, click_function=click_function
                 )
 
             if show_limits:

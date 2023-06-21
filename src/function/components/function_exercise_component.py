@@ -98,11 +98,12 @@ class FunctionExerciseComponent(QWidget):
 
     def setup_back_step_component(self):
         step_type = self._current_step_component._step.type  # noqa
-        current_step_order = next(step.order for step in self._exercise.steps if step.type == step_type)
-        if current_step_order == 0:
+        current_step_index = next(index for index, step in enumerate(self._exercise.steps) if step.type == step_type)
+        next_step_index = current_step_index - 1
+        if next_step_index < 0:
             self._send_back_exercise_signal()
         else:
-            next_step = self._exercise.steps[current_step_order - 1]
+            next_step = self._exercise.steps[next_step_index]
             self._setup_step_component(next_step=next_step)
 
     def _send_continue_signal(self):

@@ -96,16 +96,17 @@ class FunctionExerciseDataMapper:
 
         function_domain = query_result.value('graph_domain')
         domain = function_domain if bool(function_domain) else '(-inf, +inf)'
-        x_values_range = tuple(map(int, function_domain[1:-1].split(','))) if bool(function_domain) \
-            else (exercise.plot_range[0] - 1, exercise.plot_range[1] + 1)
+        if function_domain:
+            domain_parts = function_domain[1:-1].replace(' ', '').split(',')
+            first_part = exercise.plot_range[0] - 1 if domain_parts[0] == '-inf' else int(domain_parts[0])
+            last_part = exercise.plot_range[-1] + 1 if domain_parts[-1] == '+inf' else int(domain_parts[-1])
+            x_values_range = (first_part, last_part)
+        else:
+            x_values_range = (exercise.plot_range[0] - 1, exercise.plot_range[1] + 1)
 
         is_main_graphic = bool(query_result.value('is_main_graphic'))
         function = Function(function_id=function_id, expression=function_expression, x_values_range=x_values_range,
                             is_main_graphic=is_main_graphic, domain=domain)
-        if exercise.type == FunctionExerciseType.domain_concept_exercise.value:
-            function.setup_domain_data(plot_range=exercise.plot_range)
-        else:
-            function.setup_data(plot_range=exercise.plot_range)
         exercise.functions.append(function)
 
     @staticmethod

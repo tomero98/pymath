@@ -1,4 +1,4 @@
-import math  # noqa
+import math
 from collections import defaultdict
 from functools import lru_cache
 from typing import List, Tuple
@@ -8,6 +8,13 @@ from sympy.core.numbers import Rational
 
 
 class Function:
+    _PERIOD_BY_SPECIAL_FUNCTION_EXPRESSIONS = {
+        'math.tan(x)': math.pi / 2,
+        'math.cos(x)/math.sin(x)': math.pi,
+        '1/math.sin(x)': math.pi,
+        '1/math.cos(x)': math.pi / 2,
+    }
+
     def __init__(self, function_id: int, expression: str, x_values_range: Tuple[int, int], is_main_graphic: bool,
                  domain: str = '', is_invert_function: bool = False):
         self.function_id = function_id
@@ -36,7 +43,7 @@ class Function:
     def get_points(self) -> (List[int], List[int]):
         all_x_values, all_y_values = [], []
         min_x, max_x = self.x_values_range[0], self.x_values_range[1]
-        value = 10
+        value = 100
 
         x_values, y_values = [], []
         for x_value in [num / value for num in range(min_x * value, max_x * value + 1, 1)]:
@@ -45,7 +52,7 @@ class Function:
 
                 x_values.append(x_value)
                 y_values.append(y_value)
-            except Exception:
+            except Exception as e:
                 self.vertical_asymptotes.append(x_value)
                 if x_values:
                     all_x_values.append(x_values)
@@ -56,16 +63,26 @@ class Function:
             all_x_values.append(x_values)
             all_y_values.append(y_values)
 
-        if self.expression == 'math.tan(x)':
-            all_x_values, all_y_values = self._get_tan_values(all_x_value=all_x_values, all_y_values=all_y_values)
+        expression = self.expression.replace(' ', '').replace('+1', '').replace('-1', '')
+        if expression in self._PERIOD_BY_SPECIAL_FUNCTION_EXPRESSIONS:
+            all_x_values, all_y_values = self._get_special_function_values(
+                all_x_value=all_x_values, all_y_values=all_y_values
+            )
         return all_x_values, all_y_values
 
-    def _get_tan_values(self, all_x_value: list, all_y_values: list)-> [list, list]:
-        period = math.pi/2
+    def _get_special_function_values(self, all_x_value: list, all_y_values: list) -> [list, list]:
+        expression_without_shifts = self.expression.replace(' ', '').replace('+1', '').replace('-1', '')
+        period = self._PERIOD_BY_SPECIAL_FUNCTION_EXPRESSIONS[expression_without_shifts]
+        if 'x + 1' in self.expression:
+            shift = 1
+        elif 'x - 1' in self.expression:
+            shift = - 1
+        else:
+            shift = 0
         x_values_by_interval, y_values_by_interval = defaultdict(list), defaultdict(list)
         for x_point, y_point in zip(all_x_value, all_y_values):
             for x, y in zip(x_point, y_point):
-                interval = int(x // period)
+                interval = int((x + shift) // period)
                 x_values_by_interval[interval].append(x)
                 y_values_by_interval[interval].append(y)
 
@@ -76,6 +93,7 @@ class Function:
             y_values.append(y_values_by_interval[interval])
 
         return x_values, y_values
+
     @lru_cache(maxsize=1)
     def get_domain(self, domain: str) -> str:
         if not self.vertical_asymptotes:
@@ -196,36 +214,46 @@ class Function:
         return maximum_values, maximum_absolute, minimum_values, minimum_absolute
 
     def get_label_point(self) -> list:
-        x_value = [x for x_value in self.x_values for x in x_value]
-        y_value = [y for y_value in self.y_values for y in y_value]
-        num = len(x_value) // 5
+        x_values = []
+        y_values = []
+        for x_group, y_group in zip(self.x_values, self.y_values):
+            for x, y in zip(x_group, y_group):
+                valid_x = self.x_values_range[0] <= x <= self.x_values_range[-1]
+                valid_y = self.x_values_range[0] <= y <= self.x_values_range[-1]
+                if valid_x and valid_y:
+                    x_values.append(x)
+                    y_values.append(y)
 
-        center_value = x_value[num * 3], y_value[num * 3] + 0.5
-        left_value = x_value[num * 4], y_value[num * 4] + 0.5
-        right_value = x_value[num * 2], y_value[num * 2] + 0.5
+        num = len(x_values) // 5
+
+        center_value = x_values[num * 3], y_values[num * 3] + 0.5
+        left_value = x_values[num * 4], y_values[num * 4] + 0.5
+        right_value = x_values[num * 2], y_values[num * 2] + 0.5
         return [center_value, left_value, right_value]
 
     def get_math_expression(self) -> str:
-        return self.expression.replace('(x)**', 'x**').replace('**2', '²').replace('**3', '³').replace('math.sqrt', '√') \
+        return self.expression.replace('(math.e**x - math.e**(-x)) / 2', 'Sh(x)') \
+            .replace('(math.e**(x + 1) - math.e**(-(x + 1))) / 2', 'Sh(x + 1)') \
+            .replace('(math.e**(x - 1) - math.e**(-(x - 1))) / 2', 'Sh(x - 1)') \
+            .replace('(math.e**x + math.e**(-x)) / 2', 'Ch(x)') \
+            .replace('(math.e**(x + 1) + math.e**(-(x + 1))) / 2', 'Ch(x + 1)') \
+            .replace('(math.e**(x - 1) + math.e**(-(x - 1))) / 2', 'Ch(x - 1)') \
+            .replace('(math.e**x - math.e**(-x)) / (math.e**x + math.e**(-x))', 'Th(x)') \
+            .replace('(math.e**(x + 1) - math.e**(-(x + 1))) / (math.e**(x + 1) + math.e**(-(x + 1)))', 'Th(x + 1)') \
+            .replace('(math.e**(x - 1) - math.e**(-(x - 1))) / (math.e**(x - 1) + math.e**(-(x - 1)))', 'Th(x - 1)') \
+            .replace('math.cos(x) / math.sin(x)', 'cot(x)') \
+            .replace('math.cos(x + 1) / math.sin(x + 1)', 'cot(x + 1)') \
+            .replace('math.cos(x - 1) / math.sin(x - 1)', 'cot(x - 1)') \
+            .replace('1 / math.sin(x)', 'csc(x)') \
+            .replace('1 / math.sin(x + 1)', 'csc(x + 1)') \
+            .replace('1 / math.sin(x - 1)', 'csc(x - 1)') \
+            .replace('1 / math.cos(x)', 'sec(x)') \
+            .replace('1 / math.cos(x + 1)', 'sec(x + 1)') \
+            .replace('1 / math.cos(x - 1)', 'sec(x -1)') \
+            .replace('(x)**', 'x**').replace('**2', '²').replace('**3', '³').replace('math.sqrt', '√') \
             .replace('**', '^').replace('math.e', 'e').replace('math.log', 'ln').replace('math.cosh', 'cosh') \
             .replace('math.cos', 'cos').replace('math.acos', 'acos').replace('math.sin', 'sin') \
             .replace('math.tan', 'tan').replace('math.asin', 'asin')
 
     def get_sympy_expression(self) -> str:
         return self.expression.replace('math.e', 'E').replace('math.tan', 'tan').replace('math.log', 'log')
-
-    ########################################################################################################################
-    ########################################################################################################################
-    ########################################################################################################################
-    ########################################################################################################################
-    ########################################################################################################################
-    ########################################################################################################################
-
-    def get_constant_points(self):
-        min_x, max_x = self.x_values_range[1:-1].split(',')
-        min_x, max_x = float(min_x), float(max_x)
-        min_y, max_y = [eval(self.expression.replace('x', str(x))) for x in (min_x, max_x)]
-        if self.is_invert:
-            min_x, min_y = min_y, min_x
-            max_x, max_y = max_y, max_x
-        return (min_x, max_x), (min_y, max_y)

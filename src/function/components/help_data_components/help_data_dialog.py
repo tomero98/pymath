@@ -155,6 +155,14 @@ class HelpDataDialog(QWidget):
 
         PlotFactory2.set_points(graph=self._plot_widget, points=self._current_step.points,
                                 color=self._current_step.point_color)
+        for help_range in self._current_step.help_ranges:
+            linear_region_item = pyqtgraph.LinearRegionItem(
+                values=(help_range[0], help_range[1]), orientation=self._current_step.help_range_orientation,
+                swapMode='block'
+            )
+            linear_region_item.setMovable(False)
+            self._plot_widget.addItem(linear_region_item)
+
 
         self._text_label.setText(self._current_step.text)
 

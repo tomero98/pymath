@@ -20,6 +20,10 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
         )
         self._resolved = False
 
+    def _setup_data(self):
+        main_function = self._exercise.get_main_function()
+        main_function.setup_data(plot_range=self._exercise.plot_range)
+
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
         self._layout.addSpacing(10)
@@ -48,6 +52,8 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
         plot_widget = super(InverseSelectionComponent, self)._get_plot_widget()
         main_function = self._exercise.get_main_function()
         functions = self._get_option_function()
+        functions[0].setup_data(plot_range=self._exercise.plot_range)
+        functions[1].setup_data(plot_range=self._exercise.plot_range)
         colors = [(255, 0, 255), (255, 0, 0), (0, 0, 255)]
         random.shuffle(colors)
         PlotFactory2.set_functions(graph=plot_widget, functions=[functions[0]], function_width=3,
@@ -112,3 +118,6 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
 
     def _update_plot_with_error_data(self, function: Function):
         PlotFactory2.set_functions(graph=self._plot_widget, functions=[function], function_width=3, color='red')
+        help_function_values = [self._exercise.plot_range[0], self._exercise.plot_range[-1]]
+        PlotFactory2.set_graph_using_points(graph=self._plot_widget, x_values=help_function_values,
+                                            y_values=help_function_values, function_width=1, color='blue')

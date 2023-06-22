@@ -359,6 +359,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         return None
 
     def _setup_finished_exercise(self):
+        super(DomainDefinitionComponent, self)._setup_finished_exercise()
         self._validate_button.setDisabled(True)
         if self._create_range_button:
             self._create_range_button.setDisabled(True)

@@ -98,15 +98,27 @@ class DatabaseManager:
             {'exercise_type': 'ElementaryGraphExercise', 'domain': None, 'topic_id': 3},  # 1
 
             # Inverse exercises
-            {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 2
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 2
             {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 3
-
-            # Domain exercises
-            {'exercise_type': 'ConceptDomainExercise', 'domain': None, 'topic_id': 2},  # 4
-
-            # Maximum minimum exercises
-            {'exercise_type': 'MaximumMinimumExercise', 'domain': None, 'topic_id': 2},  # 5
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 4
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 5
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 6
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 7
+            {'exercise_type': 'InverseGraphExercise', 'domain': None, 'topic_id': 1},  # 8
+            {'exercise_type': 'InverseGraphExercise', 'domain': None, 'topic_id': 1},  # 9
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-4, 4', 'topic_id': 1},  # 10
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 11
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 12
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 13
+            {'exercise_type': 'InverseGraphExercise', 'domain': None, 'topic_id': 1},  # 14
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 15
+            {'exercise_type': 'InverseGraphExercise', 'domain': None, 'topic_id': 1},  # 16
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 17
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-4, 4', 'topic_id': 1},  # 18
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 19
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 20
         ]
+
         sql_query.prepare(
             """
             INSERT INTO exercises (exercise_type, domain, topic_id) VALUES (?, ?, ?)
@@ -152,19 +164,53 @@ class DatabaseManager:
             {'expression': 'math.cos(x)'},  # 11
             {'expression': 'math.sin(x)'},  # 12
             {'expression': 'math.tan(x)'},  # 13
-            {'expression': 'math.cos(x) / math.sin(x)'},  # 14 Revisar mismos problemas que con la tangente
-            {'expression': '1 / math.sin(x)'},  # 15 Revisar mismos problemas que con la tangente
-            {'expression': '1 / math.cos(x)'},  # 16 Revisar mismos problemas que con la tangente
+            {'expression': 'math.cos(x) / math.sin(x)'},  # 14
+            {'expression': '1 / math.sin(x)'},  # 15
+            {'expression': '1 / math.cos(x)'},  # 16
             {'expression': '(math.e**x - math.e**(-x)) / 2'},  # 17
             {'expression': '(math.e**x + math.e**(-x)) / 2'},  # 18
             {'expression': '(math.e**x - math.e**(-x)) / (math.e**x + math.e**(-x))'},  # 19
 
             # Inverse graphs
-            {'expression': '-x**(1/3)'},  # 10
-            {'expression': '-(x)**3 * (-x**2)'},  # 11
+            {'expression': '(-x)**3'},  # 20
+            {'expression': '1 / (x)**3'},  # 21
 
-            # Domain graphs
-            {'expression': 'x'},  # 12
+            {'expression': '1 / x'},  # 22
+            {'expression': '- 1 / x'},  # 23
+            {'expression': '-1 / math.sqrt(x)'},  # 24
+
+            {'expression': '- math.sqrt(x)'},  # 25
+
+            {'expression': 'math.sqrt(-x)'},  # 26
+            {'expression': '1 / math.sqrt(-x)'},  # 27
+            {'expression': '- math.sqrt(-x)'},  # 28
+
+            {'expression': '(3 * (x)**2) / ((x)**2 + 1)'},  # 29
+
+            {'expression': 'x**2 - abs(x)'},  # 30
+
+            {'expression': '- math.e**x'},  # 31
+            {'expression': '-(x)**3'},  # 32
+
+            {'expression': '(1 / 2)**x'},  # 33
+            {'expression': '-(1 / 2)**x'},  # 34
+            {'expression': '(1 / 2)**(-x)'},  # 35
+
+            {'expression': '- ((3 * (x)**2) / ((x)**2 + 1))'},  # 36
+
+            {'expression': '- ((3 * x) / ((x)**2 + 1))'},  # 37
+
+            {'expression': 'math.log2(x)'},  # 38
+            {'expression': '- math.log2(x)'},  # 39
+
+            {'expression': 'math.log10(x)'},  # 40
+            {'expression': '-math.log10(x)'},  # 41
+
+            {'expression': '(3 * x) / ((x)**2 + 1)'},  # 42
+
+            {'expression': '((x)**2 +  1) / x'},  # 43
+
+            {'expression': 'math.log10(-x)'},  # 44
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -223,16 +269,66 @@ class DatabaseManager:
             {'exercise_id': 1, 'graph_id': 19, 'domain': None, 'is_main_graphic': 0},  # 19
 
             # Inverse exercise
-            {'exercise_id': 2, 'graph_id': 2, 'domain': None, 'is_main_graphic': True},  # 10
-            {'exercise_id': 2, 'graph_id': 10, 'domain': None, 'is_main_graphic': False},  # 11
-            {'exercise_id': 2, 'graph_id': 11, 'domain': None, 'is_main_graphic': False},  # 12
+            {'exercise_id': 2, 'graph_id': 2, 'domain': None, 'is_main_graphic': 1},  # 20
+            {'exercise_id': 2, 'graph_id': 20, 'domain': None, 'is_main_graphic': 0},  # 21
+            {'exercise_id': 2, 'graph_id': 21, 'domain': None, 'is_main_graphic': 0},  # 22
 
-            {'exercise_id': 3, 'graph_id': 3, 'domain': None, 'is_main_graphic': True},  # 14
+            {'exercise_id': 3, 'graph_id': 1, 'domain': None, 'is_main_graphic': 1},  # 23
 
-            {'exercise_id': 4, 'graph_id': 12, 'domain': None, 'is_main_graphic': True},  # 15
+            {'exercise_id': 4, 'graph_id': 22, 'domain': None, 'is_main_graphic': 1},  # 24
+            {'exercise_id': 4, 'graph_id': 23, 'domain': None, 'is_main_graphic': 0},  # 25
+            {'exercise_id': 4, 'graph_id': 24, 'domain': None, 'is_main_graphic': 0},  # 26
 
-            {'exercise_id': 5, 'graph_id': 3, 'domain': '(3, 3)', 'is_main_graphic': True},  # 16
+            {'exercise_id': 5, 'graph_id': 23, 'domain': None, 'is_main_graphic': 1},  # 27
+            {'exercise_id': 5, 'graph_id': 22, 'domain': None, 'is_main_graphic': 0},  # 28
+            {'exercise_id': 5, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 29
+
+            {'exercise_id': 6, 'graph_id': 5, 'domain': None, 'is_main_graphic': 1},  # 29
+            {'exercise_id': 6, 'graph_id': 2, 'domain': None, 'is_main_graphic': 0},  # 30
+            {'exercise_id': 6, 'graph_id': 25, 'domain': None, 'is_main_graphic': 0},  # 31
+
+            {'exercise_id': 7, 'graph_id': 26, 'domain': None, 'is_main_graphic': 1},  # 29
+            {'exercise_id': 7, 'graph_id': 27, 'domain': None, 'is_main_graphic': 0},  # 30
+            {'exercise_id': 7, 'graph_id': 28, 'domain': None, 'is_main_graphic': 0},  # 31
+
+            {'exercise_id': 8, 'graph_id': 11, 'domain': None, 'is_main_graphic': 1},  # 32
+
+            {'exercise_id': 9, 'graph_id': 18, 'domain': None, 'is_main_graphic': 1},  # 33
+
+            {'exercise_id': 10, 'graph_id': 29, 'domain': None, 'is_main_graphic': 1},  # 33
+
+            {'exercise_id': 11, 'graph_id': 30, 'domain': None, 'is_main_graphic': 1},  # 34
+
+            {'exercise_id': 12, 'graph_id': 9, 'domain': None, 'is_main_graphic': 1},  # 29
+            {'exercise_id': 12, 'graph_id': 31, 'domain': None, 'is_main_graphic': 0},  # 30
+            {'exercise_id': 12, 'graph_id': 32, 'domain': None, 'is_main_graphic': 0},  # 31
+
+            {'exercise_id': 13, 'graph_id': 33, 'domain': None, 'is_main_graphic': 1},  # 32
+            {'exercise_id': 13, 'graph_id': 34, 'domain': None, 'is_main_graphic': 0},  # 33
+            {'exercise_id': 13, 'graph_id': 35, 'domain': None, 'is_main_graphic': 0},  # 34
+
+            {'exercise_id': 14, 'graph_id': 36, 'domain': None, 'is_main_graphic': 1},  # 35
+
+            {'exercise_id': 15, 'graph_id': 37, 'domain': None, 'is_main_graphic': 1},  # 36
+
+            {'exercise_id': 16, 'graph_id': 38, 'domain': None, 'is_main_graphic': 1},  # 37
+            {'exercise_id': 16, 'graph_id': 39, 'domain': None, 'is_main_graphic': 0},  # 38
+            {'exercise_id': 16, 'graph_id': 26, 'domain': None, 'is_main_graphic': 0},  # 39
+
+            {'exercise_id': 17, 'graph_id': 40, 'domain': None, 'is_main_graphic': 1},  # 40
+            {'exercise_id': 17, 'graph_id': 41, 'domain': None, 'is_main_graphic': 0},  # 41
+            {'exercise_id': 17, 'graph_id': 1, 'domain': None, 'is_main_graphic': 0},  # 42
+
+            {'exercise_id': 18, 'graph_id': 42, 'domain': None, 'is_main_graphic': 1},  # 43
+
+            {'exercise_id': 19, 'graph_id': 43, 'domain': None, 'is_main_graphic': 1},  # 44
+
+            {'exercise_id': 20, 'graph_id': 44, 'domain': None, 'is_main_graphic': 1},  # 45
+            {'exercise_id': 20, 'graph_id': 28, 'domain': None, 'is_main_graphic': 0},  # 46
+            {'exercise_id': 20, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 47
+
         ]
+
         sql_query = QSqlQuery()
         sql_query.prepare(
             """

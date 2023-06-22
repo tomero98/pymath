@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt, QSize
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
@@ -21,6 +19,10 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         )
 
         self._region: pyqtgraph.LinearRegionItem = None  # noqa
+
+    def _setup_data(self):
+        main_function = self._exercise.get_main_function()
+        main_function.setup_data(plot_range=self._exercise.plot_range)
 
     def _get_function_to_draw(self):
         return self._exercise.get_main_function()
@@ -49,7 +51,8 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
         PlotFactory2.set_functions(graph=plot_widget, functions=[self._exercise.get_main_function()],
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
-        self._region = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort')
+        self._region = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort',
+                                                  bounds=self._exercise.plot_range)
         plot_widget.addItem(self._region)
         return plot_widget
 
@@ -80,7 +83,6 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
 
         if is_resume:
             self._region.setRegion(expression_selected)
-            self._region.setMovable(False)
 
         if is_answer_correct:
             self._setup_correct_response()
@@ -110,3 +112,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         self._result_label.setText('Incorrecto. Los dos puntos indicados muestran porque la gráfica no tiene inversa.')
         self._result_label.setStyleSheet('color: red')
         self._result_label.setVisible(True)
+
+    def _setup_finished_exercise(self):
+        super(InverseDelimitedComponent, self)._setup_finished_exercise()
+        self._region.setMovable(False)

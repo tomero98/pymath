@@ -1,5 +1,6 @@
 from ..elementary_graph_components import ElementaryGraphComponent
-from ...models import ExerciseResume, FunctionExercise, FunctionStep
+from ...factories import PlotFactory2
+from ...models import ExerciseResume, FunctionExercise, FunctionStep, Point
 
 
 class InverseConceptComponent(ElementaryGraphComponent):
@@ -10,6 +11,10 @@ class InverseConceptComponent(ElementaryGraphComponent):
             exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_main_function_limits=False,
             show_function_labels=False
         )
+
+    def _setup_data(self):
+        main_function = self._exercise.get_main_function()
+        main_function.setup_data(plot_range=self._exercise.plot_range)
 
     def _get_options_to_display(self):
         return ['SÍ', 'NO']
@@ -43,7 +48,11 @@ class InverseConceptComponent(ElementaryGraphComponent):
                                      )
 
     def _setup_wrong_response(self, expression_selected: str):
-        self._result_label.setText(f'Incorrecto. La expresión esperada es {self._get_correct_expression()}')
+        if expression_selected == 'SÍ':
+            self._setup_wrong_yes_inverse_response()
+        elif expression_selected == 'NO':
+            self._result_label.setText(f'Incorrecto. No hay imágenes repetidas en la función.')
+
         self._result_label.setStyleSheet('color: red;')
         self._result_label.setVisible(True)
 
@@ -82,3 +91,25 @@ class InverseConceptComponent(ElementaryGraphComponent):
             }
             """
                                      )
+
+    def _setup_wrong_yes_inverse_response(self):
+        self._result_label.setText(f'Incorrecto. Hay imágenes repetidas en la función.')
+        main_function = self._get_function_to_draw()
+        values = [
+            (x, y) for x_group, y_group in zip(main_function.x_values, main_function.y_values)
+            for x, y in zip(x_group, y_group)
+            if self._exercise.plot_range[0] + 0.5 < x < self._exercise.plot_range[1] - 0.5 and
+               self._exercise.plot_range[0] + 0.5 < y < self._exercise.plot_range[1] - 0.5
+        ]
+
+        y_values_set = set()
+        x_by_y = {}
+        points = []
+
+        for x, y in values:
+            if y not in y_values_set:
+                y_values_set.add(y)
+                x_by_y[y] = x
+            else:
+                points = [Point(x, y), Point(x_by_y[y], y)]
+        PlotFactory2.set_points(self._plot_widget, points=points, color='red')

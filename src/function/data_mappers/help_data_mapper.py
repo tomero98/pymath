@@ -87,17 +87,12 @@ class HelpDataMapper:
                         text='Si delimitamos el dominio de la gráfica puede tener inversa')
 
     def _get_first_step_delimited_inverse_help(self) -> HelpStep:
-        function_one = Function(function_id=0, expression='0', x_values_range=(-5, 5), is_main_graphic=False,
-                                is_invert_function=True)
+        function_one = Function(function_id=0, expression='(x)**2', x_values_range=(0, 3), is_main_graphic=False)
         function_one.setup_data(plot_range=(-5, 5))
-
-        function_two = Function(function_id=0, expression='2', x_values_range=(-5, 5), is_main_graphic=False,
-                                is_invert_function=True)
-        function_two.setup_data(plot_range=(-5, 5))
+        function_one.x_values, function_one.y_values = function_one.y_values, function_one.x_values
 
         text = 'Al delimitar el dominio para 0 y 2 podemos observar que si tiene inversa, ya que no se repiten puntos'
-        return HelpStep(order=0, functions=[function_one, function_two],
-                        text=text, function_color='blue')
+        return HelpStep(order=0, functions=[function_one], help_ranges=[(0, 5)], text=text, function_color='blue')
 
     def _get_indicate_elementary_shift_exercise_help(self) -> List[HelpData]:
         first_help_data = self._get_first_help_data_elementary_shift()

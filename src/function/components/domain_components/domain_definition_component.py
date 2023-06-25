@@ -57,9 +57,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         widget.setObjectName('topic-container')
 
         layout = QHBoxLayout()
-
+        text = 'Dominio' if self._ORIENTATION == 'vertical' else 'Recorrido'
         self._domain_expression_label = LabelFactory.get_label_component(
-            text='Dominio:', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter
+            text=f'{text}:', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter
         )
         self._domain_expression_edit_label = self._get_domain_expression_edit_label()
         layout.addStretch()
@@ -191,8 +191,10 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
                                       lower_limit_type: str, upper_limit_type: str,
                                       linear_region_item: LinearRegionItem = None):
         if not linear_region_item:
-            linear_region_item = pyqtgraph.LinearRegionItem(values=(lower_bound, upper_bound), orientation='vertical',
-                                                            swapMode='block', bounds=(min_value, max_value))
+            linear_region_item = pyqtgraph.LinearRegionItem(
+                values=(lower_bound, upper_bound), orientation=self._ORIENTATION, swapMode='block',
+                bounds=(min_value, max_value)
+            )
             linear_region_item.sigRegionChangeFinished.connect(self._update_domain_expression_edit_label)
             self._linear_region_items.append(linear_region_item)
             self._plot_widget.addItem(linear_region_item)

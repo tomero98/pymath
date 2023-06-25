@@ -117,6 +117,10 @@ class DatabaseManager:
             {'exercise_type': 'InverseGraphExercise', 'domain': '-4, 4', 'topic_id': 1},  # 18
             {'exercise_type': 'InverseGraphExercise', 'domain': '-3, 3', 'topic_id': 1},  # 19
             {'exercise_type': 'InverseGraphExercise', 'domain': '-2, 2', 'topic_id': 1},  # 20
+
+            # Domain exercises
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 21
+
         ]
 
         sql_query.prepare(
@@ -211,6 +215,12 @@ class DatabaseManager:
             {'expression': '((x)**2 +  1) / x'},  # 43
 
             {'expression': 'math.log10(-x)'},  # 44
+
+            {'expression': '(x)**2 / 4'},  # 45
+
+            {'expression': '-(x)**2 / 2 + 4'},  # 46
+
+            {'expression': '0'},  # 47
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -327,6 +337,11 @@ class DatabaseManager:
             {'exercise_id': 20, 'graph_id': 28, 'domain': None, 'is_main_graphic': 0},  # 46
             {'exercise_id': 20, 'graph_id': 9, 'domain': None, 'is_main_graphic': 0},  # 47
 
+            # DomainExercises
+            {'exercise_id': 21, 'graph_id': 45, 'domain': '[-4, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 21, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 21, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 21, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
         ]
 
         sql_query = QSqlQuery()

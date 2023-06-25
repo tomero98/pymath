@@ -21,11 +21,11 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         self._region: pyqtgraph.LinearRegionItem = None  # noqa
 
     def _setup_data(self):
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         main_function.setup_data(plot_range=self._exercise.plot_range)
 
     def _get_function_to_draw(self):
-        return self._exercise.get_main_function()
+        return self._exercise.get_main_function()[0]
 
     def _setup_layout(self):
         super(InverseDelimitedComponent, self)._setup_layout()
@@ -40,7 +40,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         return layout
 
     def _is_exercise_correct(self, expression_selected: tuple):
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         y_values_selected = [
             y for x_group, y_group in zip(main_function.x_values, main_function.y_values)
             for x, y in zip(x_group, y_group) if expression_selected[0] <= x <= expression_selected[1]
@@ -49,7 +49,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
-        PlotFactory2.set_functions(graph=plot_widget, functions=[self._exercise.get_main_function()],
+        PlotFactory2.set_functions(graph=plot_widget, functions=[self._exercise.get_main_function()[0]],
                                    function_width=5, color='white', show_limits=self._show_main_function_limits)
         self._region = pyqtgraph.LinearRegionItem(values=(-1, 1), orientation='vertical', swapMode='sort',
                                                   bounds=self._exercise.plot_range)
@@ -91,7 +91,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         self._setup_finished_exercise()
 
     def _setup_wrong_response(self, expression_selected: str):
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         expression_selected = tuple(map(float, expression_selected.split(',')))
         values_selected = [
             (x, y) for x_group, y_group in zip(main_function.x_values, main_function.y_values)

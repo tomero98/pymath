@@ -66,7 +66,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = PlotFactory2.get_plot(function_range=self._exercise.plot_range)
         PlotFactory2.set_functions(
-            graph=plot_widget, functions=[self._exercise.get_main_function()], function_width=5, color='white',
+            graph=plot_widget, functions=self._exercise.get_main_function(), function_width=5, color='white',
             show_limits=self._show_main_function_limits, click_function=self._on_function_to_draw_click
         )
         self._proxy = pyqtgraph.SignalProxy(plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)

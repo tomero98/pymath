@@ -48,7 +48,9 @@ class GraphInteractionValidationComponent(Component):
         pass
 
     def _setup_data(self):
-        pass
+        main_functions = self._exercise.get_main_function()
+        for main_function in main_functions:
+            main_function.setup_data(self._exercise.plot_range)
 
     def _draw(self):
         self._layout = QHBoxLayout()
@@ -131,7 +133,7 @@ class GraphInteractionValidationComponent(Component):
     def _set_plot_widget(self):
         self._plot_widget = PlotFactory2.get_plot(function_range=self._exercise.exercise_domain)
         click_main_function = self._on_function_to_draw_click if self._add_interaction_to_main_graph else None
-        PlotFactory2.set_functions(graph=self._plot_widget, functions=[self._exercise.get_main_function()],
+        PlotFactory2.set_functions(graph=self._plot_widget, functions=self._exercise.get_main_function(),
                                    function_width=5, color='white', show_limits=self._show_main_function_limits,
                                    click_function=click_main_function)
 

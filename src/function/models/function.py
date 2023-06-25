@@ -107,6 +107,10 @@ class Function:
         range_parts = []
         all_y_values = [item for y_list in self.y_values for item in y_list]
         min_y, max_y = min(all_y_values), max(all_y_values)
+
+        if len(set(all_y_values)) == 1:
+            return f'[{min_y}, {max_y}]'
+
         if min_y < plot_range[0]:
             range_parts.append('(-inf')
         else:

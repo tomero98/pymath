@@ -25,7 +25,7 @@ class ElementaryShiftGraphComponent(ElementaryGraphComponent):
 
     def _setup_functions(self):
         functions = []
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         main_function_expression = main_function.expression
 
         expression = f'{main_function_expression} - 1'

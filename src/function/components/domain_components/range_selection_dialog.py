@@ -123,11 +123,11 @@ class RangeSelectionDialog(QWidget):
                     self._range_edition_help_text.setStyleSheet('color: red;')
                     return None
 
-            if lower_limit >= upper_limit:
-                self._continue_button.setDisabled(True)
-                self._range_edition_help_text.setText('El límite inferior es mayor o igual que el límite mayor.')
-                self._range_edition_help_text.setStyleSheet('color: red;')
-                return None
+            # if lower_limit >= upper_limit:
+            #     self._continue_button.setDisabled(True)
+            #     self._range_edition_help_text.setText('El límite inferior es mayor o igual que el límite mayor.')
+            #     self._range_edition_help_text.setStyleSheet('color: red;')
+            #     return None
 
             if not lower_limit == float('-inf') and lower_limit < self._plot_range[0]:
                 self._continue_button.setDisabled(True)

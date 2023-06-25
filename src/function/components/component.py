@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import List
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QPushButton
@@ -61,7 +62,7 @@ class Component(QWidget):
         pass
 
     @abstractmethod
-    def _get_function_to_draw(self) -> Function:
+    def _get_function_to_draw(self) -> [Function, List]:
         pass
 
     def _setup_resume(self):
@@ -79,9 +80,11 @@ class Component(QWidget):
         self.back_signal.emit(self._step.type)
 
     def _initialize_resume(self):
+        function = self._get_function_to_draw()[0] if isinstance(self._get_function_to_draw(), list) \
+            else self._get_function_to_draw()
         self._resume = ExerciseResume(
             resume_state=ResumeState.pending, show_help=False, exercise_id=self._exercise.id,
-            step_type=self._step.type, function_id=self._get_function_to_draw().function_id, response=None
+            step_type=self._step.type, function_id=function.function_id, response=None
         )
 
     def _get_help_button(self) -> QPushButton:

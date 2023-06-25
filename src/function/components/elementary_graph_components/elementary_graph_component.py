@@ -23,10 +23,6 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         self._bottom_buttons_layout: QHBoxLayout = None  # noqa
         self._bottom_buttons_widget: QWidget = None  # noqa
 
-    def _setup_data(self):
-        main_function = self._exercise.get_main_function()
-        main_function.setup_data((-5, 5))
-
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._plot_widget_container, alignment=Qt.AlignHCenter)
@@ -134,7 +130,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         self._result_label.setVisible(True)
 
     def _get_function_to_draw(self):
-        return self._exercise.get_main_function()
+        return self._exercise.get_main_function()[0]
 
     def _apply_resume(self):
         self._button_selected_index = next(
@@ -175,7 +171,7 @@ class ElementaryGraphComponent(GraphInteractionValidationComponent):
         return [function.get_math_expression() for function in self._exercise.functions]
 
     def _get_correct_expression(self):
-        return self._exercise.get_main_function().get_math_expression()
+        return self._exercise.get_main_function()[0].get_math_expression()
 
     def _get_error_function(self, expression: str) -> Function:
         return next(function for function in self._exercise.functions if function.get_math_expression() == expression)

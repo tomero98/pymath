@@ -12,15 +12,11 @@ class InverseConceptComponent(ElementaryGraphComponent):
             show_function_labels=False
         )
 
-    def _setup_data(self):
-        main_function = self._exercise.get_main_function()
-        main_function.setup_data(plot_range=self._exercise.plot_range)
-
     def _get_options_to_display(self):
         return ['SÍ', 'NO']
 
     def _get_function_to_draw(self):
-        return self._exercise.get_main_function()
+        return self._exercise.get_main_function()[0]
 
     def _get_correct_expression(self):
         return 'SÍ' if self._exercise.has_main_function_inverse() else 'NO'

@@ -41,6 +41,11 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._result_label: QLabel = None  # noqa
         self._validate_button: QPushButton = None  # noqa
 
+    def _setup_data(self):
+        main_functions = self._exercise.get_main_function()
+        for main_function in main_functions:
+            main_function.setup_domain_data(self._exercise.plot_range)
+
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
         self._validate_button = self._get_validate_button()
@@ -283,7 +288,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _on_click_validation_button(self):
         self._validate_exercise(expression_selected=self._domain_expression_edit_label.text())
 
-    def _get_function_to_draw(self) -> Function:
+    def _get_function_to_draw(self) -> List[Function]:
         return self._exercise.get_main_function()
 
     def _validate_exercise(self, expression_selected: str, is_resume: bool = False):
@@ -296,16 +301,22 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             region_item.setMovable(False)
 
         is_correct, user_wrong_domain_num_set, user_missed_domain_num_set = \
-            self._exercise.validate_domain_expression(user_domain_input=expression_selected)
+            self._set_validation(expression_selected)
         if is_correct:
             self._setup_correct_response()
         else:
             self._setup_wrong_response(
-                correct_response=self._exercise.get_domain_expression(),
+                correct_response=self._get_correct_expression(),
                 user_wrong_domain_num_set=user_wrong_domain_num_set,
                 user_missed_domain_num_set=user_missed_domain_num_set
             )
         self._setup_finished_exercise()
+
+    def _get_correct_expression(self) -> str:
+        return self._exercise.get_domain_expression()
+
+    def _set_validation(self, *args, **kwargs):
+        return self._exercise.validate_domain_expression(*args, **kwargs)
 
     def _setup_user_range(self, range_expression: str):
         range_expression_list = range_expression.split(' U ')
@@ -319,7 +330,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _setup_wrong_response(self, correct_response: str, user_wrong_domain_num_set: set,
                               user_missed_domain_num_set: set):
-        self._result_label.setText(f'Incorrecto. El dominio de la función es el siguiente: {correct_response}')
+        text = self._get_error_label_text(correct_response=correct_response)
+        self._result_label.setText(text)
         self._result_label.setStyleSheet('color: red')
         self._result_label.setVisible(True)
 
@@ -334,6 +346,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             sorted_missed_num_set = sorted(user_missed_domain_num_set)
             x_points = set(sorted_missed_num_set[::slice_num])
             self._setup_constant_points(x_points=x_points, color='red')
+
+    def _get_error_label_text(self, correct_response: str) -> str:
+        return f'Incorrecto. El dominio de la función es el siguiente: {correct_response}'
 
     def _setup_constant_points(self, x_points: set, color: str):
         if self._ORIENTATION == 'vertical':

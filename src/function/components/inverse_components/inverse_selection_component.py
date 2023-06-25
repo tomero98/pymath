@@ -21,7 +21,7 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
         self._resolved = False
 
     def _setup_data(self):
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         main_function.setup_data(plot_range=self._exercise.plot_range)
 
     def _setup_layout(self):
@@ -46,11 +46,11 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
         return expression_selected == correct_expression
 
     def _get_function_to_draw(self):
-        return self._exercise.get_main_function()
+        return self._exercise.get_main_function()[0]
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
         plot_widget = super(InverseSelectionComponent, self)._get_plot_widget()
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         functions = self._get_option_function()
         functions[0].setup_data(plot_range=self._exercise.plot_range)
         functions[1].setup_data(plot_range=self._exercise.plot_range)
@@ -90,7 +90,7 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
             function = None
 
         PlotFactory2.reset_graph(self._plot_widget)
-        main_function = self._exercise.get_main_function()
+        main_function = self._exercise.get_main_function()[0]
         PlotFactory2.set_functions(graph=self._plot_widget, functions=[main_function], function_width=5, color='white')
         self._setup_inverse_plot(color='green', function=main_function, plot_widget=self._plot_widget)
 

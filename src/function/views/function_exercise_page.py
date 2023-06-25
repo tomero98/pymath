@@ -128,7 +128,7 @@ class FunctionExercisePage(Window):
 
             self._setup_signals(component=self._current_exercise_component)
             self._current_exercise_component.draw()
-        except IndexError:
+        except IndexError as e:
             print('No hay ejercicios de este tipo')
             sys.exit(0)
 

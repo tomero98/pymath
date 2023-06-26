@@ -32,6 +32,11 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._proxy = None
         self._coordinates_label: QLabel = None  # noqa
 
+    def _setup_data(self):
+        main_functions = self._exercise.get_main_function()
+        for main_function in main_functions:
+            main_function.setup_domain_data(self._exercise.plot_range)
+
     def _setup_layout(self):
         self._layout.addWidget(self._question_label, alignment=Qt.AlignHCenter)
         self._layout.addSpacing(10)
@@ -46,7 +51,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._validate_exercise(expression_selected=self._answers_by_point_type)
 
     def _get_correct_expression(self):
-        return self._exercise._get_maximum_minimum_points()
+        return self._exercise.get_maximum_minimum_points()
 
     def _get_function_to_draw(self):
         return self._exercise.get_main_function()
@@ -70,7 +75,13 @@ class MaximumMinimumComponent(InverseSelectionComponent):
             show_limits=self._show_main_function_limits, click_function=self._on_function_to_draw_click
         )
         self._proxy = pyqtgraph.SignalProxy(plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
+        self._set_point_graphs(plot_widget=plot_widget)
         return plot_widget
+
+    def _set_point_graphs(self, plot_widget: pyqtgraph.PlotWidget):
+        for point in self._exercise.exercise_points:
+            color = 'w' if point.is_included else 'black'
+            PlotFactory2.set_points(graph=plot_widget, points=[point], color=color)
 
     def _setup_components(self):
         super(MaximumMinimumComponent, self)._setup_components()

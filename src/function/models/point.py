@@ -2,9 +2,10 @@ import math
 
 
 class Point:
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float, is_included: bool = True):
         self.x = x
         self.y = y
+        self.is_included = is_included
 
     def __str__(self):
         return f'({self.x}, {self.y})'

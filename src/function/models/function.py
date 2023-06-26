@@ -27,9 +27,10 @@ class Function:
         self.domain = domain
         self.real_range = ''
         self.is_invert_function = is_invert_function
+        self.points = []
 
     def setup_data(self, plot_range: Tuple[int, int]):
-        self.x_values, self.y_values = self.get_points()
+        self.x_values, self.y_values = self.get_points(plot_range=plot_range)
         if self.is_invert_function:
             self.x_values, self.y_values = self.y_values, self.x_values
 
@@ -40,18 +41,32 @@ class Function:
         self.real_range = self.get_range_expression(plot_range=plot_range)
 
     @lru_cache(maxsize=2)
-    def get_points(self) -> (List[int], List[int]):
+    def get_points(self, plot_range: Tuple[int, int] = (-5, 5)) -> (List[int], List[int]):
         all_x_values, all_y_values = [], []
         min_x, max_x = self.x_values_range[0], self.x_values_range[1]
         value = 100
 
         x_values, y_values = [], []
-        for x_value in [num / value for num in range(min_x * value, max_x * value + 1, 1)]:
+        range_value = [num / value for num in range(min_x * value, max_x * value + 1, 1)]
+        for index, x_value in enumerate(range_value):
             try:
                 y_value = eval(self.expression.replace('x', str(x_value)))
 
                 x_values.append(x_value)
                 y_values.append(y_value)
+                is_included = True
+
+                if index == 0:
+                    if self.domain[0] != '[' and '-inf' not in self.domain:
+                        is_included = False
+
+                if index == len(range_value) - 1:
+                    if self.domain[-1] != ']' and '+inf' not in self.domain:
+                        is_included = False
+
+
+                is_included = is_included if plot_range[0] <= y_value <= plot_range[1] else False
+                self.points.append((x_value, y_value, is_included))
             except Exception as e:
                 self.vertical_asymptotes.append(x_value)
                 if x_values:

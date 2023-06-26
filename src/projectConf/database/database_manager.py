@@ -24,6 +24,7 @@ class DatabaseManager:
         self._setup_exercise_data()
         self._setup_graph_data()
         self._setup_exercise_graph_data()
+        self._setup_exercise_graph_points_data()
         self._setup_exercise_resume()
         self._setup_exercise_settings_data()
         self._setup_step_settings_data()
@@ -120,6 +121,9 @@ class DatabaseManager:
 
             # Domain exercises
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 21
+
+            # Maximum exercises
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 22
 
         ]
 
@@ -342,6 +346,12 @@ class DatabaseManager:
             {'exercise_id': 21, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 21, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 21, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+
+            # Maximum exercises
+            {'exercise_id': 22, 'graph_id': 45, 'domain': '[-4, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 22, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 22, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 22, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
         ]
 
         sql_query = QSqlQuery()
@@ -356,6 +366,48 @@ class DatabaseManager:
             sql_query.addBindValue(exercise_graph['graph_id'])
             sql_query.addBindValue(exercise_graph['domain'])
             sql_query.addBindValue(exercise_graph['is_main_graphic'])
+            sql_query.exec()
+
+    def _setup_exercise_graph_points_data(self):
+        self._create_exercise_graph_points_table()
+        self._populate_exercise_graph_points_data()
+
+    @staticmethod
+    def _create_exercise_graph_points_table():
+        sql_query = QSqlQuery()
+        sql_query.exec(
+            """
+            CREATE TABLE exercise_graph_points (
+                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+                exercise_id INT NOT NULL,
+                x_value INT NOT NULL,
+                y_value INT NOT NULL,
+                is_included INT,
+                FOREIGN KEY (exercise_id) REFERENCES exercises(id)
+                )
+            """
+        )
+
+    @staticmethod
+    def _populate_exercise_graph_points_data():
+        exercise_graph_point_seed = [
+            # Points
+            {'exercise_id': 22, 'x_value': 4, 'y_value': 0, 'is_included': 1},  # 1
+            {'exercise_id': 22, 'x_value': 4, 'y_value': 4, 'is_included': 0},  # 2
+        ]
+
+        sql_query = QSqlQuery()
+        sql_query.prepare(
+            """
+            INSERT INTO exercise_graph_points (exercise_id, x_value, y_value, is_included) VALUES (?, ?, ?, ?)
+            """
+        )
+
+        for exercise_graph_point in exercise_graph_point_seed:
+            sql_query.addBindValue(exercise_graph_point['exercise_id'])
+            sql_query.addBindValue(exercise_graph_point['x_value'])
+            sql_query.addBindValue(exercise_graph_point['y_value'])
+            sql_query.addBindValue(exercise_graph_point['is_included'])
             sql_query.exec()
 
     def _setup_exercise_resume(self):

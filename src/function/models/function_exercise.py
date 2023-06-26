@@ -1,6 +1,8 @@
+from collections import defaultdict
 from functools import lru_cache
 from typing import List, Tuple
 
+from .point import Point
 from .enums.function_exercise_type import FunctionExerciseType
 from .function import Function
 from .function_step import FunctionStep
@@ -8,7 +10,8 @@ from .function_step import FunctionStep
 
 class FunctionExercise:
     def __init__(self, identifier: int, exercise_type: str, title: str, plot_range: Tuple[int, int],
-                 exercise_order: int, functions: List[Function], steps: List[FunctionStep]):
+                 exercise_order: int, functions: List[Function], steps: List[FunctionStep],
+                 exercise_points: List[Point] = []):
         self.id = identifier
         self.type = exercise_type
         self.title = title
@@ -16,6 +19,7 @@ class FunctionExercise:
         self.exercise_order = exercise_order
         self.functions = functions
         self.steps = steps
+        self.exercise_points = exercise_points
 
     @classmethod
     def get_title_by_exercise_type(cls, exercise_type) -> str:
@@ -39,11 +43,116 @@ class FunctionExercise:
     def get_main_function(self) -> List:
         return [function for function in self.functions if function.is_main_graphic]
 
-    def _get_maximum_minimum_points(self):
-        return [
-            function.get_maximum_minimum_points(plot_range=self.plot_range)
-            for function in self.functions if function.is_main_graphic
+    def get_maximum_minimum_points(self):
+        max_points = []
+        min_points = []
+        maximum_minimum_points_by_type = defaultdict(list)
+        included_points_by_x_value = {
+            point.x: (point.x, point.y, point.is_included) for point in self.exercise_points if point.is_included
+        }
+        functions = sorted(self.functions, key=lambda function: function.x_values_range[0])
+        sorted_functions = []
+        constant_functions = []
+        for function in functions:
+            if function.expression.isdigit():
+                constant_functions.append(function)
+            else:
+                sorted_functions.append(function)
+
+        all_points_by_x_value = {}
+        for function in sorted_functions:
+            for point in function.points:
+                if point[0] in all_points_by_x_value and point[2]:
+                    all_points_by_x_value[point[0]] = point
+                else:
+                    all_points_by_x_value[point[0]] = point
+
+        all_points_by_x_value.update(included_points_by_x_value)
+        constant_points = []
+        constant_point_previous_x = None
+        for x_value, point in all_points_by_x_value.items():
+            if not max_points:
+                max_points.append(point)
+            elif max_points[0][1] == point[1]:
+                max_points.append(point)
+            elif max_points[0][1] < point[1]:
+                max_points = [point]
+
+            if not min_points:
+                min_points.append(point)
+            elif min_points[0][1] == point[1]:
+                min_points.append(point)
+            elif min_points[0][1] > point[1]:
+                min_points = [point]
+
+            if not point[2]:
+                continue
+
+            previous_point = all_points_by_x_value.get(round(x_value - 0.01, 3))
+            next_point = all_points_by_x_value.get(round(x_value + 0.01, 3))
+
+            is_constant_point = (previous_point is not None and previous_point[1] == point[1]) \
+                                or (next_point is not None and next_point[1] == point[1])
+            if is_constant_point:
+                constant_points.append(x_value)
+                if not constant_point_previous_x:
+                    constant_point_previous_x = x_value - 0.01
+                continue
+
+            is_minimum_value = True
+            is_maximum_value = True
+            if previous_point:
+                is_minimum_value = previous_point[1] > point[1]
+                is_maximum_value = previous_point[1] < point[1]
+
+            if next_point:
+                is_minimum_value = next_point[1] > point[1] and is_minimum_value
+                is_maximum_value = next_point[1] < point[1] and is_maximum_value
+
+            if is_minimum_value:
+                maximum_minimum_points_by_type['minimum'].append(point)
+            if is_maximum_value:
+                maximum_minimum_points_by_type['maximum'].append(point)
+
+            if constant_points:
+                constant_points_previous_point = all_points_by_x_value.get(constant_point_previous_x)
+                constant_points_next_point = all_points_by_x_value.get(constant_point_previous_x + 0.02)
+
+                is_minimum_value = True
+                is_maximum_value = True
+                if constant_points_previous_point:
+                    is_minimum_value = constant_points_previous_point[1] > point[1]
+                    is_maximum_value = constant_points_previous_point[1] < point[1]
+
+                if constant_points_next_point:
+                    is_minimum_value = constant_points_next_point[1] > point[1] and is_minimum_value
+                    is_maximum_value = constant_points_next_point[1] < point[1] and is_maximum_value
+
+                if is_minimum_value:
+                    maximum_minimum_points_by_type['minimum'].append(point)
+                if is_maximum_value:
+                    maximum_minimum_points_by_type['maximum'].append(point)
+
+                constant_points = []
+                constant_point_previous_x = None
+        maximum_relative_points = [
+            (point[0], point[1])
+            for point in maximum_minimum_points_by_type['maximum']
+            if not max_points or max_points[0][1] != point[1]
         ]
+        minimum_relative_points = [
+            (point[0], point[1])
+            for point in maximum_minimum_points_by_type['minimum']
+            if not min_points or min_points[0][1] != point[1]
+        ]
+        max_points = [(point[0], point[1]) for point in max_points if point[2]]
+        min_points = [(point[0], point[1]) for point in min_points if point[2]]
+        return {
+            'máximo absoluto': max_points if max_points else None,
+            'máximo relativo': maximum_relative_points if maximum_relative_points else None,
+            'mínimo absoluto': min_points if min_points else None,
+            'mínimo relativo': minimum_relative_points if minimum_relative_points else None,
+        }
 
     def validate_domain_expression(self, user_domain_input: str) -> [bool, set]:
         exercise_domain = self.get_domain_expression()
@@ -113,7 +222,7 @@ class FunctionExercise:
 
         user_range_set = set()
         for range_part in user_range_input.split(' U '):
-          user_range_set.update(self.get_num_set_from_range_expression(range_expression=range_part))
+            user_range_set.update(self.get_num_set_from_range_expression(range_expression=range_part))
         return exercise_range_set == user_range_set, \
                user_range_set - exercise_range_set, \
                exercise_range_set - user_range_set
@@ -156,5 +265,3 @@ class FunctionExercise:
     def get_function_by_expression(self, expression: str) -> Function:
         function = next(function for function in self.functions if function.expression == expression)
         return function
-
-

@@ -16,7 +16,7 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
                  need_help_data: bool = False, show_main_function_limits: bool = False):
         super(InverseSelectionComponent, self).__init__(
             exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
-            show_function_labels=show_main_function_limits
+            show_main_function_limits=show_main_function_limits
         )
         self._resolved = False
 

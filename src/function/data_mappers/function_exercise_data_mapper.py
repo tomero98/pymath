@@ -6,7 +6,7 @@ from copy import deepcopy
 from PyQt5.QtSql import QSqlQuery
 
 from .step_data_mapper import StepDataMapper
-from ..models import Function, FunctionExercise
+from ..models import Function, FunctionExercise, Point
 from ..models.enums import FunctionExerciseType
 from ...projectConf.models import Topic
 
@@ -34,6 +34,9 @@ class FunctionExerciseDataMapper:
         exercises = list(exercises_by_id.values())
         if exercises[0].type == FunctionExerciseType.elementary_graph_exercise.value:
             exercises = cls._setup_elementary_graph(main_exercise=exercises[0], topic=topic)
+
+        if exercises[0].type == FunctionExerciseType.maximum_minimum_exercise.value:
+            cls._setup_maximum_graph(exercises=exercises)
 
         cls._setup_steps(exercises=exercises, topic=topic)
         return [exercise for exercise in exercises if exercise.steps]
@@ -133,6 +136,27 @@ class FunctionExerciseDataMapper:
             index = random.randint(0, num_function_per_exercise - 1)
             exercise.functions[index].is_main_graphic = True
         return exercises
+
+    @staticmethod
+    def _setup_maximum_graph(exercises: List[FunctionExercise]):
+        exercise_by_exercise_id = {exercise.id: exercise for exercise in exercises}
+        exercise_ids = list(exercise_by_exercise_id.keys())
+        result = QSqlQuery()
+        query = f"""
+                    SELECT *
+                    FROM exercise_graph_points
+                    WHERE exercise_id IN ({', '.join(list(map(str, exercise_ids)))})
+            """
+        result.exec(query)
+
+        while result.next():
+            exercise_id = result.value('exercise_id')
+            x_value = result.value('x_value')
+            y_value = result.value('y_value')
+            is_included = bool(result.value('is_included'))
+            point = Point(x=x_value, y=y_value, is_included=is_included)
+            exercise_by_exercise_id[exercise_id].exercise_points.append(point)
+
 
     @staticmethod
     def _setup_steps(exercises: List[FunctionExercise], topic: Topic) -> None:

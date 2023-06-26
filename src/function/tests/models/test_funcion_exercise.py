@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from ...models import Function, FunctionExercise
+from ...models import Function, FunctionExercise, Point
 
 
 class TestFunctionExercise(TestCase):
@@ -162,5 +162,118 @@ class TestFunctionExercise(TestCase):
             'máximo relativo': [(1, 1)],
             'mínimo absoluto': [(0, 0)],
             'mínimo relativo': None,
+        }
+        self.assertEqual(expected_dict, max_min_points_dict)
+
+    def test_get_maximum_minimum_points__6(self):
+        function_exercise = FunctionExercise(identifier=0, exercise_type='', title='', plot_range=(-3, 3),
+                                             exercise_order=0, functions=[], steps=[])
+        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 0), is_main_graphic=True,
+                            domain='(-3, 0)')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='x', x_values_range=(0, 1), is_main_graphic=True,
+                            domain='(0, 1]')
+        function.setup_data((-3, 3))
+        function_exercise.exercise_points.append(Point(0, 3, True))
+        function_exercise.functions.append(function)
+        max_min_points_dict = function_exercise.get_maximum_minimum_points()
+        expected_dict = {
+            'máximo absoluto': None,
+            'máximo relativo': [(0, 3), (1, 1)],
+            'mínimo absoluto': None,
+            'mínimo relativo': None,
+        }
+        self.assertEqual(expected_dict, max_min_points_dict)
+
+    def test_get_maximum_minimum_points__7(self):
+        function_exercise = FunctionExercise(identifier=0, exercise_type='', title='', plot_range=(-3, 3),
+                                             exercise_order=0, functions=[], steps=[])
+        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 0), is_main_graphic=True,
+                            domain='(-3, 0)')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='x-1', x_values_range=(1, 2), is_main_graphic=True,
+                            domain='[1, 2)')
+        function.setup_data((-3, 3))
+        function_exercise.exercise_points.append(Point(0, 3, True))
+        function_exercise.functions.append(function)
+        max_min_points_dict = function_exercise.get_maximum_minimum_points()
+        expected_dict = {
+            'máximo absoluto': None,
+            'máximo relativo': [(0, 3)],
+            'mínimo absoluto': [(1, 0)],
+            'mínimo relativo': None,
+        }
+        self.assertEqual(expected_dict, max_min_points_dict)
+
+    def test_get_maximum_minimum_points__constant_function(self):
+        function_exercise = FunctionExercise(identifier=0, exercise_type='', title='', plot_range=(-3, 3),
+                                             exercise_order=0, functions=[], steps=[])
+        function = Function(function_id=0, expression='2', x_values_range=(-1, 0), is_main_graphic=True,
+                            domain='(-1, 0]')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+
+        max_min_points_dict = function_exercise.get_maximum_minimum_points()
+        expected_dict = {
+            'máximo absoluto': [(num / 100, 2) for num in range(-1 * 100, 0 * 100 + 1, 1)][1:],
+            'máximo relativo': None,
+            'mínimo absoluto': [(num / 100, 2) for num in range(-1 * 100, 0 * 100 + 1, 1)][1:],
+            'mínimo relativo': None,
+        }
+        self.assertEqual(expected_dict, max_min_points_dict)
+
+    def test_get_maximum_minimum_points__all_functions__with_shift(self):
+        function_exercise = FunctionExercise(identifier=0, exercise_type='', title='', plot_range=(-3, 3),
+                                             exercise_order=0, functions=[], steps=[])
+        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 0), is_main_graphic=True,
+                            domain='(-3, 0)')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='x-1', x_values_range=(1, 2), is_main_graphic=True,
+                            domain='(1, 2]')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='1', x_values_range=(3, 4), is_main_graphic=True,
+                            domain='[3, 4)')
+        function.setup_data((-4, 4))
+        function_exercise.exercise_points.append(Point(0, -3, True))
+        function_exercise.functions.append(function)
+        max_min_points_dict = function_exercise.get_maximum_minimum_points()
+
+        constant_values = [(num / 100, 1) for num in range(3 * 100, 4 * 100 + 1, 1)]
+        expected_dict = {
+            'máximo absoluto': None,
+            'máximo relativo': [(2, 1), *constant_values[:-1]],
+            'mínimo absoluto': [(0, -3)],
+            'mínimo relativo': constant_values[:-1],
+        }
+        self.assertEqual(expected_dict, max_min_points_dict)
+
+    def test_get_maximum_minimum_points__all_functions__with_no_shifts(self):
+        function_exercise = FunctionExercise(identifier=0, exercise_type='', title='', plot_range=(-3, 3),
+                                             exercise_order=0, functions=[], steps=[])
+        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 0), is_main_graphic=True,
+                            domain='(-3, 0)')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='x-1', x_values_range=(1, 2), is_main_graphic=True,
+                            domain='(1, 2]')
+        function.setup_data((-3, 3))
+        function_exercise.functions.append(function)
+        function = Function(function_id=0, expression='1', x_values_range=(2, 3), is_main_graphic=True,
+                            domain='[3, 4)')
+        function.setup_data((-4, 4))
+        function_exercise.exercise_points.append(Point(0, -3, True))
+        function_exercise.functions.append(function)
+        max_min_points_dict = function_exercise.get_maximum_minimum_points()
+
+        constant_values = [(num / 100, 1) for num in range(2 * 100, 3 * 100 + 1, 1)]
+        expected_dict = {
+            'máximo absoluto': None,
+            'máximo relativo': [(2, 1), *constant_values[:-1]],
+            'mínimo absoluto': [(0, -3)],
+            'mínimo relativo': constant_values[1:-1],
         }
         self.assertEqual(expected_dict, max_min_points_dict)

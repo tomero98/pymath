@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Union
 
 import pyqtgraph
-from PyQt5.QtCore import pyqtSignal, Qt, QSize
+from PyQt5.QtCore import pyqtSignal, Qt, QSize, QPointF
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 from src.projectConf.factories import LabelFactory
@@ -106,10 +106,18 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         pos = e[0]
         if self._plot_widget.sceneBoundingRect().contains(pos):
             mouse_point = self._plot_widget.getPlotItem().vb.mapSceneToView(pos)
-            x_position = round(mouse_point.x(), 1)
-            y_position = round(mouse_point.y(), 1)
+            x_position = float('%.2f' % (mouse_point.x()))
+            y_position = float('%.2f' % (mouse_point.y()))
             self._coordinates_label.setText(f'Punto ({x_position}, {y_position})')
             self._coordinates_label.setVisible(True)
+            if self._plot_widget.getPlotItem().curves[0].contains(QPointF(mouse_point.x(), mouse_point.y())):
+                print('Enter')
+            if y_position - 0.01 <= x_position ** 2 <= y_position + 0.01:
+                print(1)
+            # if (x_position, y_position) in self._main_function_points:
+            #     self._coordinates_label.setText(f'Punto ({x_position}, {y_position})')
+            #     self._coordinates_label.setVisible(True)
+            #     self._plot_widget_container.setCursor(QCursor(Qt.PointingHandCursor))
 
     def _setup_point_selection_dialog(self, point_to_draw: Point):
         self._point_selection_dialog = PointSelectionDialog(point=point_to_draw)

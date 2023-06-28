@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QComboBox, QPushButton
 
@@ -8,6 +9,7 @@ from ...models import Point
 
 class PointSelectionDialog(QWidget):
     continue_signal = pyqtSignal(str, Point)
+    close_signal = pyqtSignal()
 
     def __init__(self, point: Point):
         super(PointSelectionDialog, self).__init__()
@@ -16,6 +18,9 @@ class PointSelectionDialog(QWidget):
 
         self._point_selection_combobox: QComboBox = None  # noqa
         self._continue_button: QPushButton = None  # noqa
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.close_signal.emit()
 
     def draw(self):
         self.setWindowTitle('Selección del punto')

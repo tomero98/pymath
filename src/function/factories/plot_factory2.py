@@ -58,9 +58,13 @@ class PlotFactory2:
                        symbolSize='12')
 
     @classmethod
-    def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: [str, tuple] = '') -> None:
+    def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: [str, tuple] = '',
+                   click_function=None) -> None:
         for point in points:
-            graph.plot([point.x], [point.y], symbol='o', symbolBrush=color, symbolSize='12')
+            plot_data_item = graph.plot([point.x], [point.y], symbol='o', symbolBrush=color, symbolSize='12')
+            if click_function:
+                plot_data_item.setCurveClickable(state=2, width=10)
+                plot_data_item.curve.sigClicked.connect(click_function)
 
     @classmethod
     def set_graph_using_points(cls, graph: pyqtgraph.PlotWidget, x_values: List[int], y_values: List[int],

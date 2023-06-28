@@ -30,6 +30,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._point_selection_dialog: PointSelectionDialog = None  # noqa
         self._answers_by_point_type: defaultdict = defaultdict(list)
         self._proxy = None
+        self._proxy2 = None
         self._coordinates_label: QLabel = None  # noqa
 
     def _setup_data(self):
@@ -61,9 +62,12 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         return expression_selected == correct_expression
 
     def _on_function_to_draw_click(self, plot_curve_item_selected, point_selected):
-        point = point_selected.pos()
-        point_to_draw = Point(x=point.x(), y=point.y())
-        point_to_draw.truncate(decimals=1)
+        if not isinstance(point_selected, tuple):
+            point = point_selected.pos()
+            point_to_draw = Point(x=point.x(), y=point.y())
+        else:
+            point_to_draw = Point(x=point_selected[0], y=point_selected[1])
+        point_to_draw.truncate(decimals=2)
 
         if not self._point_selection_dialog:
             self._setup_point_selection_dialog(point_to_draw=point_to_draw)
@@ -75,13 +79,15 @@ class MaximumMinimumComponent(InverseSelectionComponent):
             show_limits=self._show_main_function_limits, click_function=self._on_function_to_draw_click
         )
         self._proxy = pyqtgraph.SignalProxy(plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
+        self._proxy2 = pyqtgraph.SignalProxy(plot_widget.scene().sigMouseClicked, rateLimit=60, slot=self.mouse_click)
         self._set_point_graphs(plot_widget=plot_widget)
         return plot_widget
 
     def _set_point_graphs(self, plot_widget: pyqtgraph.PlotWidget):
         for point in self._exercise.exercise_points:
             color = 'w' if point.is_included else 'black'
-            PlotFactory2.set_points(graph=plot_widget, points=[point], color=color)
+            PlotFactory2.set_points(graph=plot_widget, points=[point], color=color,
+                                    click_function=self._on_function_to_draw_click)
 
     def _setup_components(self):
         super(MaximumMinimumComponent, self)._setup_components()
@@ -110,18 +116,21 @@ class MaximumMinimumComponent(InverseSelectionComponent):
             y_position = float('%.2f' % (mouse_point.y()))
             self._coordinates_label.setText(f'Punto ({x_position}, {y_position})')
             self._coordinates_label.setVisible(True)
-            if self._plot_widget.getPlotItem().curves[0].contains(QPointF(mouse_point.x(), mouse_point.y())):
-                print('Enter')
-            if y_position - 0.01 <= x_position ** 2 <= y_position + 0.01:
-                print(1)
-            # if (x_position, y_position) in self._main_function_points:
-            #     self._coordinates_label.setText(f'Punto ({x_position}, {y_position})')
-            #     self._coordinates_label.setVisible(True)
-            #     self._plot_widget_container.setCursor(QCursor(Qt.PointingHandCursor))
+
+    def mouse_click(self, e):
+        pos = e[0].scenePos()
+        if self._plot_widget.sceneBoundingRect().contains(pos):
+            mouse_point = self._plot_widget.getPlotItem().vb.mapSceneToView(pos)
+            x_position = float('%.2f' % (mouse_point.x()))
+            y_position = float('%.2f' % (mouse_point.y()))
+            self._coordinates_label.setText(f'Punto ({x_position}, {y_position})')
+            self._coordinates_label.setVisible(True)
+            self._on_function_to_draw_click(plot_curve_item_selected=None, point_selected=(x_position, y_position))
 
     def _setup_point_selection_dialog(self, point_to_draw: Point):
         self._point_selection_dialog = PointSelectionDialog(point=point_to_draw)
         self._point_selection_dialog.continue_signal.connect(self._set_point_to_graph)
+        self._point_selection_dialog.close_signal.connect(self._close_dialog)
         self._point_selection_dialog.draw()
 
     def _set_point_to_graph(self, point_type: str, point_to_draw: Point):
@@ -138,6 +147,9 @@ class MaximumMinimumComponent(InverseSelectionComponent):
 
         self._answers_by_point_type[point_type].append(point_to_draw)
         self._point_selection_dialog.close()
+        self._point_selection_dialog = None
+
+    def _close_dialog(self):
         self._point_selection_dialog = None
 
     def _validate_exercise(self, expression_selected: Union[dict, str], is_resume: bool = False):

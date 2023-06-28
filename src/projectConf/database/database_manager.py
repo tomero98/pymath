@@ -50,12 +50,16 @@ class DatabaseManager:
     @staticmethod
     def _populate_topic_data():
         topic_seed = [
-            {'title': 'Funciones inversas', 'description': 'Ejercicios sobre inversas', 'first_time': 1},  # 1
-            {'title': 'Dominio y recorrido', 'description': 'Ejercicios sobre dominio y recorrido', 'first_time': 1},
+            {'title': 'Funciones inversas', 'description': 'Ejercicios para afianzar el conocimiento sobre las funciones inversas: '
+                                                           'detección de inversas y restricciones de dominio.', 'first_time': 1},  # 1
+            {'title': 'Dominio y recorrido', 'description': 'Ejercicios para interiorizar los conceptos de dominio y recorrido:'
+                                                            ' definir el conjunto inicial y el conjunto final. ', 'first_time': 1},
             # 2
-            {'title': 'Gráficas elementales', 'description': 'Ejercicios para reconocer gráficas elementales',
+            {'title': 'Funciones elementales', 'description': 'Ejercicios para reconocer funciones: funciones elementales y'
+                                                              ' desplazamientos sobre ellas.',
              'first_time': 1},  # 3
-            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para detectar máximos y mínimos',
+            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para la comprensión de puntos máximos y mínimos sobre '
+                                                          'la función.',
              'first_time': 1},  # 4
         ]
 

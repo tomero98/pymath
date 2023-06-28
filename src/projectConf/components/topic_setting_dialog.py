@@ -4,7 +4,7 @@ from typing import List
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSlider, QCheckBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSlider, QCheckBox, QHBoxLayout
 
 from ..data_mappers import TopicDataMapper
 from ..factories import ButtonFactory, LabelFactory, IconFactory
@@ -24,10 +24,15 @@ class TopicSettingDialog(QWidget):
         self._checkbox_step_list_by_exercise_id: defaultdict = defaultdict(list)
         self._checkbox_exercise_list: List[QCheckBox] = []
 
+        self._slider_label: QLabel = None  # noqa
         self._save_label: QLabel = None  # noqa
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.close_signal.emit()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close_signal.emit()
 
     def draw(self):
         self.setObjectName('application')
@@ -35,7 +40,7 @@ class TopicSettingDialog(QWidget):
                     QWidget#application {
                         background-color: #EDEDE9;
                     }"""
-        )
+                           )
         self.setWindowTitle('Configuración del ejercicio')
 
         layout = QVBoxLayout()
@@ -49,8 +54,8 @@ class TopicSettingDialog(QWidget):
 
         icon = IconFactory.get_icon_widget(image_name='save.png')
         self._save_button = ButtonFactory.get_button_component(
-            title='', function_to_connect=lambda: self._send_signal(save=True), icon=icon, icon_size=25,
-            tooltip='Guardar',primary_button=True
+            title='', function_to_connect=lambda: self._send_signal(save=True), icon=icon, icon_size=30,
+            tooltip='Guardar', primary_button=True
         )
         layout.addWidget(self._save_button, alignment=Qt.AlignHCenter)
 
@@ -95,12 +100,20 @@ class TopicSettingDialog(QWidget):
 
         text_label = LabelFactory.get_label_component(
             text=f'Configuración de "{self._topic.title}"', label_type=TextType.TITLE, align=Qt.AlignLeft,
-            set_visible=True
+            set_visible=True, set_bold=True
         )
         layout.addWidget(text_label, alignment=Qt.AlignLeft)
 
+        slider_layout = QHBoxLayout()
+
+        self._slider_label = LabelFactory.get_label_component(
+            text=f'Número de ejercicios: {exercise_setting.exercise_num}', label_type=TextType.NORMAL_TEXT,
+            align=Qt.AlignLeft, set_visible=True
+        )
+        slider_layout.addWidget(self._slider_label)
         slider = self._get_slider(exercise_setting=exercise_setting)
-        layout.addWidget(slider)
+        slider_layout.addWidget(slider)
+        layout.addLayout(slider_layout)
 
         checkbox = self._get_exercise_checkbox(exercise_setting=exercise_setting)
         self._checkbox_exercise_list.append(checkbox)
@@ -127,6 +140,7 @@ class TopicSettingDialog(QWidget):
 
     def _on_slider_change(self, value: int, exercise_setting: ExerciseSetting):
         exercise_setting.exercise_num = value
+        self._slider_label.setText(f'Número de ejercicios: {value}')
         self._save_label.setVisible(False)
 
     def _get_exercise_checkbox(self, exercise_setting: ExerciseSetting) -> QCheckBox:
@@ -157,7 +171,8 @@ class TopicSettingDialog(QWidget):
         layout = QVBoxLayout()
 
         text_label = LabelFactory.get_label_component(
-            text=f'Pasos', label_type=TextType.NORMAL_TEXT, align=Qt.AlignLeft, set_visible=True
+            text=f'Selecciona los pasos a incluir en el ejercicio', label_type=TextType.NORMAL_TEXT, align=Qt.AlignLeft,
+            set_visible=True, set_underline=True, set_bold=True
         )
         layout.addWidget(text_label, alignment=Qt.AlignLeft)
 

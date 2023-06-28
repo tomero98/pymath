@@ -39,10 +39,12 @@ class Controller:
         self._current_view.continue_signal.connect(self._setup_exercise_page)
 
     def _setup_exercise_page(self, topic: Topic):
+        topic_page = self._current_view
         exercise_page = FunctionExercisePage(topic=topic)
         exercise_page.draw()
         exercise_page.back_signal.connect(self._back_page)
         self._current_view = exercise_page
+        topic_page.close()
 
     def _close_page(self):
         self._current_view.close()

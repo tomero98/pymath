@@ -43,6 +43,7 @@ class FunctionExercise:
     def get_main_function(self) -> List:
         return [function for function in self.functions if function.is_main_graphic]
 
+    @lru_cache(maxsize=1)
     def get_maximum_minimum_points(self):
         max_points = []
         min_points = []
@@ -133,10 +134,10 @@ class FunctionExercise:
             if point[2] and (int(point[1]) == point[1] or int(point[1]) + 0.5 == point[1])
         ]
         return {
-            'máximo absoluto': max_points if max_points else None,
-            'máximo relativo': maximum_relative_points if maximum_relative_points else None,
-            'mínimo absoluto': min_points if min_points else None,
-            'mínimo relativo': minimum_relative_points if minimum_relative_points else None,
+            'máximo absoluto': set(max_points) if max_points else None,
+            'máximo relativo': set(maximum_relative_points) if maximum_relative_points else None,
+            'mínimo absoluto': set(min_points) if min_points else None,
+            'mínimo relativo': set(minimum_relative_points) if minimum_relative_points else None,
         }
 
     def _constant_functions_max_min_points(self, constant_functions: List[Function], all_points_by_x_value: dict,

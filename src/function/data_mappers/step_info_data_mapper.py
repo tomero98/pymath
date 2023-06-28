@@ -25,57 +25,33 @@ class StepInfoDataMapper:
             return step_info_data
 
     def _get_inverse_concept_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='inverse_concept_info_data.mp4', info_list=info_list)
 
     def _get_selection_inverse_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='selection_inverse_info_data.mp4', info_list=info_list)
 
     def _get_delimited_inverse_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='delimited_inverse_info_data.mp4', info_list=info_list)
 
     def _get_indicate_elementary_exercise_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='indicate_elementary_exercise_info_data.mp4', info_list=info_list)
 
     def _get_indicate_elementary_shift_exercise_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='indicate_elementary_shift_exercise_info_data.mp4', info_list=info_list)
 
     def _get_indicate_domain_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='indicate_domain_info', info_list=info_list)
 
     def _get_indicate_range_info_data(self) -> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='indicate_range_info', info_list=info_list)
 
     def _get_maximum_minimum_info_data(self)-> StepInfoData:
-        info_list = [
-            'Hola',
-            'Adios'
-        ]
+        info_list = []
         return StepInfoData(video_name='maximum_minimum_info_data.mp4', info_list=info_list)

@@ -29,6 +29,13 @@ class HelpDataDialog(QWidget):
         self._current_step: HelpStep = None  # noqa
 
     def draw(self):
+        self.setObjectName('application')
+        self.setStyleSheet("""
+                QWidget#application {
+                    background-color: #EDEDE9;
+                }
+            """
+        )
         self.setWindowTitle('Ayuda')
 
         help_layout = QVBoxLayout()
@@ -47,14 +54,14 @@ class HelpDataDialog(QWidget):
 
         self._text_label = LabelFactory.get_label_component(
             text=self._help_data_list[0].text, label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
-            need_word_wrap=True, set_visible=True
+            set_visible=True, need_word_wrap=True
         )
         help_layout.addSpacing(10)
         help_layout.addWidget(self._text_label)
 
         self.setLayout(help_layout)
         self.show()
-        self.setFixedSize(800, 800)
+        self.setFixedSize(1000, 900)
 
         self._current_help_data = self._help_data_list[0]
         self._current_step = None
@@ -98,7 +105,8 @@ class HelpDataDialog(QWidget):
         buttons_layout.addWidget(self._continue_button, alignment=Qt.AlignRight)
         buttons_layout.addSpacing(50)
         widget.setLayout(buttons_layout)
-        widget.setMinimumSize(QSize(widget.minimumSizeHint().width() * 1.2, widget.minimumSizeHint().height() * 1.4))
+        widget.setMinimumSize(QSize(widget.minimumSizeHint().width()* 1.3, widget.minimumSizeHint().height()* 1.3))
+        widget.setMaximumSize(QSize(widget.minimumSizeHint().width() * 1.3, widget.minimumSizeHint().height() * 1.3))
         return widget
 
     def _execute_back(self):
@@ -162,7 +170,6 @@ class HelpDataDialog(QWidget):
             )
             linear_region_item.setMovable(False)
             self._plot_widget.addItem(linear_region_item)
-
 
         self._text_label.setText(self._current_step.text)
 

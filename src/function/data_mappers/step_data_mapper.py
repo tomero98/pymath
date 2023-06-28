@@ -42,7 +42,7 @@ class StepDataMapper:
 
     def _get_inverse_concept_exercise_step(self) -> FunctionStep:
         step_type = StepType.inverse_concept_exercise
-        question = 'Indica si la siguiente gráfica tiene inversa para todo el dominio mostrado'
+        question = 'Indica si la siguiente gráfica tiene inversa para todo el dominio mostrado.'
         order = 0
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
@@ -51,7 +51,7 @@ class StepDataMapper:
 
     def _get_selection_inverse_exercise_step(self):
         step_type = StepType.selection_inverse_exercise
-        question = 'Selecciona la gráfica que representa la inversa en el dominio dado para la función:'
+        question = 'Selecciona la función inversa de la siguiente función.'
         order = 1
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)

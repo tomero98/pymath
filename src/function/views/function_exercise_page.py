@@ -107,9 +107,10 @@ class FunctionExercisePage(Window):
         self._steps_done_widget = QComboBox()
         self._steps_done_widget.setStyleSheet('background-color: #ECDAC6;')
         self._steps_done_widget.setDisabled(True)
-        combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.SUBTITLE)
+        combobox_label = LabelFactory.get_label_component(text='Ejercicio actual:', label_type=TextType.SUBTITLE,
+                                                          set_bold=True)
         exercise_count_label = LabelFactory.get_label_component(text=f'/ {len(self._exercises)}',
-                                                                label_type=TextType.SUBTITLE)
+                                                                label_type=TextType.SUBTITLE, set_bold=True)
         combobox_layout.addWidget(combobox_label, alignment=Qt.AlignVCenter)
         combobox_layout.addSpacing(15)
         combobox_layout.addWidget(self._steps_done_widget)

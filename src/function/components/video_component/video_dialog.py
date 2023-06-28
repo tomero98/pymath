@@ -68,8 +68,10 @@ class VideoDialog(QWidget):
         layout.addWidget(self._video_widget)
         layout.addLayout(control_layout)
         layout.addWidget(self._status_bar)
-        text_widget = self._get_text_widget()
-        layout.addWidget(text_widget, alignment=Qt.AlignHCenter)
+
+        if self._step_info_data.info_list:
+            text_widget = self._get_text_widget()
+            layout.addWidget(text_widget, alignment=Qt.AlignHCenter)
 
         self._media_player.setVideoOutput(self._video_widget)
         self._media_player.stateChanged.connect(self._media_state_changed)

@@ -56,7 +56,7 @@ class FunctionExerciseDataMapper:
                     FROM exercises
                     {where_clause}
                     ORDER BY RANDOM()
-                    LIMIT {exercise_setting.max_exercise_num}
+                    LIMIT {exercise_setting.exercise_num}
                 """
                 result.exec(query)
 

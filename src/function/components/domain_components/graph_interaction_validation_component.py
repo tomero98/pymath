@@ -82,7 +82,7 @@ class GraphInteractionValidationComponent(Component):
 
     def _get_question_label(self) -> QLabel:
         return LabelFactory.get_label_component(text=self._step.question, label_type=TextType.SUBTITLE,
-                                                align=Qt.AlignHCenter)
+                                                align=Qt.AlignHCenter, set_cursive=True)
 
     def _get_result_label(self) -> QLabel:
         return LabelFactory.get_label_component(

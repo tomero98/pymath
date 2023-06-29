@@ -170,18 +170,20 @@ class Function:
 
     @lru_cache(maxsize=1)
     def get_horizontal_asymptotes(self) -> List:
-        sympy_expression = self.get_sympy_expression()
-        if 'cos' in sympy_expression or 'sin' in sympy_expression:
-            return []
+        try:
+            sympy_expression = self.get_sympy_expression()
+            if 'cos' in sympy_expression or 'sin' in sympy_expression:
+                return []
 
-        asymptotes = []
-        asymptote_one = limit(sympy_expression, symbols('x'), -oo)
-        if isinstance(asymptote_one, Rational):
-            asymptotes.append(round(float(asymptote_one), 2))
-        asymptote_two = limit(sympy_expression, symbols('x'), oo)
-        if asymptote_one != asymptote_two and isinstance(asymptote_two, Rational):
-            asymptotes.append(round(float(asymptote_two), 2))
-
+            asymptotes = []
+            asymptote_one = limit(sympy_expression, symbols('x'), -oo)
+            if isinstance(asymptote_one, Rational):
+                asymptotes.append(round(float(asymptote_one), 2))
+            asymptote_two = limit(sympy_expression, symbols('x'), oo)
+            if asymptote_one != asymptote_two and isinstance(asymptote_two, Rational):
+                asymptotes.append(round(float(asymptote_two), 2))
+        except:
+            asymptotes = []
         return asymptotes
 
     @lru_cache(maxsize=1)

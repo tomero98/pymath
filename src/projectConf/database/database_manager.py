@@ -50,16 +50,20 @@ class DatabaseManager:
     @staticmethod
     def _populate_topic_data():
         topic_seed = [
-            {'title': 'Funciones inversas', 'description': 'Ejercicios para afianzar el conocimiento sobre las funciones inversas: '
-                                                           'detección de inversas y restricciones de dominio.', 'first_time': 1},  # 1
-            {'title': 'Dominio y recorrido', 'description': 'Ejercicios para interiorizar los conceptos de dominio y recorrido:'
-                                                            ' definir el conjunto inicial y el conjunto final. ', 'first_time': 1},
+            {'title': 'Funciones inversas',
+             'description': 'Ejercicios para afianzar el conocimiento sobre las funciones inversas: '
+                            'detección de inversas y restricciones de dominio.', 'first_time': 1},  # 1
+            {'title': 'Dominio y recorrido',
+             'description': 'Ejercicios para interiorizar los conceptos de dominio y recorrido:'
+                            ' definir el conjunto inicial y el conjunto final. ', 'first_time': 1},
             # 2
-            {'title': 'Funciones elementales', 'description': 'Ejercicios para reconocer funciones: funciones elementales y'
-                                                              ' desplazamientos sobre ellas.',
+            {'title': 'Funciones elementales',
+             'description': 'Ejercicios para reconocer funciones: funciones elementales y'
+                            ' desplazamientos sobre ellas.',
              'first_time': 1},  # 3
-            {'title': 'Máximos y mínimos', 'description': 'Ejercicios para la comprensión de puntos máximos y mínimos sobre '
-                                                          'la función.',
+            {'title': 'Máximos y mínimos',
+             'description': 'Ejercicios para la comprensión de puntos máximos y mínimos sobre '
+                            'la función.',
              'first_time': 1},  # 4
         ]
 
@@ -128,6 +132,27 @@ class DatabaseManager:
 
             # Maximum exercises
             {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 22
+
+            # Domain exercises
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-4, 4', 'topic_id': 2},  # 23
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-4, 4', 'topic_id': 2},  # 24
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-4, 4', 'topic_id': 2},  # 25
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 26
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 27
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-6, 6', 'topic_id': 2},  # 28
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-6, 6', 'topic_id': 2},  # 29
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-6, 6', 'topic_id': 2},  # 30
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-3, 3', 'topic_id': 2},  # 31
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 32
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 33
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 34
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 35
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 35
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-2, 2', 'topic_id': 2},  # 36
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 37
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 38
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 39
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 40
 
         ]
 
@@ -229,6 +254,29 @@ class DatabaseManager:
             {'expression': '-(x)**2 / 2 + 4'},  # 46
 
             {'expression': '0'},  # 47
+
+            {'expression': '-1'},  # 48
+
+            {'expression': '((x)**2 * ((x)**4 + 7 * (x)**2 - 104)) / 120'},  # 49
+
+            {'expression': 'abs(x)'},  # 50
+            {'expression': '(x)**3 - 5 * (x)**2 + 3 * x + 8'},  # 51
+            {'expression': 'abs(x+1)'},  # 52
+
+            {'expression': '2 * (x)**2 - 3'},  # 53
+            {'expression': '-x ** (3) + 11 * (x) ** 2 - 35 * x + 26'},  # 54
+            {'expression': '2 * (x-3) * (x-5)'},  # 55
+
+            {'expression': '-(((x + 4) * ((x) ** 2 + 2 * x + 8)) / (4))'}, #56
+            {'expression': '-((3 * (x) ** 2 - 4 * x - 12) / (4))'}, #57
+
+            {'expression': '-(2 * x) / 3'}, #58
+
+            {'expression': '((2 * x**3 - 15 * (x)**2 + 24 * x + 5) / (4))'}, #59
+            {'expression': '-9 * x**3 + 16 * (x)**2 - 3'}, #60
+            {'expression': '-(((x)**(2) + 4 * x + 6)/(2))'}, #61
+
+            {'expression': '3'}, #62
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -356,6 +404,47 @@ class DatabaseManager:
             {'exercise_id': 22, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 22, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 22, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+
+            # DomainExercises
+            {'exercise_id': 23, 'graph_id': 49, 'domain': '[-3, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 23, 'graph_id': 49, 'domain': '(-2, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 23, 'graph_id': 49, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 24, 'graph_id': 49, 'domain': '(-3, 0]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 24, 'graph_id': 48, 'domain': '(0, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 25, 'graph_id': 49, 'domain': '(-3, 0]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 25, 'graph_id': 48, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 26, 'graph_id': 50, 'domain': '(-inf, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 26, 'graph_id': 51, 'domain': '(2, 4]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 27, 'graph_id': 52, 'domain': '(-2, 1]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 27, 'graph_id': 51, 'domain': '(2, 3]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 28, 'graph_id': 53, 'domain': '(-1, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 28, 'graph_id': 54, 'domain': '[4, 5)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 28, 'graph_id': 55, 'domain': '(3, 4)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 29, 'graph_id': 55, 'domain': '[3, 4)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 29, 'graph_id': 54, 'domain': '(4, 5]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 30, 'graph_id': 53, 'domain': '[-2, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 30, 'graph_id': 55, 'domain': '(4, 5)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 31, 'graph_id': 48, 'domain': '(-inf, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 32, 'graph_id': 56, 'domain': '(-inf, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 32, 'graph_id': 57, 'domain': '(-2, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 33, 'graph_id': 56, 'domain': '(-inf, -4)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 33, 'graph_id': 57, 'domain': '[-2, 4]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 34, 'graph_id': 56, 'domain': '(-inf, -4)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 34, 'graph_id': 57, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 34, 'graph_id': 58, 'domain': '[0, 3)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 35, 'graph_id': 59, 'domain': '(-inf, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 36, 'graph_id': 60, 'domain': '(-inf, 1)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 37, 'graph_id': 48, 'domain': '(-inf, 1]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 38, 'graph_id': 61, 'domain': '(-inf, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 38, 'graph_id': 60, 'domain': '[0, 1)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 38, 'graph_id': 59, 'domain': '(1, +inf)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 39, 'graph_id': 61, 'domain': '(-inf, -2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 39, 'graph_id': 60, 'domain': '(0, 1)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 39, 'graph_id': 59, 'domain': '(1, 3)', 'is_main_graphic': 1},   # 47
+            {'exercise_id': 40, 'graph_id': 61, 'domain': '(-inf, -2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 40, 'graph_id': 60, 'domain': '(0, 1)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 40, 'graph_id': 59, 'domain': '[1, +inf)', 'is_main_graphic': 1},  # 47
+
         ]
 
         sql_query = QSqlQuery()

@@ -26,7 +26,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
                  need_help_data: bool = False, show_main_function_limits: bool = True,
                  show_function_labels: bool = False):
         super(DomainDefinitionComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data,
+            exercise=exercise, step=step, resume=resume, need_help_data=True,
             show_main_function_limits=show_main_function_limits, show_function_labels=show_function_labels
         )
 

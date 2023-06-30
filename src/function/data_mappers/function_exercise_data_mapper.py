@@ -90,7 +90,7 @@ class FunctionExerciseDataMapper:
         domain = query_result.value('exercise_domain')
         domain = (-5, 5) if not bool(domain) else tuple(map(int, domain.split(',')))
         return FunctionExercise(identifier=exercise_id, exercise_type=exercise_type, plot_range=domain,
-                                title=title, functions=[], steps=[], exercise_order=exercise_order)
+                                title=title, functions=[], steps=[], exercise_order=exercise_order, exercise_points=[])
 
     @staticmethod
     def _setup_exercises(query_result: QSqlQuery, exercise: FunctionExercise) -> None:

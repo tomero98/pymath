@@ -147,12 +147,15 @@ class DatabaseManager:
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 33
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 34
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 35
-            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 35
-            {'exercise_type': 'ConceptDomainExercise', 'domain': '-2, 2', 'topic_id': 2},  # 36
-            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 37
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 36
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-2, 2', 'topic_id': 2},  # 37
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 38
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 39
             {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 40
+            {'exercise_type': 'ConceptDomainExercise', 'domain': '-5, 5', 'topic_id': 2},  # 41
+
+            # Maximum exercises
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 42
 
         ]
 
@@ -444,6 +447,12 @@ class DatabaseManager:
             {'exercise_id': 40, 'graph_id': 61, 'domain': '(-inf, -2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 40, 'graph_id': 60, 'domain': '(0, 1)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 40, 'graph_id': 59, 'domain': '[1, +inf)', 'is_main_graphic': 1},  # 47
+
+            # Maximum exercises
+            {'exercise_id': 42, 'graph_id': 45, 'domain': '[-4, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 42, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 42, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 42, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
 
         ]
 

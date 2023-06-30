@@ -20,7 +20,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
     def __init__(self, exercise: FunctionExercise, step: FunctionStep, resume: ExerciseResume,
                  need_help_data: bool = False):
         super(MaximumMinimumComponent, self).__init__(
-            exercise=exercise, step=step, resume=resume, need_help_data=need_help_data, show_main_function_limits=True
+            exercise=exercise, step=step, resume=resume, need_help_data=True, show_main_function_limits=True
         )
         self._point_info_by_point_type = {
             'máximo absoluto': (255, 0, 0), 'máximo relativo': (200, 0, 0), 'mínimo absoluto': (0, 0, 255),

@@ -85,7 +85,7 @@ class PlotFactory2:
             color, text = point_info
             x_value, y_value = point.x, point.y
             font = QFont()
-            font.setPixelSize(25)
+            font.setPixelSize(20)
             label = TextItem(anchor=(0.5, 0.5))
             label.setText(text=text)
             label.setPos(x_value, y_value)

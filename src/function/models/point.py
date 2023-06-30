@@ -17,3 +17,6 @@ class Point:
         ten_pow = 10 ** decimals
         self.x = math.trunc(self.x * ten_pow) / ten_pow
         self.y = math.trunc(self.y * ten_pow) / ten_pow
+
+    def serialize(self):
+        return (self.x, self.y)

@@ -30,9 +30,27 @@ class RangeSelectionDialog(QWidget):
         self.delete_signal.emit()
 
     def draw(self):
+        self.setObjectName('application')
+        self.setStyleSheet("""
+                QWidget#application {
+                    background-color: #EDEDE9;
+                }
+            """
+                           )
         self.setWindowTitle('Selecciona el rango')
 
+        widget = QWidget()
+        widget.setObjectName('topic-container')
+        widget.setStyleSheet("""
+            #topic-container {
+                border: 4px solid #897B6D;
+                border-radius: 20px;
+                background: #F5EBE0;
+            }
+        """)
+
         layout = QVBoxLayout()
+        layout1 = QVBoxLayout()
 
         if self._range_item:
             text = f'Editar el rango {self._range_item}'
@@ -53,7 +71,9 @@ class RangeSelectionDialog(QWidget):
         layout.addLayout(answer_layout)
         layout.addWidget(self._range_edition_help_text, alignment=Qt.AlignRight)
 
-        self.setLayout(layout)
+        widget.setLayout(layout)
+        layout1.addWidget(widget)
+        self.setLayout(layout1)
         self.show()
         self.setFixedSize(self.width(), self.height())
 

@@ -63,8 +63,10 @@ class TopicSettingDialog(QWidget):
             text=f'Guardado', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter, set_visible=False
         )
         self._save_label.setStyleSheet('color: green;')
+        layout.addWidget(self._save_label, alignment=Qt.AlignHCenter)
 
         self._setup_exercise_checkbox_layout()
+        self._setup_step_checkbox_layout()
 
         self.setLayout(layout)
         self.show()
@@ -83,8 +85,9 @@ class TopicSettingDialog(QWidget):
 
             self._topic = self._topic_edited
             TopicDataMapper.save_topic_configuration(self._topic_edited)
-
-        self.close_signal.emit()
+            self._save_label.setVisible(True)
+        else:
+            self.close_signal.emit()
 
     def _get_exercise_setting_widget(self, exercise_setting: ExerciseSetting) -> QWidget:
         widget = QWidget()
@@ -99,7 +102,7 @@ class TopicSettingDialog(QWidget):
         layout = QVBoxLayout()
 
         text_label = LabelFactory.get_label_component(
-            text=f'Configuración de "{self._topic.title}"', label_type=TextType.TITLE, align=Qt.AlignLeft,
+            text=f'{self._topic.title}', label_type=TextType.TITLE, align=Qt.AlignLeft,
             set_visible=True, set_bold=True
         )
         layout.addWidget(text_label, alignment=Qt.AlignLeft)
@@ -204,3 +207,9 @@ class TopicSettingDialog(QWidget):
         checkbox_activated = [checkbox for checkbox in self._checkbox_exercise_list if checkbox.isChecked()]
         if len(checkbox_activated) == 1:
             checkbox_activated[0].setDisabled(True)
+
+    def _setup_step_checkbox_layout(self):
+        for checkbox_list in self._checkbox_step_list_by_exercise_id.values():
+            checkbox_activated = [checkbox for checkbox in checkbox_list if checkbox.isChecked()]
+            if len(checkbox_activated) == 1:
+                checkbox_activated[0].setDisabled(True)

@@ -18,11 +18,12 @@ class TopicPage(Window):
     back_signal = pyqtSignal()
 
     def __init__(self):
-        self._title = 'Conceptos relativos sobre funciones y sus características'
+        self._title = 'Conceptos relativos a funciones y sus características'
         super(TopicPage, self).__init__(title=self._title)
 
         self._topics: List[Topic] = TopicDataMapper.get_topics()
         self._setting_buttons: List[QPushButton] = []
+        self._user_button: QPushButton = None  # noqa
         self._topic_setting_dialog: TopicSettingDialog = None  # noqa
         self._topic_buttons: List[QWidget] = []
 
@@ -30,14 +31,23 @@ class TopicPage(Window):
         main_window = QWidget()
         layout = QVBoxLayout()
 
+        icon = IconFactory.get_icon_widget(image_name='usuario.png')
+        self._user_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=self._setup_user_stats, icon=icon, icon_size=30, primary_button=True,
+            tooltip='Estadísticas de usuario'
+        )
+
         title_label = LabelFactory.get_label_component(text=self._title, label_type=TextType.TITLE,
                                                        align=Qt.AlignHCenter, set_bold=True)
         self._topic_buttons = self._get_topic_buttons()
-        self._setup_layout(layout=layout, title_label=title_label, topic_buttons=self._topic_buttons)
+        self._setup_layout(layout=layout, title_label=title_label)
 
         main_window.setLayout(layout)
         self.setCentralWidget(main_window)
         self.show()
+
+    def _setup_user_stats(self):
+        pass
 
     @pyqtSlot()
     def _get_topic_buttons(self) -> List[QWidget]:
@@ -66,10 +76,7 @@ class TopicPage(Window):
 
         description_layout = QVBoxLayout()
         title = LabelFactory.get_label_component(text=topic.title, label_type=TextType.SUBTITLE, set_bold=True)
-        description = LabelFactory.get_label_component(text=topic.description, label_type=TextType.NORMAL_TEXT,
-                                                       align=Qt.AlignLeft, set_cursive=True)
-        description_layout.addWidget(title)
-        description_layout.addWidget(description, alignment=Qt.AlignLeft)
+        description_layout.addWidget(title, alignment=Qt.AlignVCenter)
 
         layout.addSpacing(10)
         layout.addWidget(book_button, alignment=Qt.AlignLeft)
@@ -97,7 +104,7 @@ class TopicPage(Window):
         effect.setOffset(0, 0)
         effect.setBlurRadius(15)
         widget.setGraphicsEffect(effect)
-        widget.setFixedSize(1100, 100)
+        widget.setFixedSize(550, 100)
         widget.mouseReleaseEvent = lambda event: self._send_continue_signal(topic=topic)
         return widget
 
@@ -117,6 +124,8 @@ class TopicPage(Window):
             for button in self._topic_buttons:
                 button.setDisabled(True)
 
+            self._user_button.setDisabled(True)
+
     def _set_topic_setting_dialog_close(self):
         if self._topic_setting_dialog:
             self._topic_setting_dialog.close()
@@ -128,12 +137,14 @@ class TopicPage(Window):
         for button in self._topic_buttons:
             button.setDisabled(False)
 
-    @staticmethod
-    def _setup_layout(layout: QVBoxLayout, title_label: QLabel, topic_buttons: List[QPushButton]):
-        layout.addSpacing(30)
+        self._user_button.setDisabled(False)
+
+    def _setup_layout(self, layout: QVBoxLayout, title_label: QLabel):
+        layout.setContentsMargins(10, 10, 50, 0)
+        layout.addWidget(self._user_button, alignment=Qt.AlignLeft)
         layout.addWidget(title_label, alignment=Qt.AlignHCenter)
         layout.addSpacing(30)
-        for topic_button_layout in topic_buttons:
+        for topic_button_layout in self._topic_buttons:
             layout.addWidget(topic_button_layout, alignment=Qt.AlignHCenter)
             layout.addSpacing(45)
         layout.addStretch()

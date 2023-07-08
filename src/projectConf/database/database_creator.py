@@ -1,25 +1,8 @@
-import os
-import sys
-
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtSql import QSqlQuery
 
 
-class DatabaseManager:
-    def setup_database(self):
-        database_name = 'project.db'
-        database = QSqlDatabase.addDatabase('QSQLITE')
-        database.setDatabaseName(database_name)
-
-        is_database_created = os.path.isfile(database_name)
-
-        if not database.open():
-            print("Database Error: %s" % database.lastError().databaseText())
-            sys.exit(1)
-
-        if not is_database_created:
-            self._create_database()
-
-    def _create_database(self):
+class DatabaseCreator:
+    def create_database(self):
         self._setup_topic_data()
         self._setup_exercise_data()
         self._setup_graph_data()
@@ -42,7 +25,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
                 title VARCHAR(64) NOT NULL,
                 description VARCHAR(128), 
-                first_time INT
+                topic_order INT NOT NULL
                 )
             """
         )
@@ -52,32 +35,32 @@ class DatabaseManager:
         topic_seed = [
             {'title': 'Funciones inversas',
              'description': 'Ejercicios para afianzar el conocimiento sobre las funciones inversas: '
-                            'detección de inversas y restricciones de dominio.', 'first_time': 1},  # 1
+                            'detección de inversas y restricciones de dominio.', 'topic_order': 2},  # 1
             {'title': 'Dominio y recorrido',
              'description': 'Ejercicios para interiorizar los conceptos de dominio y recorrido:'
-                            ' definir el conjunto inicial y el conjunto final. ', 'first_time': 1},
+                            ' definir el conjunto inicial y el conjunto final. ', 'topic_order': 0},
             # 2
             {'title': 'Funciones elementales',
              'description': 'Ejercicios para reconocer funciones: funciones elementales y'
                             ' desplazamientos sobre ellas.',
-             'first_time': 1},  # 3
+             'topic_order': 1},  # 3
             {'title': 'Máximos y mínimos',
              'description': 'Ejercicios para la comprensión de puntos máximos y mínimos sobre '
                             'la función.',
-             'first_time': 1},  # 4
+             'topic_order': 3},  # 4
         ]
 
         sql_query = QSqlQuery()
         sql_query.prepare(
             """
-            INSERT INTO topics (title, description, first_time) VALUES (?, ?, ?)
+            INSERT INTO topics (title, description, topic_order) VALUES (?, ?, ?)
             """
         )
 
         for topic in topic_seed:
             sql_query.addBindValue(topic['title'])
             sql_query.addBindValue(topic['description'])
-            sql_query.addBindValue(topic['first_time'])
+            sql_query.addBindValue(topic['topic_order'])
             sql_query.exec()
 
     def _setup_exercise_data(self):
@@ -270,16 +253,16 @@ class DatabaseManager:
             {'expression': '-x ** (3) + 11 * (x) ** 2 - 35 * x + 26'},  # 54
             {'expression': '2 * (x-3) * (x-5)'},  # 55
 
-            {'expression': '-(((x + 4) * ((x) ** 2 + 2 * x + 8)) / (4))'}, #56
-            {'expression': '-((3 * (x) ** 2 - 4 * x - 12) / (4))'}, #57
+            {'expression': '-(((x + 4) * ((x) ** 2 + 2 * x + 8)) / (4))'},  # 56
+            {'expression': '-((3 * (x) ** 2 - 4 * x - 12) / (4))'},  # 57
 
-            {'expression': '-(2 * x) / 3'}, #58
+            {'expression': '-(2 * x) / 3'},  # 58
 
-            {'expression': '((2 * x**3 - 15 * (x)**2 + 24 * x + 5) / (4))'}, #59
-            {'expression': '-9 * x**3 + 16 * (x)**2 - 3'}, #60
-            {'expression': '-(((x)**(2) + 4 * x + 6)/(2))'}, #61
+            {'expression': '((2 * x**3 - 15 * (x)**2 + 24 * x + 5) / (4))'},  # 59
+            {'expression': '-9 * x**3 + 16 * (x)**2 - 3'},  # 60
+            {'expression': '-(((x)**(2) + 4 * x + 6)/(2))'},  # 61
 
-            {'expression': '3'}, #62
+            {'expression': '3'},  # 62
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -443,7 +426,7 @@ class DatabaseManager:
             {'exercise_id': 38, 'graph_id': 59, 'domain': '(1, +inf)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 39, 'graph_id': 61, 'domain': '(-inf, -2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 39, 'graph_id': 60, 'domain': '(0, 1)', 'is_main_graphic': 1},  # 47
-            {'exercise_id': 39, 'graph_id': 59, 'domain': '(1, 3)', 'is_main_graphic': 1},   # 47
+            {'exercise_id': 39, 'graph_id': 59, 'domain': '(1, 3)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 40, 'graph_id': 61, 'domain': '(-inf, -2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 40, 'graph_id': 60, 'domain': '(0, 1)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 40, 'graph_id': 59, 'domain': '[1, +inf)', 'is_main_graphic': 1},  # 47

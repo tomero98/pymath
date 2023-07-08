@@ -4,7 +4,7 @@ from ..views import WelcomePage, TopicPage
 from ...function.views import FunctionExercisePage
 
 
-class Controller:
+class Router:
     def __init__(self):
         self._app = None
         self._current_view = None

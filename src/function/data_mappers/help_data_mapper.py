@@ -16,16 +16,16 @@ class HelpDataMapper:
             help_data_list = self._get_selection_inverse_help()
         elif step_type == StepType.delimited_inverse_exercise:
             help_data_list = self._get_delimited_inverse_help()
-        elif step_type == StepType.maximum_minimum_exercise:
 
+        elif step_type == StepType.maximum_minimum_exercise:
             help_data_list = self._get_maximum_minimum_help()
 
         elif step_type == StepType.indicate_domain_exercise:
             help_data_list = self._get_indicate_domain_help()
         elif step_type == StepType.indicate_range_exercise:
             help_data_list = self._get_indicate_range_help()
-        elif step_type == StepType.indicate_elementary_shift_exercise:
 
+        elif step_type == StepType.indicate_elementary_shift_exercise:
             help_data_list = self._get_indicate_elementary_shift_exercise_help()
         return help_data_list
 
@@ -36,11 +36,7 @@ class HelpDataMapper:
         first_step = self._get_first_step_inverse_concept_help()
         function = Function(function_id=0, expression='(x)**2', x_values_range=(-4, 4), is_main_graphic=True)
         function.setup_data(plot_range=(-5, 5))
-        text = 'Dada una función biyectiva f(x) que relaciona elementos de un conjunto A con elementos de un conjunto ' \
-               'B (A → B), se definirá su función inversa f⁻¹(x) como la función que realiza de forma inversa la ' \
-               'asignación entre conjuntos A y B (B → A). Los valores del conjunto inicial de f(x) son los valores del ' \
-               'conjunto imagen de f⁻¹(x) y los valores del conjunto imagen de f(x) son los valores del conjunto ' \
-               'inicial de f⁻¹(x).'
+        text = '¿Se repiten imágenes?'
         return HelpData(order=0, functions=[function], help_steps=[first_step],
                         title='Apuntes sobre funciones inversas', text=text)
 
@@ -50,10 +46,7 @@ class HelpDataMapper:
 
         function_two = Function(function_id=0, expression='4', x_values_range=(-5, 5), is_main_graphic=False)
         function_two.setup_data(plot_range=(-5, 5))
-        text = 'Las funciones inversas son funciones biyectivas, cualquier par de elementos del conjunto inicial tiene ' \
-               'imágenes distintas y el conjunto imagen coincide con el conjunto final. Las funciones constantes ' \
-               'f(x)=1 y g(x)=4 muestran valores repetidos para un par de elementos del conjunto inicial, por ello ' \
-               'la función mostrada no tiene inversa en este dominio.'
+        text = 'Si se repiten imágenes la función no tiene inversa para el dominio dado.'
         point_one = Point(x=1, y=1)
         point_two = Point(x=-1, y=1)
         point_three = Point(x=2, y=4)
@@ -67,24 +60,29 @@ class HelpDataMapper:
     def _get_help_data_selection_inverse_help(self) -> HelpData:
         function = Function(function_id=0, expression='(x)**3', x_values_range=(-4, 4), is_main_graphic=True)
         function.setup_data(plot_range=(-5, 5))
-        first_step = self._get_first_step_selection_inverse_help(function=function)
-        return HelpData(order=0, functions=[function], help_steps=[first_step],
+        first_step = self._get_first_step_selection_inverse_help()
+        second_step = self._get_second_step_selection_inverse_help(function=function)
+        return HelpData(order=0, functions=[function], help_steps=[first_step, second_step],
                         title='Apuntes sobre funciones inversas',
-                        text='La función inversa de f(x), f⁻¹(x), es aquella cuyos valores del conjunto inicial de f(x)'
-                             ' son los valores del conjunto imagen de f⁻¹(x) y los valores del conjunto imagen de f(x)'
-                             ' son los valores del conjunto inicial de f⁻¹(x).')
+                        text='La función inversa es aquella que intercambia los valores de entrada de la función por '
+                             'sus imágenes.')
 
-    def _get_first_step_selection_inverse_help(self, function: Function) -> HelpStep:
+    def _get_first_step_selection_inverse_help(self) -> HelpStep:
+        function_two = Function(function_id=0, expression='x', x_values_range=(-5, 5), is_main_graphic=False)
+        function_two.setup_data(plot_range=(-5, 5))
+        text = 'Con la ayuda de la recta x=y podemos observar la relación entre los elementos de una función y su ' \
+               'inversa, los valores de entrada de la función inversa son las imágenes de la función y viceversa.'
+        return HelpStep(order=0, functions=[function_two], text=text, function_color='blue')
+
+    def _get_second_step_selection_inverse_help(self, function: Function) -> HelpStep:
         function_one = Function(function_id=0, expression='1', x_values_range=(-4, 4), is_main_graphic=False,
                                 is_invert_function=True)
         function_one.x_values = function.y_values
         function_one.y_values = function.x_values
 
-        function_two = Function(function_id=0, expression='x', x_values_range=(-5, 5), is_main_graphic=False)
-        function_two.setup_data(plot_range=(-5, 5))
-        text = 'Con la ayuda de la función f(x)=y podemos observar la relación entre una función y su inversa, ' \
-               'los valores de la función inversa son la reflexión de los valores de la función sobre f(x)=y.'
-        return HelpStep(order=0, functions=[function_one, function_two], text=text, function_color='blue')
+        text = 'Con la ayuda de la recta x=y podemos observar la relación entre los elementos de una función y su ' \
+               'inversa, los valores de entrada de la función inversa son las imágenes de la función y viceversa.'
+        return HelpStep(order=0, functions=[function_one], text=text, function_color='green')
 
     def _get_delimited_inverse_help(self) -> List[HelpData]:
         return [self._get_help_data_delimited_inverse_help()]
@@ -95,18 +93,15 @@ class HelpDataMapper:
         first_step = self._get_first_step_delimited_inverse_help()
         return HelpData(order=0, functions=[function], help_steps=[first_step],
                         title='Apuntes sobre funciones inversas',
-                        text='La restricción de dominio sobre una función permite obtener funciones inversas sobre '
-                             'una función que inicialmente no tenía. Al restringir el dominio se puede conseguir que '
-                             'la función sea biyectiva y por tanto tenga inversa en esa restricción.')
+                        text='Si se repiten imágenes recortamos dominio para evitar repeticiones y así obtener una '
+                             'función inversa para la función.')
 
     def _get_first_step_delimited_inverse_help(self) -> HelpStep:
         function_one = Function(function_id=0, expression='(x)**2', x_values_range=(0, 3), is_main_graphic=False)
         function_one.setup_data(plot_range=(-5, 5))
         function_one.x_values, function_one.y_values = function_one.y_values, function_one.x_values
 
-        text = 'En la función descrita se restringe el dominio a [0, 2] permitiendo así que la función no tenga' \
-               ' imágenes repetidas para dos valores cualquiera del conjunto inicial, ahora es una función inyectiva,' \
-               ' y por tanto biyectiva, ya era suprayectiva antes.'
+        text = 'Ejemplo de dominio recortado, la función ahora sí tiene inversa.'
         return HelpStep(order=0, functions=[function_one], help_ranges=[(0, 5)], text=text, function_color='blue')
 
     def _get_indicate_elementary_shift_exercise_help(self) -> List[HelpData]:
@@ -121,23 +116,19 @@ class HelpDataMapper:
         function.setup_data(plot_range=(-5, 5))
         return HelpData(order=0, functions=[function], help_steps=[first_step, second_step],
                         title='Apuntes sobre desplazamientos en funciones',
-                        text='El desplazamiento sobre el eje horizontal se produce al sumar o restar una constante '
-                             'a la variable x.')
+                        text='Desplazamientos horizontales sobre f(x).')
 
     def _get_first_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x + 1)**2', x_values_range=(-4, 4), is_main_graphic=False)
         function.setup_data(plot_range=(-5, 5))
-        return HelpStep(order=0, functions=[function],
-                        text='Para obtener un desplazamiento horizontal hacia la izquierda hay que sumar una constante'
-                             ' a la variable x. En este caso hemos cambiado la función f(x)=x² a f(x)=(x + 1)².',
+        return HelpStep(order=0, functions=[function], text='Desplazamiento horizontal hacia la izquierda: f(x + 1).',
                         function_color='blue')
 
     def _get_second_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x - 1)**2', x_values_range=(-4, 4), is_main_graphic=False)
         function.setup_data(plot_range=(-5, 5))
         return HelpStep(order=1, functions=[function],
-                        text='Para obtener un desplazamiento horizontal hacia la derecha hay que restar una constante'
-                             ' a la variable x. En este caso hemos cambiado la función f(x)=x² a f(x)=(x - 1)².',
+                        text='Desplazamiento horizontal hacia la derecha: f(x - 1).',
                         function_color='purple')
 
     def _get_second_help_data_elementary_shift(self) -> HelpData:
@@ -147,23 +138,18 @@ class HelpDataMapper:
         function.setup_data(plot_range=(-5, 5))
         return HelpData(order=1, functions=[function], help_steps=[first_step, second_step],
                         title='Apuntes sobre desplazamientos en funciones',
-                        text='El desplazamiento sobre el eje vertical se produce al sumar o restar una constante '
-                             'a la función completa.')
+                        text='Desplazamientos verticales sobre f(x).')
 
     def _get_third_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x)**2 + 1', x_values_range=(-3, 3), is_main_graphic=False)
         function.setup_data(plot_range=(-5, 5))
-        return HelpStep(order=0, functions=[function],
-                        text='Para obtener un desplazamiento vertical hacia arriba hay que sumar una constante'
-                             ' a la función completa. En este caso hemos cambiado la función f(x)=x² a f(x)=x² + 1.',
+        return HelpStep(order=0, functions=[function], text='Desplazamiento vertical hacia arriba: f(x) + 1.',
                         function_color='blue')
 
     def _get_fourth_step_elementary_shift(self) -> HelpStep:
         function = Function(function_id=0, expression='(x)**2 - 1', x_values_range=(-3, 3), is_main_graphic=False)
         function.setup_data(plot_range=(-5, 5))
-        return HelpStep(order=1, functions=[function],
-                        text='Para obtener un desplazamiento vertical hacia abajo hay que restar una constante'
-                             ' a la función completa. En este caso hemos cambiado la función f(x)=x² a f(x)=x² - 1.',
+        return HelpStep(order=1, functions=[function], text='Desplazamiento vertical hacia abajo: f(x) - 1.',
                         function_color='purple')
 
     def _get_indicate_domain_help(self) -> List[HelpData]:
@@ -255,7 +241,8 @@ class HelpDataMapper:
         return HelpStep(order=0, functions=[], text=text)
 
     def _get_second_help_step_maximum(self) -> HelpStep:
-        function_one = Function(function_id=0, expression='(4 * x - 8) - 1', x_values_range=(2, 3), is_main_graphic=False,
+        function_one = Function(function_id=0, expression='(4 * x - 8) - 1', x_values_range=(2, 3),
+                                is_main_graphic=False,
                                 domain='(2, 3]', is_invert_function=False)
         function_one.setup_data(plot_range=(-5, 5))
 
@@ -266,7 +253,8 @@ class HelpDataMapper:
                         points=[Point(3, 3, True)])
 
     def _get_third_help_step_maximum(self) -> HelpStep:
-        function_one = Function(function_id=0, expression='((1/3) * x + 4) - 1', x_values_range=(3, 6), is_main_graphic=False,
+        function_one = Function(function_id=0, expression='((1/3) * x + 4) - 1', x_values_range=(3, 6),
+                                is_main_graphic=False,
                                 domain='(3, +inf)', is_invert_function=False)
         function_one.setup_data(plot_range=(-5, 5))
 

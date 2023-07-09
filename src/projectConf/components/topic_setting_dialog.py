@@ -86,7 +86,7 @@ class TopicSettingDialog(QWidget):
             self._topic = self._topic_edited
             TopicDataMapper.save_topic_configuration(self._topic_edited)
             self._save_label.setVisible(True)
-        else:
+
             self.close_signal.emit()
 
     def _get_exercise_setting_widget(self, exercise_setting: ExerciseSetting) -> QWidget:

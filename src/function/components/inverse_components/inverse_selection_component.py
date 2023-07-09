@@ -19,6 +19,7 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
             show_main_function_limits=show_main_function_limits
         )
         self._resolved = False
+        self._functions = []
 
     def _setup_data(self):
         main_function = self._exercise.get_main_function()[0]
@@ -56,21 +57,24 @@ class InverseSelectionComponent(GraphInteractionValidationComponent):
         functions[1].setup_data(plot_range=self._exercise.plot_range)
         colors = [(255, 0, 255), (255, 0, 0), (0, 0, 255)]
         random.shuffle(colors)
-        PlotFactory2.set_functions(graph=plot_widget, functions=[functions[0]], function_width=3,
-                                   click_function=self._on_graph_click, color=colors.pop())
-        PlotFactory2.set_functions(graph=plot_widget, functions=[functions[1]], function_width=3,
-                                   click_function=self._on_graph_click, color=colors.pop())
+        f = PlotFactory2.set_functions(graph=plot_widget, functions=[functions[0]], function_width=3,
+                                       click_function=self._on_graph_click, color=colors.pop())
+        f1 = PlotFactory2.set_functions(graph=plot_widget, functions=[functions[1]], function_width=3,
+                                        click_function=self._on_graph_click, color=colors.pop())
         inverse_color = colors.pop()
         self._setup_inverse_plot(color=inverse_color, function=main_function, plot_widget=plot_widget)
-
+        f2 = PlotFactory2.set_functions(graph=plot_widget, functions=self._exercise.get_main_function(),
+                                        function_width=3, color='white', show_limits=self._show_main_function_limits)
+        self._functions.extend([f[0], f1[0], f2[0]])
         return plot_widget
 
     def _setup_inverse_plot(self, color: [str, tuple], function: Function, plot_widget: pyqtgraph.PlotWidget):
         for x_group, y_group in zip(function.y_values, function.x_values):
-            PlotFactory2.set_graph_using_points(
+            f = PlotFactory2.set_graph_using_points(
                 graph=plot_widget, x_values=x_group, y_values=y_group, function_width=3,
                 click_function=self._on_graph_click, color=color, function_name='inverse'
             )
+            self._functions.append(f)
 
     def _get_option_function(self):
         return [function for function in self._exercise.functions if not function.is_main_graphic]

@@ -34,6 +34,7 @@ class FunctionExercisePage(Window):
         self._steps_done_widget: QComboBox = None  # noqa
         self._header_layout: QHBoxLayout = None  # noqa
         self._current_exercise_component: FunctionExerciseComponent = None  # noqa
+        self._home_button: QPushButton = None  # noqa
         self._next_button: QPushButton = None  # noqa
         self._back_button: QPushButton = None  # noqa
         self._header_widget: QWidget = None  # noqa
@@ -59,17 +60,19 @@ class FunctionExercisePage(Window):
         header = QWidget()
         header_layout = QHBoxLayout()
 
+        self._home_button = self._get_home_button()
         self._back_button = self._get_back_button()
         self._combobox_layout = self._get_combobox_layout()
         self._next_button = self._get_next_button()
 
-        header_layout.addSpacing(50)
+        header_layout.addSpacing(20)
+        header_layout.addWidget(self._home_button)
         header_layout.addWidget(self._back_button)
         header_layout.addStretch()
         header_layout.addLayout(self._combobox_layout)
         header_layout.addStretch()
         header_layout.addWidget(self._next_button)
-        header_layout.addSpacing(50)
+        header_layout.addSpacing(20)
         header.setLayout(header_layout)
         header.setObjectName('container')
         effect = QGraphicsDropShadowEffect()
@@ -80,6 +83,14 @@ class FunctionExercisePage(Window):
         header.setMinimumSize(QSize(header.minimumSizeHint().width() * 2, header.minimumSizeHint().height() * 1.2))
         header.setMaximumSize(QSize(header.minimumSizeHint().width() * 2, header.minimumSizeHint().height() * 1.2))
         return header
+
+    def _get_home_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='casa.png')
+        home_button = ButtonFactory.get_button_component(
+            title='', function_to_connect=lambda: self.back_signal.emit(), icon=icon, icon_size=35,
+            tooltip='Volver al inicio', secondary_button=True
+        )
+        return home_button
 
     def _get_back_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='left-arrow.png')
@@ -167,7 +178,7 @@ class FunctionExercisePage(Window):
     def _setup_next_exercise(self, current_exercise_id: int):
         try:
             current_exercise_order = next(
-                exercise.exercise_order for exercise in self._exercises if exercise.id == current_exercise_id
+                index for index, exercise in enumerate(self._exercises) if exercise.id == current_exercise_id
             )
             next_exercise = self._exercises[current_exercise_order + 1]
             self._set_exercise_component(next_exercise=next_exercise)
@@ -176,7 +187,7 @@ class FunctionExercisePage(Window):
 
     def _setup_back_exercise(self, current_exercise_id: int):
         current_exercise_order = next(
-            exercise.exercise_order for exercise in self._exercises if exercise.id == current_exercise_id
+            index for index, exercise in enumerate(self._exercises) if exercise.id == current_exercise_id
         )
         next_exercise = self._exercises[current_exercise_order - 1]
         self._set_exercise_component(next_exercise=next_exercise, start_step=next_exercise.steps[-1])

@@ -1,8 +1,9 @@
 from typing import List
 
 import pyqtgraph
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from pyqt5_plugins.examplebuttonplugin import QtGui
 
 from src.function.factories.plot_factory2 import PlotFactory2
 from src.function.models import HelpData, HelpStep
@@ -11,6 +12,8 @@ from src.projectConf.models.enums import TextType
 
 
 class HelpDataDialog(QWidget):
+    close_signal = pyqtSignal()
+
     _PLOT_RANGE = (-5, 5)
 
     def __init__(self, help_data_list: List[HelpData], show_main_function_limits: bool = False,
@@ -28,6 +31,13 @@ class HelpDataDialog(QWidget):
         self._current_help_data: HelpData = None  # noqa
         self._current_step: HelpStep = None  # noqa
 
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.close_signal.emit()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close_signal.emit()
+
     def draw(self):
         self.setObjectName('application')
         self.setStyleSheet("""
@@ -35,7 +45,7 @@ class HelpDataDialog(QWidget):
                     background-color: #EDEDE9;
                 }
             """
-        )
+                           )
         self.setWindowTitle('Ayuda')
 
         help_layout = QVBoxLayout()
@@ -105,7 +115,7 @@ class HelpDataDialog(QWidget):
         buttons_layout.addWidget(self._continue_button, alignment=Qt.AlignRight)
         buttons_layout.addSpacing(50)
         widget.setLayout(buttons_layout)
-        widget.setMinimumSize(QSize(widget.minimumSizeHint().width()* 1.3, widget.minimumSizeHint().height()* 1.3))
+        widget.setMinimumSize(QSize(widget.minimumSizeHint().width() * 1.3, widget.minimumSizeHint().height() * 1.3))
         widget.setMaximumSize(QSize(widget.minimumSizeHint().width() * 1.3, widget.minimumSizeHint().height() * 1.3))
         return widget
 

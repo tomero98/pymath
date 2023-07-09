@@ -90,7 +90,8 @@ class FunctionExerciseComponent(QWidget):
     def setup_next_step_component(self):
         try:
             step_type = self._current_step_component._step.type  # noqa
-            current_step_order = next(step.order for step in self._exercise.steps if step.type == step_type)
+            current_step_order = next(index
+                                      for index, step in enumerate(self._exercise.steps) if step.type == step_type)
             next_step = self._exercise.steps[current_step_order + 1]
             self._setup_step_component(next_step=next_step)
         except IndexError:

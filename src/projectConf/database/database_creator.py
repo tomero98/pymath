@@ -140,6 +140,8 @@ class DatabaseCreator:
             # Maximum exercises
             {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 42
 
+            # Inverse exercises
+            {'exercise_type': 'InverseGraphExercise', 'domain': '-5, 5', 'topic_id': 1},  # 43
         ]
 
         sql_query.prepare(
@@ -263,6 +265,7 @@ class DatabaseCreator:
             {'expression': '-(((x)**(2) + 4 * x + 6)/(2))'},  # 61
 
             {'expression': '3'},  # 62
+            {'expression': '- (x) ** 2'},  # 63
         ]
         sql_query = QSqlQuery()
         sql_query.prepare(
@@ -436,6 +439,9 @@ class DatabaseCreator:
             {'exercise_id': 42, 'graph_id': 46, 'domain': '[-2, 0)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 42, 'graph_id': 47, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 42, 'graph_id': 45, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+
+            # Inverse exercise
+            {'exercise_id': 43, 'graph_id': 63, 'domain': '(-3, 3)', 'is_main_graphic': 1},  # 48
 
         ]
 

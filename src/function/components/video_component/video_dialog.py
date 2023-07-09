@@ -31,6 +31,10 @@ class VideoDialog(QWidget):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.close_signal.emit()
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close_signal.emit()
+
     def draw(self):
         self.setObjectName('application')
         self.setStyleSheet("""

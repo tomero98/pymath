@@ -48,6 +48,11 @@ class InverseConceptComponent(ElementaryGraphComponent):
             self._setup_wrong_yes_inverse_response()
         elif expression_selected == 'NO':
             self._result_label.setText(f'Incorrecto. No hay imágenes repetidas en la función.')
+            for num in range(*self._exercise.plot_range):
+                x_values = [self._exercise.plot_range[0] - 1, self._exercise.plot_range[-1] + 1]
+                y_values = [num] * 2
+                PlotFactory2.set_graph_using_points(graph=self._plot_widget, x_values=x_values, y_values=y_values,
+                                                    color='blue', function_width=1)
 
         self._result_label.setStyleSheet('color: red;')
         self._result_label.setVisible(True)
@@ -108,4 +113,6 @@ class InverseConceptComponent(ElementaryGraphComponent):
                 x_by_y[y] = x
             else:
                 points = [Point(x, y), Point(x_by_y[y], y)]
+        PlotFactory2.set_graph_using_points(self._plot_widget, x_values=[points[0].x, points[1].x],
+                                            y_values=[points[0].y, points[1].y], color='blue')
         PlotFactory2.set_points(self._plot_widget, points=points, color='red')

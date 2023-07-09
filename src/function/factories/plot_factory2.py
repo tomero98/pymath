@@ -29,20 +29,23 @@ class PlotFactory2:
 
     @classmethod
     def set_functions(cls, graph: pyqtgraph.PlotWidget, functions: List[Function], function_width: int = 3,
-                      color: [str, Tuple] = '', show_limits: bool = False, click_function=None) -> None:
+                      color: [str, Tuple] = '', show_limits: bool = False, click_function=None) -> List:
         # pink red green blue
         colors = [(255, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
+        function_return = []
         for function in functions:
             x_values, y_values = function.x_values, function.y_values
             for x_set, y_set in zip(x_values, y_values):
                 color_selected = color if color else colors.pop()
-                PlotFactory2.set_graph_using_points(
+                p = PlotFactory2.set_graph_using_points(
                     graph=graph, x_values=x_set, y_values=y_set, color=color_selected,
                     function_width=function_width, function_name=function.expression, click_function=click_function
                 )
+                function_return.append(p)
 
             if show_limits:
                 PlotFactory2._setup_limits(graph=graph, function=function, x_values=x_values, y_values=y_values)
+        return function_return
 
     @classmethod
     def _setup_limits(cls, graph: pyqtgraph.PlotWidget, function: Function, x_values: List[int], y_values: List[int]):

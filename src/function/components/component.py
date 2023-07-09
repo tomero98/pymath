@@ -38,6 +38,8 @@ class Component(QWidget):
 
         self._video_dialog: VideoDialog = None  # noqa
 
+        self._help_data_dialog: HelpDataDialog = None  # noqa
+
     def draw(self):
         self._setup_data()
         self._draw()
@@ -100,6 +102,8 @@ class Component(QWidget):
             self._video_dialog.close_signal.connect(self._set_video_dialog_close)
             self._video_dialog.draw()
             self._help_button.setDisabled(True)
+            if self._info_button:
+                self._info_button.setDisabled(True)
 
     def _set_video_dialog_close(self):
         if self._video_dialog:
@@ -107,6 +111,8 @@ class Component(QWidget):
             self._video_dialog = None
         if self._help_button:
             self._help_button.setDisabled(False)
+        if self._info_button:
+            self._info_button.setDisabled(False)
 
     def _get_info_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='lessons.png')
@@ -116,8 +122,20 @@ class Component(QWidget):
         )
 
     def _setup_help_data(self):
-        help_data_dialog = HelpDataDialog(
-            help_data_list=self._step.help_data_list, show_main_function_limits=self._show_main_function_limits,
-            show_function_labels=self._show_function_labels
-        )
-        help_data_dialog.draw()
+        if not self._help_data_dialog:
+            self._help_data_dialog = HelpDataDialog(
+                help_data_list=self._step.help_data_list, show_main_function_limits=self._show_main_function_limits,
+                show_function_labels=self._show_function_labels
+            )
+            self._help_data_dialog.close_signal.connect(self._set_help_data_dialog_close)
+            self._help_data_dialog.draw()
+            self._info_button.setDisabled(True)
+            if self._help_button:
+                self._help_button.setDisabled(True)
+
+    def _set_help_data_dialog_close(self):
+        if self._help_button:
+            self._help_button.setDisabled(False)
+        self._help_data_dialog.close()
+        self._help_data_dialog = None
+        self._info_button.setDisabled(False)

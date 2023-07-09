@@ -1,4 +1,7 @@
+import math
+
 import pyqtgraph
+from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, Qt, QSize
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
 
@@ -42,7 +45,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
     def _is_exercise_correct(self, expression_selected: tuple):
         main_function = self._exercise.get_main_function()[0]
         y_values_selected = [
-            y for x_group, y_group in zip(main_function.x_values, main_function.y_values)
+            math.trunc(y * 1000) / 1000 for x_group, y_group in zip(main_function.x_values, main_function.y_values)
             for x, y in zip(x_group, y_group) if expression_selected[0] <= x <= expression_selected[1]
         ]
         return len(set(y_values_selected)) == len(y_values_selected)
@@ -86,6 +89,9 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
 
         if is_answer_correct:
             self._setup_correct_response()
+            color = QtGui.QColor(0, 255, 0, 100)
+            brush = QtGui.QBrush(color)
+            self._region.setBrush(brush)
         else:
             self._setup_wrong_response(expression_selected=expression_selected_str)
         self._setup_finished_exercise()
@@ -94,7 +100,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
         main_function = self._exercise.get_main_function()[0]
         expression_selected = tuple(map(float, expression_selected.split(',')))
         values_selected = [
-            (x, y) for x_group, y_group in zip(main_function.x_values, main_function.y_values)
+            (x, math.trunc(y * 1000) / 1000) for x_group, y_group in zip(main_function.x_values, main_function.y_values)
             for x, y in zip(x_group, y_group) if expression_selected[0] <= x <= expression_selected[1]
         ]
         y_values_set = set()
@@ -109,7 +115,7 @@ class InverseDelimitedComponent(DomainDefinitionComponent):
 
         PlotFactory2.set_points(self._plot_widget, points=points, color='red')
 
-        self._result_label.setText('Incorrecto. Los dos puntos indicados muestran porque la gráfica no tiene inversa.')
+        self._result_label.setText('Incorrecto. Los dos puntos indicados muestran imágenes repetidas.')
         self._result_label.setStyleSheet('color: red')
         self._result_label.setVisible(True)
 

@@ -42,7 +42,7 @@ class StepDataMapper:
 
     def _get_inverse_concept_exercise_step(self) -> FunctionStep:
         step_type = StepType.inverse_concept_exercise
-        question = 'Indica si la siguiente gráfica tiene inversa para todo el dominio mostrado.'
+        question = 'Indica si la siguiente función tiene inversa para todo el dominio mostrado.'
         order = 0
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
@@ -51,7 +51,7 @@ class StepDataMapper:
 
     def _get_selection_inverse_exercise_step(self):
         step_type = StepType.selection_inverse_exercise
-        question = 'Selecciona la función inversa de la siguiente función.'
+        question = 'Selecciona la función inversa de la función blanca.'
         order = 1
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
@@ -60,8 +60,8 @@ class StepDataMapper:
 
     def _get_delimited_inverse_exercise_step(self):
         step_type = StepType.delimited_inverse_exercise
-        question = 'Delimita el rango de la función para que tenga inversa'
-        order = 1
+        question = 'Delimita el rango de la función para que tenga inversa.'
+        order = 2
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, step_info_data=step_info_data,
@@ -87,7 +87,7 @@ class StepDataMapper:
 
     def _get_indicate_elementary_exercise_step(self):
         step_type = StepType.indicate_elementary_exercise
-        question = 'Selecciona la expresión de la gráfica mostrada:'
+        question = 'Selecciona la expresión de la función representada.'
         order = 0
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
         return FunctionStep(step_type=step_type, question=question, order=order, help_data_list=None,
@@ -95,7 +95,7 @@ class StepDataMapper:
 
     def _get_indicate_elementary_shift_exercise_step(self):
         step_type = StepType.indicate_elementary_shift_exercise
-        question = 'Selecciona la expresión de la gráfica mostrada:'
+        question = 'Selecciona la expresión de la función representada.'
         order = 1
         help_data_list = self._help_data_mapper.get_help_data(step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)

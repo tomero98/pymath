@@ -26,14 +26,17 @@ class StepDataMapper:
             elif step_setting.step_type == StepType.delimited_inverse_exercise.value \
                     and not self._exercise.has_main_function_inverse():
                 step = self._get_delimited_inverse_exercise_step()
+
             elif step_setting.step_type == StepType.indicate_domain_exercise.value:
                 step = self._get_indicate_domain_exercise_step()
             elif step_setting.step_type == StepType.indicate_range_exercise.value:
                 step = self._get_indicate_range_exercise_step()
+
             elif step_setting.step_type == StepType.indicate_elementary_exercise.value:
                 step = self._get_indicate_elementary_exercise_step()
             elif step_setting.step_type == StepType.indicate_elementary_shift_exercise.value:
                 step = self._get_indicate_elementary_shift_exercise_step()
+
             elif step_setting.step_type == StepType.maximum_minimum_exercise.value:
                 step = self._get_maximum_minimum_exercise_step()
 
@@ -69,7 +72,7 @@ class StepDataMapper:
 
     def _get_indicate_domain_exercise_step(self) -> FunctionStep:
         step_type = StepType.indicate_domain_exercise
-        question = 'Con la ayuda del ratón, indica el dominio de la función representada.'
+        question = 'Crea intervalos utilizando el botón de añadir para indicar el dominio de la función representada.'
         order = 0
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)
@@ -78,7 +81,7 @@ class StepDataMapper:
 
     def _get_indicate_range_exercise_step(self) -> FunctionStep:
         step_type = StepType.indicate_range_exercise
-        question = 'Con la ayuda del ratón, indica el recorrido de la función representada.'
+        question = 'Crea intervalos utilizando el botón de añadir para indicar el recorrido de la función representada.'
         order = 1
         help_data_list = self._help_data_mapper.get_help_data(step_type=step_type)
         step_info_data = self._step_info_data_mapper.get_step_info_data(step_type=step_type)

@@ -17,7 +17,7 @@ class RangeSelectionDialog(QWidget):
     def __init__(self, plot_range: list, ranges_added: list, range_item: str = None):
         super(RangeSelectionDialog, self).__init__()
 
-        self._pattern: str = r'(^\(|\[){1}(-inf|-?\d+(\.\d+)?),\s(-?\d+(\.\d+)?|\+inf)(\]|\)){1}$'
+        self._pattern: str = r'(^\(|\[){1}(-inf|-?\d+(\.\d+)?),\s?(-?\d+(\.\d+)?|\+inf)(\]|\)){1}$'
         self._plot_range = plot_range
         self._ranges_added: list = ranges_added
         self._range_item: str = range_item
@@ -37,7 +37,7 @@ class RangeSelectionDialog(QWidget):
                 }
             """
                            )
-        self.setWindowTitle('Selecciona el rango')
+        self.setWindowTitle('Selecciona el intervalo')
 
         widget = QWidget()
         widget.setObjectName('topic-container')
@@ -53,9 +53,9 @@ class RangeSelectionDialog(QWidget):
         layout1 = QVBoxLayout()
 
         if self._range_item:
-            text = f'Editar el rango {self._range_item}'
+            text = f'Editar el intervalo {self._range_item}'
         else:
-            text = 'Crear nuevo rango de valores'
+            text = 'Define el intervalo'
         text_label = LabelFactory.get_label_component(
             text=text, label_type=TextType.SUBTITLE, align=Qt.AlignHCenter, need_word_wrap=False, set_visible=True
         )
@@ -81,7 +81,7 @@ class RangeSelectionDialog(QWidget):
         layout = QHBoxLayout()
 
         text_label = LabelFactory.get_label_component(
-            text=f'Indica el rango a introducir:', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
+            text=f'Indica el intervalo a introducir:', label_type=TextType.NORMAL_TEXT, align=Qt.AlignHCenter,
             need_word_wrap=False, set_visible=True
         )
 
@@ -132,14 +132,14 @@ class RangeSelectionDialog(QWidget):
             if lower_limit == float('-inf'):
                 if first_limit == '[':
                     self._continue_button.setDisabled(True)
-                    self._range_edition_help_text.setText('Se está incluyendo -inf en el rango.')
+                    self._range_edition_help_text.setText('Se está incluyendo -inf en el intervalo.')
                     self._range_edition_help_text.setStyleSheet('color: red;')
                     return None
 
             if upper_limit == float('inf'):
                 if last_limit == ']':
                     self._continue_button.setDisabled(True)
-                    self._range_edition_help_text.setText('Se está incluyendo +inf en el rango.')
+                    self._range_edition_help_text.setText('Se está incluyendo +inf en el intervalo.')
                     self._range_edition_help_text.setStyleSheet('color: red;')
                     return None
 
@@ -152,7 +152,7 @@ class RangeSelectionDialog(QWidget):
             if not lower_limit == float('-inf') and lower_limit < self._plot_range[0]:
                 self._continue_button.setDisabled(True)
                 self._range_edition_help_text.setText(
-                    'El límite inferior es menor que el rango mostrado en la gráfica.'
+                    'El límite inferior es menor que el intervalo mostrado en la gráfica.'
                 )
                 self._range_edition_help_text.setStyleSheet('color: red;')
                 return None
@@ -160,7 +160,7 @@ class RangeSelectionDialog(QWidget):
             if not upper_limit == float('inf') and upper_limit > self._plot_range[1]:
                 self._continue_button.setDisabled(True)
                 self._range_edition_help_text.setText(
-                    'El límite superior es mayor que el rango mostrado en la gráfica.'
+                    'El límite superior es mayor que el intervalo mostrado en la gráfica.'
                 )
                 self._range_edition_help_text.setStyleSheet('color: red;')
                 return None

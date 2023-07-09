@@ -211,10 +211,11 @@ class FunctionExercise:
             exercise_domain_set.update(function_domain)
 
         user_domain_set = set()
-        for domain_part in user_domain_input.split(' U '):
-            user_domain_set.update(self.get_num_set_from_domain_expression(domain_expression=domain_part))
-        return exercise_domain_set == user_domain_set, \
-               user_domain_set - exercise_domain_set, \
+        if user_domain_input:
+            for domain_part in user_domain_input.split(' U '):
+                user_domain_set.update(self.get_num_set_from_domain_expression(domain_expression=domain_part))
+
+        return exercise_domain_set == user_domain_set, user_domain_set - exercise_domain_set, \
                exercise_domain_set - user_domain_set
 
     def get_domain_expression(self) -> str:
@@ -262,10 +263,10 @@ class FunctionExercise:
             exercise_range_set.update(range_domain)
 
         user_range_set = set()
-        for range_part in user_range_input.split(' U '):
-            user_range_set.update(self.get_num_set_from_range_expression(range_expression=range_part))
-        return exercise_range_set == user_range_set, \
-               user_range_set - exercise_range_set, \
+        if user_range_input:
+            for range_part in user_range_input.split(' U '):
+                user_range_set.update(self.get_num_set_from_range_expression(range_expression=range_part))
+        return exercise_range_set == user_range_set, user_range_set - exercise_range_set, \
                exercise_range_set - user_range_set
 
     def get_range_expression(self) -> str:

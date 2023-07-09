@@ -161,58 +161,33 @@ class HelpDataMapper:
                                 domain='[-2, +inf)')
         function_one.setup_data(plot_range=(-5, 5))
         help_step_one = self._get_first_help_step_domain()
-        help_step_two = self._get_second_help_step_domain()
         return HelpData(order=0, title='Apuntes sobre el dominio de una función',
-                        functions=[function_one], help_steps=[help_step_one, help_step_two],
-                        text='El dominio de una función corresponde al conjunto de valores de entrada para los que la '
+                        functions=[function_one], help_steps=[help_step_one],
+                        text='El dominio de una función corresponde al conjunto de valores para los que la '
                              'función está definida.')
 
     def _get_first_help_step_domain(self) -> HelpStep:
-        text = 'Para la función dada, se puede observar que el rango de valores del dominio comprende desde la abscisa -2 hasta' \
-               ' infinito, porque no vemos punto límite para la función por la derecha, así que nos podemos imaginar ' \
-               'que continua infinitamente.'
+        text = 'Para la gráfica mostrada, el dominio es [-2, inf) porque no vemos punto límite para la función por la ' \
+               'derecha, así que nos podemos imaginar que continua infinitamente.'
         return HelpStep(order=0, functions=[], text=text, help_range_orientation='vertical', help_ranges=[(-2, 6)])
-
-    def _get_second_help_step_domain(self) -> HelpStep:
-        function_one = Function(function_id=0, expression='3', x_values_range=(-4, -3), is_main_graphic=False,
-                                domain='[-4, -3]', is_invert_function=False)
-        function_one.setup_data((-5, 5))
-
-        text = 'Para las funciones definidas a trozos, el dominio corresponde al conjunto unión de los dominios de las ' \
-               'funciones que la forman. En este caso el dominio es [-4, -3] U [-2, +inf). Resaltar el salto en el dominio, ' \
-               'no tienen que ser seguidos los valores que puede tomar el dominio.'
-        return HelpStep(order=0, functions=[function_one], text=text, function_color='white',
-                        help_range_orientation='vertical', help_ranges=[(-4, -3)])
 
     def _get_indicate_range_help(self) -> List[HelpData]:
         first_help_data = self._get_first_help_data_range()
         return [first_help_data]
 
     def _get_first_help_data_range(self) -> HelpData:
-        function_one = Function(function_id=0, expression='(x)**2', x_values_range=(-2, 3), is_main_graphic=True,
+        function_one = Function(function_id=0, expression='3', x_values_range=(-2, 3), is_main_graphic=True,
                                 domain='[-2, +inf)')
         function_one.setup_data(plot_range=(-5, 5))
         help_step_one = self._get_first_help_step_range()
-        help_step_two = self._get_second_help_step_range()
         return HelpData(order=0, title='Apuntes sobre el recorrido de una función',
-                        functions=[function_one], help_steps=[help_step_one, help_step_two],
-                        text='El recorrido de una función es el conjunto de valores que puede alcanzar la función, es '
-                             'decir, el recorrido es el conjunto formado por todas las imágenes de su dominio.')
+                        functions=[function_one], help_steps=[help_step_one],
+                        text='El recorrido de una función es el conjunto de valores que puede alcanzar la función.')
 
     def _get_first_help_step_range(self) -> HelpStep:
-        text = 'Para la función dada, se puede observar que el rango de valores del recorrido comprende desde la ordenada 0 hasta' \
-               ' infinito, porque no podemos observar límite por arriba para los valores que pueda tomar la función.'
-        return HelpStep(order=0, functions=[], text=text, help_range_orientation='horizontal', help_ranges=[(0, 6)])
-
-    def _get_second_help_step_range(self) -> HelpStep:
-        function_one = Function(function_id=0, expression='-1', x_values_range=(-4, -3), is_main_graphic=False,
-                                domain='[-4, -3]', is_invert_function=False)
-        function_one.setup_data((-5, 5))
-
-        text = 'Para las funciones definidas a trozos, el recorrido corresponde al conjunto unión de los recorridos de las ' \
-               'funciones que la forman. En este caso el recorrido es [-1, -1] U [-2, +inf).'
-        return HelpStep(order=0, functions=[function_one], text=text, function_color='white',
-                        help_range_orientation='horizontal', help_ranges=[(-1, -1)])
+        text = 'Para la gráfica mostrada, el único valor alcanzado por la función es 3, el recorrido de esta ' \
+               'función es {3}.'
+        return HelpStep(order=0, functions=[], text=text, help_range_orientation='horizontal', help_ranges=[(3, 3)])
 
     def _get_maximum_minimum_help(self) -> List[HelpData]:
         first_help_data = self._get_help_maximum_range()

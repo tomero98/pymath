@@ -8,9 +8,8 @@ from pyqtgraph import LinearRegionItem
 
 from src.projectConf.factories import ButtonFactory, LineEditFactory, LabelFactory, IconFactory
 from src.projectConf.models.enums import TextType
-from .graph_interaction_validation_component import GraphInteractionValidationComponent
 from .range_selection_dialog import RangeSelectionDialog
-from ...factories import PlotFactory2
+from ..graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
 from ...models.enums import ResumeState
 
@@ -40,6 +39,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._delete_range_button: QPushButton = None  # noqa
         self._result_label: QLabel = None  # noqa
         self._validate_button: QPushButton = None  # noqa
+        self._user_input_button: QPushButton = None  # noqa
+        self._result_button: QPushButton = None  # noqa
 
     def _setup_data(self):
         main_functions = self._exercise.get_main_function()
@@ -49,7 +50,6 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
     def _setup_components(self):
         super(DomainDefinitionComponent, self)._setup_components()
         self._validate_button = self._get_validate_button()
-        self._validate_button.setDisabled(True)
         self._domain_expression_edit_widget = self._get_domain_expression_edit_widget()
 
     def _get_domain_expression_edit_widget(self) -> QWidget:
@@ -83,10 +83,12 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         layout = super(DomainDefinitionComponent, self)._get_button_layout()
 
         button_option_layout = self._get_button_option_layout()
+        resume_button_layout = self._resume_button_layout()
 
         layout.addStretch()
         layout.addLayout(button_option_layout)
         layout.addStretch()
+        layout.addLayout(resume_button_layout)
         return layout
 
     def _get_plot_widget(self) -> pyqtgraph.PlotWidget:
@@ -133,8 +135,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
 
     def _on_click_create_range_button(self):
         if not self._range_selection_dialog:
-            self._setup_range_selection_dialog()
-            self._create_range_button.setDisabled(True)
+            self._add_range_selection_dialog(range_added='(-1, 1)')
 
     def _get_delete_range_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='minus.png')
@@ -149,6 +150,67 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             self._plot_widget.removeItem(linear_region_item)
             self._update_domain_expression_edit_label()
 
+    def _resume_button_layout(self) -> QHBoxLayout:
+        layout = QHBoxLayout()
+        self._user_input_button = self._get_user_input_button()
+        self._result_button = self._get_result_button()
+        layout.addWidget(self._user_input_button, alignment=Qt.AlignRight | Qt.AlignVCenter)
+        layout.addSpacing(20)
+        layout.addWidget(self._result_button, alignment=Qt.AlignRight | Qt.AlignVCenter)
+        layout.addStretch()
+
+        return layout
+
+    def _get_user_input_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='invalid.png')
+        button = ButtonFactory.get_button_component(
+            title='', function_to_connect=self._on_click_show_user_input, primary_button=True, icon=icon,
+            icon_size=60, tooltip='Mostrar intervalo introducido'
+        )
+        button.setVisible(False)
+        return button
+
+    def _on_click_show_user_input(self):
+        self._show_input(self._resume.response)
+        self._user_input_button.setDisabled(True)
+        self._result_button.setDisabled(False)
+
+    def _get_result_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='valid.png')
+        button = ButtonFactory.get_button_component(
+            title='', function_to_connect=self._on_click_show_resume_input, primary_button=True, icon=icon,
+            icon_size=60, tooltip='Mostrar intervalo esperado',
+        )
+        button.setVisible(False)
+        return button
+
+    def _on_click_show_resume_input(self):
+        self._show_input(self._get_correct_expression())
+        self._user_input_button.setDisabled(False)
+        self._result_button.setDisabled(True)
+
+    def _show_input(self, input_to_show: str):
+        if self._linear_region_items:
+            for linear_region_item in self._linear_region_items:
+                self._plot_widget.removeItem(linear_region_item)
+
+        input_parts = input_to_show.split(' U ')
+        for input_part in input_parts:
+            limits = input_part[1:-1].split(',')
+            force_include_upper_limit = False
+            force_include_lower_limit = False
+            if input_part[0] == '(' and '-inf' not in input_part:
+                force_include_lower_limit = f'{limits[0].replace(" ", "")}]' in input_to_show
+            if input_part[-1] == ')' and '+inf' not in input_part:
+                force_include_upper_limit = f'[{limits[-1].replace(" ", "")}' in input_to_show
+            self._add_range_selection_dialog(
+                range_added=input_part, force_include_upper_limit=force_include_upper_limit,
+                force_include_lower_limit=force_include_lower_limit
+            )
+
+        for region_item in self._linear_region_items:
+            region_item.setMovable(False)
+
     def _setup_range_selection_dialog(self, domain_expression: str = ''):
         self._range_selection_dialog = RangeSelectionDialog(
             plot_range=[self._exercise.plot_range[0], self._exercise.plot_range[1]], ranges_added=[],
@@ -158,7 +220,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._range_selection_dialog.draw()
         self._range_selection_dialog.delete_signal.connect(self._destroy_range_selection_dialog)
 
-    def _add_range_selection_dialog(self, range_added: str):
+    def _add_range_selection_dialog(self, range_added: str, force_include_upper_limit: bool = False,
+                                    force_include_lower_limit: bool = False):
         min_value = self._exercise.plot_range[0]
         max_value = self._exercise.plot_range[1]
 
@@ -178,6 +241,11 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         else:
             upper_bound = round(float(upper_limit), 2)
             upper_limit_type = 'included' if range_added[-1] == ']' else 'not_included'
+
+        if force_include_lower_limit:
+            lower_limit_type = 'included'
+        if force_include_upper_limit:
+            upper_limit_type = 'included'
 
         self._setup_new_linear_region_item(lower_bound=lower_bound, upper_bound=upper_bound, min_value=min_value,
                                            max_value=max_value, lower_limit_type=lower_limit_type,
@@ -218,6 +286,9 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             self._range_selection_dialog = None
 
     def _update_domain_expression_edit_label(self):
+        if self._resume.resume_state != ResumeState.pending:
+            return
+
         limits = []
         for region_item in self._linear_region_items:
             expression = self._get_domain_expression_from_linear_region_item(region_item)
@@ -297,7 +368,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         super()._validate_exercise(expression_selected=expression_selected, is_resume=is_resume)
 
         if is_resume:
-            self._setup_user_range(range_expression=expression_selected)
+            if expression_selected:
+                self._setup_user_range(range_expression=expression_selected)
 
         for region_item in self._linear_region_items:
             region_item.setMovable(False)
@@ -308,9 +380,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             self._setup_correct_response()
         else:
             self._setup_wrong_response(
-                correct_response=self._get_correct_expression(),
-                user_wrong_domain_num_set=user_wrong_domain_num_set,
-                user_missed_domain_num_set=user_missed_domain_num_set
+                correct_response=self._get_correct_expression(), expression_selected=expression_selected
             )
         self._setup_finished_exercise()
 
@@ -330,43 +400,22 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._result_label.setStyleSheet('color: green')
         self._result_label.setVisible(True)
 
-    def _setup_wrong_response(self, correct_response: str, user_wrong_domain_num_set: set,
-                              user_missed_domain_num_set: set):
+    def _setup_wrong_response(self, correct_response: str, expression_selected: str):
         text = self._get_error_label_text(correct_response=correct_response)
         self._result_label.setText(text)
         self._result_label.setStyleSheet('color: red')
         self._result_label.setVisible(True)
 
-        if user_wrong_domain_num_set:
-            slice_num = max(len(user_wrong_domain_num_set) // 3, 1)
-            sorted_wrong_num_set = sorted(user_wrong_domain_num_set)
-            x_points = set(sorted_wrong_num_set[::slice_num])
-            self._setup_constant_points(x_points=x_points, color='red')
-
-        if user_missed_domain_num_set:
-            slice_num = max(len(user_missed_domain_num_set) // 3, 1)
-            sorted_missed_num_set = sorted(user_missed_domain_num_set)
-            x_points = set(sorted_missed_num_set[::slice_num])
-            self._setup_constant_points(x_points=x_points, color='red')
+        if expression_selected:
+            self._user_input_button.setVisible(True)
+            self._user_input_button.setDisabled(True)
+            self._on_click_show_user_input()
+            self._result_button.setVisible(True)
+        else:
+            self._on_click_show_resume_input()
 
     def _get_error_label_text(self, correct_response: str) -> str:
         return f'Incorrecto. El dominio de la función es el siguiente: {correct_response}'
-
-    def _setup_constant_points(self, x_points: set, color: str):
-        if self._ORIENTATION == 'vertical':
-            points_list = [
-                ([x_point, x_point], [self._exercise.plot_range[0], self._exercise.plot_range[1]])
-                for x_point in x_points
-            ]
-        else:
-            points_list = [
-                ([self._exercise.plot_range[0], self._exercise.plot_range[1]], [x_point, x_point])
-                for x_point in x_points
-            ]
-        for point_list in points_list:
-            PlotFactory2.set_graph_using_points(
-                graph=self._plot_widget, x_values=point_list[0], y_values=point_list[1], color=color, function_width=1.5
-            )
 
     def _is_exercise_correct(self, expression_selected: str) -> bool:
         is_correct, _, _ = self._exercise.validate_domain_expression(user_domain_input=expression_selected)

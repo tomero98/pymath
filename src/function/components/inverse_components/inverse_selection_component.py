@@ -3,7 +3,7 @@ import random
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt
 
-from ..domain_components.graph_interaction_validation_component import GraphInteractionValidationComponent
+from ..graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...factories import PlotFactory2
 from ...models import FunctionExercise, FunctionStep, ExerciseResume, Function
 

@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
 from src.projectConf.factories import ButtonFactory
-from ..domain_components.graph_interaction_validation_component import GraphInteractionValidationComponent
+from ..graph_interaction_validation_component import GraphInteractionValidationComponent
 from ...factories import PlotFactory2
 from ...models import ExerciseResume, FunctionExercise, FunctionStep, Function
 

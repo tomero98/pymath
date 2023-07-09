@@ -27,3 +27,29 @@ class RangeDefinitionComponent(DomainDefinitionComponent):
 
     def _get_error_label_text(self, correct_response: str) -> str:
         return f'Incorrecto. El rango de la función es el siguiente: {correct_response}'
+
+    def _show_input(self, input_to_show: str):
+        if self._linear_region_items:
+            for linear_region_item in self._linear_region_items:
+                self._plot_widget.removeItem(linear_region_item)
+
+        input_parts = input_to_show.split(' U ')
+        for input_part in input_parts:
+            limits = input_part[1:-1].split(',')
+            force_include_upper_limit = False
+            force_include_lower_limit = False
+            if input_part[0] == '(' and '-inf' not in input_part:
+                first_condition = f'{limits[0].replace(" ", "")}]' in input_to_show
+                second_condition = f'[{limits[0].replace(" ", "")}' in input_to_show
+                force_include_lower_limit = first_condition or second_condition
+            if input_part[-1] == ')' and '+inf' not in input_part:
+                first_condition = f'[{limits[-1].replace(" ", "")}' in input_to_show
+                second_condition = f'{limits[-1].replace(" ", "")}]' in input_to_show
+                force_include_upper_limit = first_condition or second_condition
+            self._add_range_selection_dialog(
+                range_added=input_part, force_include_upper_limit=force_include_upper_limit,
+                force_include_lower_limit=force_include_lower_limit
+            )
+
+        for region_item in self._linear_region_items:
+            region_item.setMovable(False)

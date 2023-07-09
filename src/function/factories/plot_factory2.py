@@ -62,12 +62,15 @@ class PlotFactory2:
 
     @classmethod
     def set_points(cls, graph: pyqtgraph.PlotWidget, points: List[Point], color: [str, tuple] = '',
-                   click_function=None) -> None:
+                   click_function=None) -> list:
+        plot_items = []
         for point in points:
             plot_data_item = graph.plot([point.x], [point.y], symbol='o', symbolBrush=color, symbolSize='12')
+            plot_items.append(plot_data_item)
             if click_function:
                 plot_data_item.setCurveClickable(state=2, width=10)
                 plot_data_item.curve.sigClicked.connect(click_function)
+        return plot_items
 
     @classmethod
     def set_graph_using_points(cls, graph: pyqtgraph.PlotWidget, x_values: List[int], y_values: List[int],
@@ -83,7 +86,8 @@ class PlotFactory2:
         return plot_data_item
 
     @classmethod
-    def set_labels2(cls, graph: pyqtgraph.PlotWidget, points: List[Tuple[Point, Tuple[tuple, str]]]) -> None:
+    def set_labels2(cls, graph: pyqtgraph.PlotWidget, points: List[Tuple[Point, Tuple[tuple, str]]]) -> list:
+        labels = []
         for point, point_info in points:
             color, text = point_info
             x_value, y_value = point.x, point.y
@@ -95,6 +99,8 @@ class PlotFactory2:
             label.setFont(font)
             label.setColor(color)
             graph.addItem(label)
+            labels.append(label)
+        return labels
 
     @classmethod
     def set_labels(cls, graph: pyqtgraph.PlotWidget, functions: list) -> None:

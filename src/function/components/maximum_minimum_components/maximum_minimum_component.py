@@ -1,11 +1,12 @@
+import math
 from collections import defaultdict
 from typing import Union
 
 import pyqtgraph
 from PyQt5.QtCore import pyqtSignal, Qt, QSize, QPointF
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QPushButton
 
-from src.projectConf.factories import LabelFactory
+from src.projectConf.factories import LabelFactory, IconFactory, ButtonFactory
 from src.projectConf.models.enums import TextType
 from .point_selection_dialog import PointSelectionDialog
 from ..inverse_components import InverseSelectionComponent
@@ -33,6 +34,8 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._proxy2 = None
         self._coordinates_label: QLabel = None  # noqa
         self._resolved: bool = False
+        self._delete_point_button: QPushButton = None  # noqa
+        self._point_items_added: list = []  # noqa
 
     def _setup_data(self):
         main_functions = self._exercise.get_main_function()
@@ -48,6 +51,40 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._layout.addWidget(self._validate_button, alignment=Qt.AlignHCenter)
         self._layout.addWidget(self._result_label, alignment=Qt.AlignHCenter)
         self._layout.addStretch()
+
+    def _get_button_layout(self) -> QVBoxLayout:
+        layout = super(MaximumMinimumComponent, self)._get_button_layout()
+
+        button_option_layout = self._get_button_option_layout()
+
+        layout.addStretch()
+        layout.addLayout(button_option_layout)
+        layout.addStretch()
+        return layout
+
+    def _get_button_option_layout(self) -> QHBoxLayout:
+        layout = QHBoxLayout()
+        self._delete_point_button = self._get_delete_point_button()
+        layout.addWidget(self._delete_point_button, alignment=Qt.AlignRight | Qt.AlignVCenter)
+        layout.addStretch()
+
+        return layout
+
+    def _get_delete_point_button(self) -> QPushButton:
+        icon = IconFactory.get_icon_widget(image_name='minus.png')
+        return ButtonFactory.get_button_component(
+            title='', function_to_connect=self._on_click_delete_point_button, primary_button=True, icon=icon,
+            icon_size=60, tooltip='Eliminar el último punto añadido', is_disable=True
+        )
+
+    def _on_click_delete_point_button(self):
+        if self._point_items_added:
+            plot_items = self._point_items_added.pop()
+            for plot_item in plot_items:
+                self._plot_widget.removeItem(plot_item)
+
+            if not self._point_items_added:
+                self._delete_point_button.setDisabled(True)
 
     def _on_click_validation_button(self):
         self._validate_exercise(expression_selected=self._answers_by_point_type)
@@ -142,17 +179,25 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         color_point = self._point_info_by_point_type[point_type]
 
         if point_to_draw.x is not None and point_to_draw.y is not None:
-            PlotFactory2.set_points(graph=self._plot_widget, points=[point_to_draw], color=color_point)
+            plot_items = PlotFactory2.set_points(graph=self._plot_widget, points=[point_to_draw], color=color_point)
             self._answers_by_point_type[point_type].append(point_to_draw.serialize())
 
             text_point = str(point_to_draw)
             point_to_draw.y = point_to_draw.y - 0.15
-            PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color_point, text_point))])
+            label_one = PlotFactory2.set_labels2(graph=self._plot_widget,
+                                                 points=[(point_to_draw, (color_point, text_point))])
 
-            point_to_draw.y = point_to_draw.y - 0.2
-            PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color_point, point_type))])
+            point_to_draw.y = point_to_draw.y - 0.35
+            label_two = PlotFactory2.set_labels2(graph=self._plot_widget,
+                                                 points=[(point_to_draw, (color_point, point_type))])
+            plot_items.append(label_one[0])
+            plot_items.append(label_two[0])
+            self._point_items_added.append(plot_items)
+
         self._update_with_constant_points(y_constant=y_constant, x_range_for_y=x_range_for_y, point_type=point_type,
                                           color=color_point)
+        if self._point_items_added:
+            self._delete_point_button.setDisabled(False)
         self._point_selection_dialog.close()
         self._point_selection_dialog = None
 
@@ -185,7 +230,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
 
         if x_points:
             self._answers_by_point_type[point_type].extend(nums)
-            PlotFactory2.set_graph_using_points(
+            plot_item = PlotFactory2.set_graph_using_points(
                 graph=self._plot_widget, x_values=x_points, y_values=y_points, function_width=5, color=color
             )
             positive_shift = ['máximo absoluto', 'máximo relativo']
@@ -193,28 +238,32 @@ class MaximumMinimumComponent(InverseSelectionComponent):
 
             point_to_draw = Point(x_points[len(x_points) // 2], y_points[len(x_points) // 2] + label_shift)
             point_to_draw.y = point_to_draw.y - 0.15
-            PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color, f'{x_range_for_y}'))])
+            label_one = PlotFactory2.set_labels2(graph=self._plot_widget,
+                                                 points=[(point_to_draw, (color, f'{x_range_for_y}'))])
 
-            point_to_draw.y = point_to_draw.y - 0.2
-            PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color, point_type))])
+            point_to_draw.y = point_to_draw.y - 0.35
+            label_two = PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color, point_type))])
+            self._point_items_added.append([plot_item, label_one[0], label_two[0]])
 
     def _close_dialog(self):
         self._point_selection_dialog = None
 
     def _validate_exercise(self, expression_selected: Union[dict, str], is_resume: bool = False):
-        super(InverseSelectionComponent, self)._validate_exercise(expression_selected=str(dict(expression_selected)),
+        if expression_selected == '{}':
+            expression_selected_translated = '{}'
+            expression_selected = defaultdict(list)
+        else:
+            expression_selected_translated = \
+                str(eval(expression_selected)) if not isinstance(expression_selected, defaultdict) \
+                    else str(dict(expression_selected))
+        super(InverseSelectionComponent, self)._validate_exercise(expression_selected=expression_selected_translated,
                                                                   is_resume=is_resume)
-        expression_selected = dict(expression_selected)
+        expression_selected = dict(expression_selected) if isinstance(expression_selected, defaultdict) \
+            else eval(expression_selected)
         correct_expression = self._get_correct_expression()
         self._resolved = True
         self._coordinates_label.setVisible(False)
-        # is_answer_correct = self._is_exercise_correct(expression_selected=str(dict(expression_selected)))
-        # if not is_answer_correct:
-        #     PlotFactory2.reset_graph(self._plot_widget)
-        #     PlotFactory2.set_functions(
-        #         graph=self._plot_widget, functions=self._exercise.get_main_function(), function_width=5, color='white',
-        #         show_limits=self._show_main_function_limits, click_function=self._on_function_to_draw_click
-        #     )
+
         wrong_points_by_y_point_type = defaultdict(list)
         missing_points_by_y_point_type = defaultdict(list)
         for point_type, points in expression_selected.items():
@@ -222,7 +271,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
                 continue
 
             for point in points:
-                if point not in correct_expression[point_type]:
+                if correct_expression[point_type] is None or point not in correct_expression[point_type]:
                     key = (point[1], point_type)
                     wrong_points_by_y_point_type[key].append(point[0])
 
@@ -238,14 +287,14 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._setup_wrong(wrong_points_by_y_point_type=wrong_points_by_y_point_type,
                           missing_points_by_y_point_type=missing_points_by_y_point_type)
 
-        if self._is_exercise_correct(expression_selected=str(dict(expression_selected))):
+        if self._is_exercise_correct(expression_selected=expression_selected_translated):
             self._setup_correct_response()
         else:
             self._setup_wrong_response()
 
     def _set_point_on_validating(self, point: Point, point_type: str, validation_type: str):
         point_color_text_by_validation_type = {
-            'wrong': ('red', 'Incorrecto. '),
+            'wrong': ('yellow', 'Incorrecto. '),
             'missing': ('orange', 'No seleccionado. '),
             'correct': ('green', 'Correcto. '),
         }
@@ -258,7 +307,7 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         point_to_draw.y = point_to_draw.y - 0.15
         PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color_point, text_point))])
 
-        point_to_draw.y = point_to_draw.y - 0.2
+        point_to_draw.y = point_to_draw.y - 0.35
         PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, (color_point, point_type))])
 
     def _setup_correct_response(self, *args, **kwargs):
@@ -267,7 +316,8 @@ class MaximumMinimumComponent(InverseSelectionComponent):
         self._result_label.setVisible(True)
 
     def _setup_wrong_response(self, *args, **kwargs):
-        self._result_label.setText('Incorrecto.')
+        self._result_label.setText('Incorrecto. En naranja se muestran los puntos que faltan, en amarillo los puntos'
+                                   ' equivocado.')
         self._result_label.setStyleSheet('color: red;')
         self._result_label.setVisible(True)
 
@@ -298,12 +348,23 @@ class MaximumMinimumComponent(InverseSelectionComponent):
                     y_points = [y_value] * len(x_group)
                     PlotFactory2.set_graph_using_points(
                         graph=self._plot_widget, x_values=x_group, y_values=y_points, function_width=5,
-                        color='red'
+                        color='yellow'
                     )
+                    # positive_shift = ['máximo absoluto', 'máximo relativo']
+                    # label_shift = 0.7 if point_type in positive_shift else - 0.7
+                    #
+                    # point_to_draw = Point(x_group[len(x_group) // 2], y_points[len(x_group) // 2] + label_shift)
+                    # point_to_draw.y = point_to_draw.y - 0.15
+                    # PlotFactory2.set_labels2(graph=self._plot_widget,
+                    #                          points=[(point_to_draw, ('yellow', f'{x_range_for_y}'))])
+                    #
+                    # point_to_draw.y = point_to_draw.y - 0.35
+                    # PlotFactory2.set_labels2(graph=self._plot_widget,
+                    #                          points=[(point_to_draw, ('yellow', point_type))])
 
             elif len(wrong_points) == 1:
                 point = Point(x=wrong_points[0], y=y_value)
-                self._set_point_on_validating(point=point, point_type=point_type, validation_type='missing')
+                self._set_point_on_validating(point=point, point_type=point_type, validation_type='wrong')
 
         for key, missing_points in missing_points_by_y_point_type.items():
             y_value, point_type = key
@@ -338,12 +399,20 @@ class MaximumMinimumComponent(InverseSelectionComponent):
                     label_shift = 0.7 if point_type in positive_shift else -0.2
 
                     point_to_draw = Point(x_group[len(x_group) // 2], y_value + label_shift)
-                    point_to_draw.y = point_to_draw.y - 0.15
-                    PlotFactory2.set_labels2(
-                        graph=self._plot_widget,
-                        points=[(point_to_draw, ('orange', f'[{x_group[0]}, {x_group[-1]}]'))])
-
                     point_to_draw.y = point_to_draw.y - 0.2
+                    first_value_rounded = round(x_group[0])
+                    last_value_rounded = round(x_group[-1])
+                    if len(x_group) > 1:
+                        first_limit = f'[{x_group[0]}' if x_group[0] == first_value_rounded \
+                            else f'({float(first_value_rounded)}'
+                        last_limit = f'{x_group[-1]}]' if x_group[-1] == last_value_rounded \
+                            else f'{float(last_value_rounded)})'
+                        label = f'{first_limit}, {last_limit}'
+                    else:
+                        label = f'({x_group[0]}, {y_value})'
+                    PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, ('orange', label))])
+
+                    point_to_draw.y = point_to_draw.y - 0.35
                     PlotFactory2.set_labels2(graph=self._plot_widget, points=[(point_to_draw, ('orange', point_type))])
 
             elif len(missing_points) == 1:

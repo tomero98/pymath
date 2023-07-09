@@ -211,6 +211,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         for region_item in self._linear_region_items:
             region_item.setMovable(False)
 
+        self._create_range_button.setDisabled(True)
+
     def _setup_range_selection_dialog(self, domain_expression: str = ''):
         self._range_selection_dialog = RangeSelectionDialog(
             plot_range=[self._exercise.plot_range[0], self._exercise.plot_range[1]], ranges_added=[],
@@ -407,6 +409,8 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
         self._result_label.setVisible(True)
 
         if expression_selected:
+            self._result_label.setText(f'{text}\n Utiliza los botones ubicados a la derecha de la gráfica para ver la'
+                                       f' respuesta correcta.')
             self._user_input_button.setVisible(True)
             self._user_input_button.setDisabled(True)
             self._on_click_show_user_input()
@@ -415,7 +419,7 @@ class DomainDefinitionComponent(GraphInteractionValidationComponent):
             self._on_click_show_resume_input()
 
     def _get_error_label_text(self, correct_response: str) -> str:
-        return f'Incorrecto. El dominio de la función es el siguiente: {correct_response}'
+        return f'Incorrecto. El dominio de la función es el siguiente: {correct_response}.'
 
     def _is_exercise_correct(self, expression_selected: str) -> bool:
         is_correct, _, _ = self._exercise.validate_domain_expression(user_domain_input=expression_selected)

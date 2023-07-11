@@ -125,7 +125,6 @@ class GraphInteractionValidationComponent(Component):
         layout = QHBoxLayout()
 
         layout.addWidget(self._info_button, alignment=Qt.AlignTop)
-        layout.addWidget(self._help_button, alignment=Qt.AlignTop)
         layout.addStretch()
 
         return layout

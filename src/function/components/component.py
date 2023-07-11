@@ -91,10 +91,12 @@ class Component(QWidget):
 
     def _get_help_button(self) -> QPushButton:
         icon = IconFactory.get_icon_widget(image_name='question.png')
-        return ButtonFactory.get_button_component(
+        button = ButtonFactory.get_button_component(
             title='', function_to_connect=self._setup_question_data, secondary_button=True, icon=icon, icon_size=45,
             tooltip='Ayuda sobre el ejercicio'
         )
+        button.setVisible(False)
+        return button
 
     def _setup_question_data(self):
         if not self._video_dialog:

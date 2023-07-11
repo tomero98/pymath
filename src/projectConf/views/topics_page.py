@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayo
 
 from ..components import Window
 from ..components.topic_setting_dialog import TopicSettingDialog
+from ..components.user_stats_dialog import UserStatsDialog
 from ..data_mappers import TopicDataMapper
 from ..factories import ButtonFactory, LabelFactory
 from ..factories.icon_factory import IconFactory
@@ -26,6 +27,7 @@ class TopicPage(Window):
         self._user_button: QPushButton = None  # noqa
         self._topic_setting_dialog: TopicSettingDialog = None  # noqa
         self._topic_buttons: List[QWidget] = []
+        self._user_stats_dialog: UserStatsDialog = None  # noqa
 
     def draw(self, *args, **kwargs):
         main_window = QWidget()
@@ -47,7 +49,31 @@ class TopicPage(Window):
         self.show()
 
     def _setup_user_stats(self):
-        pass
+        if not self._user_stats_dialog:
+            self._user_stats_dialog = UserStatsDialog()
+            self._user_stats_dialog.close_signal.connect(self._close_user_stats_dialog)
+            self._user_stats_dialog.draw()
+
+            for button in self._setting_buttons:
+                button.setDisabled(True)
+
+            for button in self._topic_buttons:
+                button.setDisabled(True)
+
+            self._user_button.setDisabled(True)
+
+    def _close_user_stats_dialog(self):
+        if self._user_stats_dialog:
+            self._user_stats_dialog.close()
+            self._user_stats_dialog = None
+
+        for button in self._setting_buttons:
+            button.setDisabled(False)
+
+        for button in self._topic_buttons:
+            button.setDisabled(False)
+
+        self._user_button.setDisabled(False)
 
     @pyqtSlot()
     def _get_topic_buttons(self) -> List[QWidget]:

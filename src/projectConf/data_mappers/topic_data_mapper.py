@@ -84,10 +84,10 @@ class TopicDataMapper:
             DatabaseAccessSingleton.execute_save_exercise_setting(topic_id=topic.id, exercise_setting=exercise_setting)
 
     @classmethod
-    def get_resume_exercises(cls) -> dict:
+    def get_resume_exercises(cls) -> defaultdict:
         result = DatabaseAccessSingleton.get_resume_result()
 
-        resume_by_step_type_by_exercise_type = defaultdict(lambda: defaultdict(list))
+        resume_by_step_type = defaultdict(list)
 
         while result.next():
             step_type = result.value('step_type')
@@ -95,5 +95,5 @@ class TopicDataMapper:
             resume = Resume(resume_id=result.value('id'), is_correct=bool(result.value('is_correct')),
                             step_type=step_type, response=result.value('response'),
                             exercise_id=exercise_id, graph_id=result.value('graph_id'))
-
-        return resume_by_step_type_by_exercise_type
+            resume_by_step_type[step_type].append(resume)
+        return resume_by_step_type

@@ -46,8 +46,8 @@ class WelcomePage(Window):
 
     @staticmethod
     def _get_logo_widget() -> QLabel:
-        logo_widget = LabelFactory.get_label_image_component(image_name='uva_logo.jpg', align=Qt.AlignHCenter,
-                                                             width=275, height=275)
+        logo_widget = LabelFactory.get_label_image_component(image_name='uva_logo2.png', align=Qt.AlignHCenter,
+                                                             width=600, height=600)
         return logo_widget
 
     def _get_enter_button(self) -> QPushButton:
@@ -70,7 +70,7 @@ class WelcomePage(Window):
     @staticmethod
     def _set_layout(layout: QVBoxLayout, title_widget: QLabel, subtitle_widget: QLabel, logo_widget: QLabel,
                     enter_button: QPushButton, footer_layout: QVBoxLayout):
-        layout.setContentsMargins(0, 25, 0, 0)
+        layout.setContentsMargins(0, 70, 0, 0)
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         layout.addWidget(title_widget)
         layout.addSpacing(10)
@@ -82,7 +82,6 @@ class WelcomePage(Window):
         layout.addSpacing(65)
         layout.addLayout(footer_layout)
         layout.addStretch()
-        layout.addSpacing(10)
 
     def keyPressEvent(self, e):
         if e.key() in (Qt.Key_Return, Qt.Key_Enter):

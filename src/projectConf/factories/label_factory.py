@@ -44,5 +44,5 @@ class LabelFactory:
 
     @staticmethod
     def _get_image_path(image_name: str) -> str:
-        image_path = str(Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.joinpath(f'media/{image_name}'))
+        image_path = str(Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.joinpath(f'media/images/{image_name}'))
         return image_path

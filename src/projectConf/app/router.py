@@ -18,11 +18,7 @@ class Router:
         self._app = PyMathApp(sys_argv=[])
 
     def _start_app_flow(self):
-        # self._setup_exercise_page(
-        #     topic=Topic(identifier=1, title='Gráficas inversas', description='Ejercicios sobre funciones')
-        # )
-        # self._setup_front_page()
-        self._setup_topic_page()
+        self._setup_front_page()
 
     def _setup_front_page(self):
         front_page = WelcomePage()

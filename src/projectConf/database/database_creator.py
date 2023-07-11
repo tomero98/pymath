@@ -142,6 +142,26 @@ class DatabaseCreator:
 
             # Inverse exercises
             {'exercise_type': 'InverseGraphExercise', 'domain': '-5, 5', 'topic_id': 1},  # 43
+
+            # Maximum exercises
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-3, 3', 'topic_id': 4},  # 44
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-3, 3', 'topic_id': 4},  # 45
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 46
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 47
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 48
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-3, 3', 'topic_id': 4},  # 49
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 50
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 51
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 52
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 53
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-4, 4', 'topic_id': 4},  # 54
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-4, 4', 'topic_id': 4},  # 55
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 56
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 57
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 58
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 59
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 60
+            {'exercise_type': 'MaximumMinimumExercise', 'domain': '-5, 5', 'topic_id': 4},  # 61
         ]
 
         sql_query.prepare(
@@ -402,8 +422,8 @@ class DatabaseCreator:
             {'exercise_id': 24, 'graph_id': 48, 'domain': '(0, +inf)', 'is_main_graphic': 1},  # 47
             {'exercise_id': 25, 'graph_id': 49, 'domain': '(-3, 0]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 25, 'graph_id': 48, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
-            {'exercise_id': 26, 'graph_id': 50, 'domain': '(-inf, 2]', 'is_main_graphic': 1},  # 47
-            {'exercise_id': 26, 'graph_id': 51, 'domain': '(2, 4]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 26, 'graph_id': 50, 'domain': '(-inf, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 26, 'graph_id': 51, 'domain': '[2, 4]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 27, 'graph_id': 52, 'domain': '(-2, 1]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 27, 'graph_id': 51, 'domain': '(2, 3]', 'is_main_graphic': 1},  # 47
             {'exercise_id': 28, 'graph_id': 53, 'domain': '(-1, 2]', 'is_main_graphic': 1},  # 47
@@ -442,6 +462,43 @@ class DatabaseCreator:
 
             # Inverse exercise
             {'exercise_id': 43, 'graph_id': 63, 'domain': '(-3, 3)', 'is_main_graphic': 1},  # 48
+
+            # Maximum exercises
+            {'exercise_id': 44, 'graph_id': 1, 'domain': '(-inf, +inf)', 'is_main_graphic': 1},  # 49
+            {'exercise_id': 45, 'graph_id': 1, 'domain': '(-inf, +inf)', 'is_main_graphic': 1},  # 50
+            {'exercise_id': 46, 'graph_id': 48, 'domain': '(-3, 3)', 'is_main_graphic': 1},  # 51
+            {'exercise_id': 47, 'graph_id': 48, 'domain': '(-3, 3)', 'is_main_graphic': 1},  # 52
+            {'exercise_id': 48, 'graph_id': 48, 'domain': '(-3, 3)', 'is_main_graphic': 1},  # 53
+            {'exercise_id': 49, 'graph_id': 2, 'domain': '(-inf, +inf)', 'is_main_graphic': 1},  # 54
+
+            {'exercise_id': 50, 'graph_id': 1, 'domain': '[-2, 2]', 'is_main_graphic': 1},  # 55
+            {'exercise_id': 51, 'graph_id': 63, 'domain': '[-2, 2]', 'is_main_graphic': 1},  # 55
+
+            {'exercise_id': 52, 'graph_id': 49, 'domain': '[-3, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 52, 'graph_id': 49, 'domain': '(-2, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 52, 'graph_id': 49, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 53, 'graph_id': 49, 'domain': '[-3, -2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 53, 'graph_id': 49, 'domain': '(-2, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 53, 'graph_id': 49, 'domain': '(2, +inf)', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 54, 'graph_id': 49, 'domain': '(-3, 0]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 54, 'graph_id': 48, 'domain': '(0, 3)', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 55, 'graph_id': 49, 'domain': '[-3, 0)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 55, 'graph_id': 48, 'domain': '[0, 2]', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 56, 'graph_id': 60, 'domain': '(-inf, 1)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 57, 'graph_id': 60, 'domain': '(-inf, 1]', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 58, 'graph_id': 63, 'domain': '[-2, 2]', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 59, 'graph_id': 50, 'domain': '(-inf, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 59, 'graph_id': 51, 'domain': '[2, 4]', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 60, 'graph_id': 50, 'domain': '(-inf, 2)', 'is_main_graphic': 1},  # 47
+            {'exercise_id': 60, 'graph_id': 51, 'domain': '(2, 4)', 'is_main_graphic': 1},  # 47
+
+            {'exercise_id': 61, 'graph_id': 5, 'domain': '[0, 4)', 'is_main_graphic': 1},  # 47
 
         ]
 
@@ -485,7 +542,17 @@ class DatabaseCreator:
             # Points
             {'exercise_id': 22, 'x_value': 4, 'y_value': 0, 'is_included': 1},  # 1
             {'exercise_id': 22, 'x_value': 4, 'y_value': 4, 'is_included': 0},  # 2
-        ]
+            {'exercise_id': 45, 'x_value': 0, 'y_value': 0, 'is_included': 0},  # 3
+            {'exercise_id': 45, 'x_value': 0, 'y_value': 1, 'is_included': 1},  # 3
+            {'exercise_id': 47, 'x_value': -3, 'y_value': 3, 'is_included': 1},  # 4
+            {'exercise_id': 47, 'x_value': -3, 'y_value': -1, 'is_included': 0},  # 4
+            {'exercise_id': 48, 'x_value': 3, 'y_value': -4, 'is_included': 1},  # 5
+            {'exercise_id': 48, 'x_value': 3, 'y_value': -1, 'is_included': 0},  # 6
+            {'exercise_id': 50, 'x_value': 0, 'y_value': 0, 'is_included': 0},  # 3
+            {'exercise_id': 50, 'x_value': 0, 'y_value': 1, 'is_included': 1},  # 3
+            {'exercise_id': 53, 'x_value': -2, 'y_value': -3, 'is_included': 1},  # 3
+            {'exercise_id': 53, 'x_value': 2, 'y_value': -3, 'is_included': 1},  # 3
+       ]
 
         sql_query = QSqlQuery()
         sql_query.prepare(

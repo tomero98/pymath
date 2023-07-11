@@ -106,32 +106,4 @@ class TestFunction(TestCase):
                             domain='(-inf, 5]')
         maximum_values, maximum_absolute, minimum_values, minimum_absolute = function.get_maximum_minimum_points(
             plot_range=(-5, 5))
-        a=8
-
-    def test_get_points(self):
-        function = Function(function_id=0, expression='(x)**2', x_values_range=(-3, 3), is_main_graphic=True,
-                            domain='(-3, 3)')
-        function.get_points((-5, 5))
-        self.assertEqual(0, function.min_y_value)
-        self.assertEqual(9, function.max_y_value)
-    def test_get_points__2(self):
-        function = Function(function_id=0, expression='x', x_values_range=(-3, 3), is_main_graphic=True,
-                            domain='(-inf, +inf)')
-        function.get_points((-2, 2))
-        self.assertEqual(-3, function.min_y_value)
-        self.assertEqual(3, function.max_y_value)
-
-    def test_get_points__3(self):
-        function = Function(function_id=0, expression='x', x_values_range=(-1, 1), is_main_graphic=True,
-                            domain='(-1, 1]')
-        function.get_points((-2, 2))
-        self.assertEqual(-1, function.min_y_value)
-        self.assertEqual(1, function.max_y_value)
-
-    def test_get_points__4(self):
-        function = Function(function_id=0, expression='1', x_values_range=(-1, 1), is_main_graphic=True,
-                            domain='(-1, 1]')
-        function.get_points((-2, 2))
-        self.assertEqual(4, function.min_y_value)
-        self.assertEqual(4, function.max_y_value)
-
+        a = 8

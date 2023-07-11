@@ -55,7 +55,7 @@ class FunctionExercise:
         sorted_functions = []
         constant_functions = []
         for function in functions:
-            if function.expression.isdigit():
+            if function.expression.lstrip('-+').isdigit():
                 constant_functions.append(function)
             else:
                 sorted_functions.append(function)
@@ -109,10 +109,21 @@ class FunctionExercise:
             if is_maximum_value:
                 maximum_minimum_points_by_type['maximum'].append(point)
 
+        if not all_points_by_x_value:
+            all_points_by_x_value.update(included_points_by_x_value)
+
         self._constant_functions_max_min_points(
             constant_functions=constant_functions, all_points_by_x_value=all_points_by_x_value,
             max_points=max_points, min_points=min_points, maximum_minimum_points_by_type=maximum_minimum_points_by_type
         )
+
+        if len(all_points_by_x_value) == len(included_points_by_x_value):
+            for point in included_points_by_x_value.values():
+                if point not in max_points and point in maximum_minimum_points_by_type['maximum']:
+                    maximum_minimum_points_by_type['maximum'].remove(point)
+
+                if point not in min_points and point in maximum_minimum_points_by_type['minimum']:
+                    maximum_minimum_points_by_type['minimum'].remove(point)
 
         maximum_relative_points = [
             (point[0], point[1])
@@ -186,14 +197,16 @@ class FunctionExercise:
             elif max_points[0][1] == first_point[1]:
                 max_points.extend(const_max_points)
             elif max_points[0][1] < first_point[1]:
-                max_points = const_max_points
+                max_points.clear()
+                max_points.extend(const_max_points)
 
             if not min_points:
                 min_points.extend(const_min_points)
             elif min_points[0][1] == first_point[1]:
                 min_points.extend(const_min_points)
             elif min_points[0][1] > first_point[1]:
-                min_points = const_min_points
+                min_points.clear()
+                min_points.extend(const_min_points)
 
     def validate_domain_expression(self, user_domain_input: str) -> [bool, set]:
         exercise_domain = self.get_domain_expression()
